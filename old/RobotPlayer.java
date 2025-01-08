@@ -1,4 +1,4 @@
-package BBBBBexample;
+package old;
 
 import battlecode.common.*;
 
