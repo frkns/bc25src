@@ -11,6 +11,8 @@ SOURCE_DIR=$1
 SOURCE_NAME=$(basename "$SOURCE_DIR")
 DEST_DIR=$2
 
+rm -r "$DEST_DIR"
+
 # Copy the source directory to the destination in pwd
 cp -r "$SOURCE_DIR" "$DEST_DIR"
 

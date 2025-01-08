@@ -5,6 +5,7 @@ import battlecode.common.*;
 //phase 1 for soldiers
 //spread out and build cash towers
 public class Splashers extends RobotPlayer{
+    static int nearestPaintTowerDistance = 999999;
     static MapLocation nearestPaintTower = null;
     public static MapLocation target;
 
@@ -25,9 +26,9 @@ public class Splashers extends RobotPlayer{
                 if (robot.getType() == UnitType.LEVEL_ONE_PAINT_TOWER
                     || robot.getType() == UnitType.LEVEL_TWO_PAINT_TOWER
                     || robot.getType() == UnitType.LEVEL_THREE_PAINT_TOWER) {
-                    if (nearestPaintTower == null ||
-                        rc.getLocation().distanceSquaredTo(robot.getLocation()) < rc.getLocation().distanceSquaredTo(nearestPaintTower)) {
+                    if (robot.getLocation().distanceSquaredTo(rc.getLocation()) < nearestPaintTowerDistance) {
                         nearestPaintTower = robot.getLocation();
+                        nearestPaintTowerDistance = robot.getLocation().distanceSquaredTo(rc.getLocation());
                     }
                 }
             }
@@ -37,10 +38,10 @@ public class Splashers extends RobotPlayer{
         if (nearestPaintTower != null && paint < 70) {
             rc.setIndicatorString("Getting some paint!");
             int mxPaint = rc.getType().paintCapacity;
+            System.out.println("mxpaint: " + mxPaint);
             int amt = mxPaint - paint;
             if (rc.canTransferPaint(nearestPaintTower, -1 * amt)) {
                 rc.transferPaint(nearestPaintTower, -1 * amt);
-                System.out.println("Transferred " + amt + " paint!!!");
             }
             target = nearestPaintTower;
         } else
