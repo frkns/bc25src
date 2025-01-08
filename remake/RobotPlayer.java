@@ -9,6 +9,7 @@ public class RobotPlayer {
     public static void run(RobotController r) throws GameActionException {
         rc = r;
         Utils.init(rc);
+        UnitFuncs.init(rc);
 
         while (true) {
             if (rc.getRoundNum() < 200) {
@@ -18,11 +19,19 @@ public class RobotPlayer {
             }
             try {
                 // Move switch statements into phases
-                switch (rc.getType()){
-                    case SOLDIER: UnitFuncs.runSoldier(rc); break;
-                    case MOPPER: UnitFuncs.runMopper(rc); break;
-                    case SPLASHER: UnitFuncs.runSplasher(rc); break;
-                    default: TowerFuncs.runTower(rc); break;
+                switch (rc.getType()) {
+                    case SOLDIER:
+                        UnitFuncs.runSoldier();
+                        break;
+                    case MOPPER:
+                        UnitFuncs.runMopper();
+                        break;
+                    case SPLASHER:
+                        UnitFuncs.runSplasher();
+                        break;
+                    default:
+                        TowerFuncs.runTower(rc);
+                        break;
                 }
             } catch (GameActionException e) {
                 System.out.println("GameActionException");
