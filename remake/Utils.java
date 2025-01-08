@@ -4,7 +4,6 @@ import java.util.Random;
 import battlecode.common.*;
 
 
-
 public class Utils {
     private static RobotController rc;
 
@@ -41,17 +40,4 @@ public class Utils {
         SPAWN_LOCATION = rc.getLocation();
     }
 
-
-
-
-    // other stuffs that i copied
-
-    public static boolean isInMap(MapLocation loc) {
-        return (loc.x >= 0 && loc.x < MAP_WIDTH && loc.y >= 0 && loc.y < MAP_HEIGHT);
-    }
-
-    // misc
-    public static boolean isBitOne(int value, int LSBpos) {
-        return (((value >> LSBpos) & 1) == 1);
-    }
 }
