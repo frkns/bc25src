@@ -1,4 +1,4 @@
-package kenny;
+package temp;
 
 import battlecode.common.*;
 
@@ -140,8 +140,7 @@ public class RobotPlayer {
                 if(r > 55) {
                     nextBot = 1;
                 } else if (r > 40){
-                    // nextBot = 0;
-                    nextBot = 2;
+                    nextBot = 0;
                 } else {
                     nextBot = 2;
                 }
