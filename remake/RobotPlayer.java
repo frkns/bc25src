@@ -4,11 +4,18 @@ import battlecode.common.*;
 
 public class RobotPlayer {
     static RobotController rc;
+    static int PHASE = 1;
+
     public static void run(RobotController r) throws GameActionException {
         rc = r;
         Utils.init(rc);
 
         while (true) {
+            if (rc.getRoundNum() < 200) {
+                PHASE = 1;
+            } else if (true) {
+                PHASE = 2;
+            }
             try {
                 // Move switch statements into phases
                 switch (rc.getType()){
