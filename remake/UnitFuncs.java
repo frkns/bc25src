@@ -8,7 +8,7 @@ class UnitFuncs extends RobotPlayer {
     static final Random rng = new Random(0);
 
     static RobotController rc;
-    static UnitType bunny_t;
+    static UnitType bunnyType;
 
     static Direction direction;
     static MapLocation target;
@@ -18,7 +18,7 @@ class UnitFuncs extends RobotPlayer {
 
     static void init(RobotController r) throws GameActionException {
         rc = r;
-        bunny_t = rc.getType();
+        bunnyType = rc.getType();
     }
 
     /** SOLDIER */
@@ -45,11 +45,12 @@ class UnitFuncs extends RobotPlayer {
         if (mypaint < 40) {
             // we should path to nearestPaintTower
             if (nearestPaintTower != null) {
-                int amt = bunny_t.paintCapacity - mypaint;
+                int amt = bunnyType.paintCapacity - mypaint;
                 if (rc.canTransferPaint(nearestPaintTower, -1 * amt)) {
                     rc.transferPaint(nearestPaintTower, -1 * amt);
                 }
                 target = nearestPaintTower;
+                PathFinder.move(rc, target);
             }
         } else {
             // set regualr target
