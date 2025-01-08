@@ -3,11 +3,11 @@ package remake;
 import battlecode.common.*;
 
 public class RobotPlayer {
-    static RobotController rc;
     static int PHASE = 1;
 
-    public static void run(RobotController r) throws GameActionException {
-        rc = r;
+    public static void run(RobotController rc) throws GameActionException {
+        Debug.init(rc);
+        PathFinder.init(rc);
         Utils.init(rc);
         UnitFuncs.init(rc);
 

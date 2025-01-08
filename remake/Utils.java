@@ -4,8 +4,8 @@ import java.util.Random;
 import battlecode.common.*;
 
 
-public class Utils {
-    private static RobotController rc;
+class Utils extends RobotPlayer {
+    static RobotController rc;
 
     static Random rng;
 
@@ -15,6 +15,17 @@ public class Utils {
     static int MAP_HEIGHT;
     static int MAP_AREA;
     static MapLocation SPAWN_LOCATION;
+    static boolean DEBUG_FAIL_FAST = false;
+
+    static void init(RobotController r) throws GameActionException{
+        rc = r;
+        rng = new Random(rc.getRoundNum() * 1007 + rc.getID() * 1009);
+
+        MAP_HEIGHT = rc.getMapHeight();
+        MAP_WIDTH = rc.getMapWidth();
+        MAP_AREA = MAP_HEIGHT * MAP_WIDTH;
+        SPAWN_LOCATION = rc.getLocation();
+    }
 
     static MapLocation mirror(MapLocation loc) {
         return new MapLocation(MAP_WIDTH - loc.x - 1, MAP_HEIGHT - loc.y - 1);
@@ -30,14 +41,9 @@ public class Utils {
         return new MapLocation(Math.min(Math.max(0, loc.x), MAP_WIDTH-1), Math.min(Math.max(0, loc.y), MAP_HEIGHT-1));
     }
 
-    static void init(RobotController r) {
-        rc = r;
-        rng = new Random(rc.getRoundNum() * 1007 + rc.getID() * 1009);
 
-        MAP_HEIGHT = rc.getMapHeight();
-        MAP_WIDTH = rc.getMapWidth();
-        MAP_AREA = MAP_HEIGHT * MAP_WIDTH;
-        SPAWN_LOCATION = rc.getLocation();
+    static int distance(MapLocation A, MapLocation B) {
+        return Math.max(Math.abs(A.x - B.x), Math.abs(A.y - B.y));
     }
 
 }
