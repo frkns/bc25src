@@ -20,19 +20,18 @@ public class Splashers extends RobotPlayer{
         int distance = 0;
         RobotInfo curBot = null;
 
-
         for (RobotInfo robot : nearbyRobots){
             if (robot.getTeam() == rc.getTeam()) {
                 if (robot.getType() == UnitType.LEVEL_ONE_PAINT_TOWER
                     || robot.getType() == UnitType.LEVEL_TWO_PAINT_TOWER
                     || robot.getType() == UnitType.LEVEL_THREE_PAINT_TOWER) {
-                    if (robot.getLocation().distanceSquaredTo(rc.getLocation()) < nearestPaintTowerDistance) {
+                    if (nearestPaintTower == null || rc.getLocation().distanceSquaredTo(robot.getLocation()) < rc.getLocation().distanceSquaredTo(nearestPaintTower)) {
                         nearestPaintTower = robot.getLocation();
-                        nearestPaintTowerDistance = robot.getLocation().distanceSquaredTo(rc.getLocation());
                     }
                 }
             }
         }
+
 
         int paint = rc.getPaint();
         if (nearestPaintTower != null && paint < 70) {
