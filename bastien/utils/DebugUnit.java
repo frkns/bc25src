@@ -14,6 +14,7 @@ public class DebugUnit {
 
     public static boolean debug = true;
     private static RobotController rc;
+    static int lastByteCodeClockDebuged;
 
     public static void init(){
         rc = Robot.rc;
@@ -32,6 +33,7 @@ public class DebugUnit {
             lastBytecode[i] = 0;
             lastRound[i] = turn;
         }
+        lastByteCodeClockDebuged = 0;
     }
 
     public static void print(int level, String text){
@@ -50,7 +52,9 @@ public class DebugUnit {
             lastBytecode[i] = lastBytecode[level];
         }
 
-        if (cost > 500) {
+        if (Clock.getBytecodeNum() - lastByteCodeClockDebuged> 500) {
+            lastByteCodeClockDebuged = Clock.getBytecodeNum();
+
             System.out.println("%5d | + %5d | ".formatted(Clock.getBytecodeNum(), cost) + indents[level] + text);
         }else{
             System.out.println("%5d |         | ".formatted(Clock.getBytecodeNum()) + indents[level] + text);
