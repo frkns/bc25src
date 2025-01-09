@@ -2,6 +2,8 @@ package old;
 
 import battlecode.common.*;
 
+import java.awt.*;
+
 //phase 2 for soldiers
 //keep spreading out and build paint towers
 public class Phase2 extends RobotPlayer{

@@ -37,6 +37,8 @@ class UnitFuncs extends RobotPlayer {
     // Exploration
     static MapLocation spawnTowerLocation; // location of the tower that spawned me
     static Direction spawnDirection;
+    static MapLocation target;
+
     // Rune filling (SOLDIER ONLY)
     static int state = 0; // 0 = wandering, 1 = filling rune, 2 = filling pattern
 
@@ -248,7 +250,14 @@ class UnitFuncs extends RobotPlayer {
             }
         }
 
-        if (PHASE == 1) {
+        if (target == null || rc.getLocation().distanceSquaredTo(target) < 3) {
+            target = Utils.getRandomInBoundLocation();
+        }
+        if (Utils.outOfExplorationBounds(rc.getLocation())) {
+            target = Utils.getRandomInBoundLocation();
+        }
+
+        if (true) {
             int myPaint = rc.getPaint();
             if (myPaint < lowPaintPercentage * bunnyType.paintCapacity) {
                 if (nearestPaintTower != null) {
@@ -256,13 +265,14 @@ class UnitFuncs extends RobotPlayer {
                     if (rc.canTransferPaint(nearestPaintTower, -1 * amt)) {
                         rc.transferPaint(nearestPaintTower, -1 * amt);
                     }
-                    Pathfinder.move(nearestPaintTower);
+                    target = nearestPaintTower;
                 }
             } else {
                 findRuinAndBuildTower(rc, UnitType.LEVEL_ONE_MONEY_TOWER);
-                explore(/*spawnDirection*/);
+                // explore(/*spawnDirection*/);
             }
         }
+        Pathfinder.move(target, true);
 
     }
 
@@ -276,14 +286,13 @@ class UnitFuncs extends RobotPlayer {
         System.out.println("Running splasher");
     }
 
-    static void explore(/*Direction spawnDirection*/) throws GameActionException {
-        Direction dirToMove = spawnDirection;
-        MapLocation target = rc.getLocation().translate(dirToMove.dx * WIDTH, dirToMove.dy * HEIGHT);
-        if (Utils.outOfExplorationBounds(rc.getLocation())) {
-            target = Utils.getRandomInBoundLocation();
-        }
-        Pathfinder.move(target);
-    }
+    // static void explore(/*Direction spawnDirection*/) throws GameActionException {
+    //     Direction dirToMove = spawnDirection;
+    //     if (Utils.outOfExplorationBounds(rc.getLocation())) {
+    //         target = Utils.getRandomInBoundLocation();
+    //     }
+    //     Pathfinder.move(target);
+    // }
 
     static MapInfo findNearbyRuin(RobotController rc, MapInfo[] nearbyTiles) throws GameActionException {
         return null;
