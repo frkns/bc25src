@@ -7,8 +7,8 @@ import battlecode.common.UnitType;
 import bastien.Robot;
 
 public class Soldier extends Robot {
-    public Soldier(RobotController controlller){
-        super(controlller);
+    public Soldier(RobotController controller){
+        super(controller);
         attackCost = UnitType.SOLDIER.attackCost;
 
 

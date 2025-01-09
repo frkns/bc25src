@@ -6,8 +6,8 @@ import bastien.utils.DebugUnit;
 
 public class Tower extends Robot {
 
-    public Tower(RobotController controlller) {
-        super(controlller);
+    public Tower(RobotController controller) {
+        super(controller);
 
         DebugUnit.debug = false;
         attackCost = 0;

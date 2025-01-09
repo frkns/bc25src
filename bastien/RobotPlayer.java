@@ -45,18 +45,13 @@ public class RobotPlayer {
         turnCount = 0;
     }
 
-    public static void run(RobotController robotController) throws GameActionException {
-        // System.out.println("I'm alive");
-        rc = robotController;
+    public static void run(RobotController r) throws GameActionException {
+        rc = r;  // Assign r to the public static field rc
         resetRobot();
 
         while (true) {
             try {
                 rc.getRoundNum();
-                if(false){
-                    rc.resign();
-                }
-
                 robot.initTurn();
                 robot.playTurn();
                 robot.endTurn();

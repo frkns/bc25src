@@ -6,11 +6,11 @@ import battlecode.common.*;
 import bastien.Robot;
 
 public class Mopper extends Robot {
-    public static MapLocation enemiePaint;
-    public static MapLocation neighbourEnemiePaint;
+    public static MapLocation enemyPaint;
+    public static MapLocation neighbourEnemyPaint;
 
-    public Mopper(RobotController controlller){
-        super(controlller);
+    public Mopper(RobotController controller){
+        super(controller);
         attackCost = UnitType.MOPPER.attackCost;
 
         actions.add(new ActionExplore());

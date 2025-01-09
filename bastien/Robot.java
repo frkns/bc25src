@@ -13,7 +13,7 @@ public abstract class Robot{
     public static int ACTION_PAINT = 30;
     public static int ACTION_EXPLORE = 15;
 
-    // -------------- Attributs --------------
+    // -------------- Attributes --------------
     public static final Direction[] directions = {
             Direction.NORTH,
             Direction.NORTHEAST,
@@ -26,7 +26,6 @@ public abstract class Robot{
     };
 
     public static Random rng = new Random();
-    public static int action_range = 0;
 
     public static RobotController rc;
     static MessageUnit messageUnit;
@@ -38,15 +37,13 @@ public abstract class Robot{
     public static RobotInfo[] enemies;
     public static MapLocation[] ruins;
     public static MapInfo[] marks;
-    public static MapLocation nearestEmptyRuins;
-    public static MapInfo nearestIncorrectMark;
+    public static MapLocation nearestEmptyRuin;
     public static int attackCost = 0;
 
-    // -------------- Methodes --------------
+    // -------------- Methods --------------
     public Robot(RobotController controlller){
         rc = controlller;
         messageUnit = new MessageUnit(this);
-        action_range = rc.getType().actionRadiusSquared;
         DebugUnit.init();
     }
 
@@ -56,34 +53,14 @@ public abstract class Robot{
         ruins = rc.senseNearbyRuins(-1);
         marks = rc.senseNearbyMapInfos(-1);
 
-        nearestEmptyRuins = null;
-        int distanceNeirestRuins = 999;
+        nearestEmptyRuin = null;
+        int nearestRuinDistance = 999;
         for(MapLocation loc: ruins){
             if(!rc.canSenseRobotAtLocation(loc)){ // No tower at the location, empty ruins
-
                 int distance = rc.getLocation().distanceSquaredTo(loc);
-                if(distance < distanceNeirestRuins){
-                    nearestEmptyRuins = loc;
-                    distanceNeirestRuins = distance;
-                }
-            }
-        }
-
-        nearestIncorrectMark = null;
-        int distanceNeirestIncorrectMark = 99;
-        for(MapInfo info: marks){
-            // Color != Mark and Mark is not empty
-            if(!info.getMark().equals(PaintType.EMPTY) && !info.getPaint().equals(info.getMark())){
-
-                // Paint is not enemy or type is mopper
-                if(!info.getPaint().isEnemy()|| rc.getType().equals(UnitType.MOPPER)) {
-
-                    // Paint is nearest
-                    int distance = rc.getLocation().distanceSquaredTo(info.getMapLocation());
-                    if(distance < distanceNeirestIncorrectMark) {
-                        nearestIncorrectMark = info;
-                        distanceNeirestIncorrectMark = distance;
-                    }
+                if(distance < nearestRuinDistance){
+                    nearestEmptyRuin = loc;
+                    nearestRuinDistance = distance;
                 }
             }
         }

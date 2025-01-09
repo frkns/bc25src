@@ -7,8 +7,8 @@ import battlecode.common.UnitType;
 import bastien.Robot;
 
 public class Splasher extends Robot {
-    public Splasher(RobotController controlller){
-        super(controlller);
+    public Splasher(RobotController controller){
+        super(controller);
         attackCost = UnitType.SPLASHER.attackCost;
 
         actions.add(new ActionExplore());
