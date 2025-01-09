@@ -4,9 +4,9 @@ package remake;
 import battlecode.common.*;
 import remake.fast.*;
 
-class PathFinder extends RobotPlayer{
+class Pathfinder extends RobotPlayer{
     static RobotController rc;
-    
+
     static MapLocation target = null;
     static MapLocation stayawayFrom = null;
     static int stuckCnt;
@@ -15,16 +15,21 @@ class PathFinder extends RobotPlayer{
         rc = r;
     }
 
-    static void tryMove(Direction dir) throws GameActionException {
+    static void tryMove(Direction dir, boolean allowAttack) throws GameActionException {
         if (dir == Direction.CENTER)
             return;
         if (rc.canMove(dir)) {
             rc.move(dir);
-        // TODO paint tile before moving onto it
+        }
+        MapLocation myLoc = rc.getLocation();
+        if (allowAttack && rc.senseMapInfo(myLoc).getPaint() == PaintType.EMPTY){
+            if (rc.canAttack(myLoc)){
+                rc.attack(myLoc);
+            }
         }
     }
 
-    static void move(MapLocation loc) throws GameActionException {
+    static void move(MapLocation loc, boolean allowAttack) throws GameActionException {
         if (!rc.isMovementReady() || loc == null)
             return;
         target = loc;
@@ -32,14 +37,14 @@ class PathFinder extends RobotPlayer{
         Direction dir = BugNav.getMoveDir();
         if (dir == null)
             return;
-        tryMove(dir);
+        tryMove(dir, allowAttack);
     }
 
 
     static class BugNav {
         static DirectionStack dirStack = new DirectionStack();
         static MapLocation prevTarget = null; // previous target
-        static FastLocSet visistedLocs = new FastLocSet();
+        static FastLocSet visitedLocs = new FastLocSet();
         static int currentTurnDir = 0;
         static int stackDepthCutoff = 8;
         static final int MAX_DEPTH = 20;
@@ -62,18 +67,18 @@ class PathFinder extends RobotPlayer{
                 lastMoveRound = rc.getRoundNum();
             }
 
-            // different target? ==> previous data does not help!
+            // Clear previous data if new target
             if (prevTarget == null || target.distanceSquaredTo(prevTarget) > 2) {
                 resetPathfinding();
             }
             
             Debug.printString(Debug.INFO, String.format("move%sst%dcnt%d", target, stuckCnt, dirStack.size));
             prevTarget = target;
-            if (visistedLocs.contains(rc.getLocation())) {
+            if (visitedLocs.contains(rc.getLocation())) {
                 stuckCnt++;
             } else {
                 stuckCnt = 0;
-                visistedLocs.add(rc.getLocation());
+                visitedLocs.add(rc.getLocation());
             }
             if (dirStack.size == 0) {
                 stackDepthCutoff = 8;
@@ -81,7 +86,7 @@ class PathFinder extends RobotPlayer{
                 if (canMoveOrFill(dir)) {
                     return dir;
                 }
-                // If cannot move
+                // If robot cannot move
                 MapLocation loc = rc.getLocation().add(dir);
 
                 // ADAPT bot 1 code that starts with: if there is water and sideway passage...
@@ -276,7 +281,7 @@ class PathFinder extends RobotPlayer{
             stackDepthCutoff = 8;
             dirStack.clear();
             stuckCnt = 0;
-            visistedLocs.clear();
+            visitedLocs.clear();
         }
 
         static boolean canMoveOrFill(Direction dir) throws GameActionException {

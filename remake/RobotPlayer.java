@@ -8,36 +8,26 @@ public class RobotPlayer {
     static int HEIGHT;
 
     public static void run(RobotController rc) throws GameActionException {
-        // just init here
         WIDTH = rc.getMapWidth();
         HEIGHT = rc.getMapHeight();
 
         Debug.init(rc);
-        PathFinder.init(rc);
+        Pathfinder.init(rc);
         Utils.init(rc);
         UnitFuncs.init(rc);
 
         while (true) {
-            if (rc.getRoundNum() < 200) {
+            if (rc.getRoundNum() < 1000) {
                 PHASE = 1;
-            } else if (true) {
+            } else if (rc.getRoundNum() >= 1000) {
                 PHASE = 2;
             }
             try {
-                // TODO Move switch statements into phases
                 switch (rc.getType()) {
-                    case SOLDIER:
-                        UnitFuncs.runSoldier();
-                        break;
-                    case MOPPER:
-                        UnitFuncs.runMopper();
-                        break;
-                    case SPLASHER:
-                        UnitFuncs.runSplasher();
-                        break;
-                    default:
-                        TowerFuncs.runTower(rc);
-                        break;
+                    case SOLDIER: UnitFuncs.runSoldier(); break;
+                    case MOPPER: UnitFuncs.runMopper(); break;
+                    case SPLASHER: UnitFuncs.runSplasher(); break;
+                    default: TowerFuncs.runTower(rc); break;
                 }
             } catch (GameActionException e) {
                 System.out.println("GameActionException");
