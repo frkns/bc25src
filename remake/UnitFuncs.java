@@ -31,12 +31,14 @@ class UnitFuncs extends RobotPlayer {
 
     // Paint refill
     static MapLocation nearestPaintTower = null;
-    static FastLocSet paintTowerLocs = new FastLocSet();
+    // static FastLocSet paintTowerLocs = new FastLocSet();
     static double lowPaintPercentage = 0.3; // TODO make a function of distance from nearest recorded paint tower assume
                                             // will lose 2 paint per tile
     // Exploration
     static MapLocation spawnTowerLocation; // location of the tower that spawned me
     static Direction spawnDirection;
+    static MapLocation target;
+
     // Rune filling (SOLDIER ONLY)
     static int state = 0; // 0 = wandering, 1 = filling rune, 2 = filling pattern
 
@@ -224,9 +226,9 @@ class UnitFuncs extends RobotPlayer {
             if (robot.getType().isTowerType()) {
                 spawnTowerLocation = robot.getLocation();
                 spawnDirection = rc.getLocation().directionTo(spawnTowerLocation).opposite();
-                if (getTowerType(robot.getType()) == towerType.PAINT_TOWER) {
-                    paintTowerLocs.add(robot.getLocation());
-                }
+                // if (getTowerType(robot.getType()) == towerType.PAINT_TOWER) {
+                    // paintTowerLocs.add(robot.getLocation());
+                // }
             }
         }
     }
@@ -238,16 +240,39 @@ class UnitFuncs extends RobotPlayer {
         RobotInfo[] nearbyRobots = rc.senseNearbyRobots();
         MapInfo[] nearbyTiles = rc.senseNearbyMapInfos();
 
-        if (PHASE == 1) {
-            int myPaint = rc.getPaint();
-            if (myPaint < lowPaintPercentage * bunnyType.paintCapacity) {
-                refillPaint(rc.senseNearbyRobots(), myPaint);
-            } else {
-
-                findRuinAndBuildTower(rc, UnitType.LEVEL_ONE_MONEY_TOWER);
-                explore(spawnDirection);
+        for (RobotInfo robot : nearbyRobots) {
+            if (robot.getType().isTowerType()) {
+                if (getTowerType(robot.getType()) == towerType.PAINT_TOWER) {
+                    if (nearestPaintTower == null || rc.getLocation().distanceSquaredTo(robot.getLocation()) < rc.getLocation().distanceSquaredTo(nearestPaintTower)) {
+                        nearestPaintTower = robot.getLocation();
+                    }
+                }
             }
         }
+
+        if (target == null || rc.getLocation().distanceSquaredTo(target) < 3) {
+            target = Utils.getRandomInBoundLocation();
+        }
+        if (Utils.outOfExplorationBounds(rc.getLocation())) {
+            target = Utils.getRandomInBoundLocation();
+        }
+
+        if (true) {
+            int myPaint = rc.getPaint();
+            if (myPaint < lowPaintPercentage * bunnyType.paintCapacity) {
+                if (nearestPaintTower != null) {
+                    int amt = bunnyType.paintCapacity - myPaint;
+                    if (rc.canTransferPaint(nearestPaintTower, -1 * amt)) {
+                        rc.transferPaint(nearestPaintTower, -1 * amt);
+                    }
+                    target = nearestPaintTower;
+                }
+            } else {
+                findRuinAndBuildTower(rc, UnitType.LEVEL_ONE_MONEY_TOWER);
+                // explore(/*spawnDirection*/);
+            }
+        }
+        Pathfinder.move(target, true);
 
     }
 
@@ -261,46 +286,13 @@ class UnitFuncs extends RobotPlayer {
         System.out.println("Running splasher");
     }
 
-    static void refillPaint(RobotInfo[] nearbyRobots, int myPaint) throws GameActionException {
-        nearestPaintTower = null;
-        for (RobotInfo robot : nearbyRobots) {
-            if (robot.getTeam() == rc.getTeam()) {
-                if (getTowerType(robot.getType()) == towerType.PAINT_TOWER) {
-                    if (nearestPaintTower == null || rc.getLocation().distanceSquaredTo(robot.getLocation()) < rc
-                            .getLocation().distanceSquaredTo(nearestPaintTower)) {
-                        nearestPaintTower = robot.getLocation();
-                    }
-                }
-            }
-        }
-        // Efficiently iterate through paintTowerLocs
-        if (nearestPaintTower == null) {
-            for (int i = 1; i < paintTowerLocs.keys.length(); i += 3) {
-                int x = (int) paintTowerLocs.keys.charAt(i);
-                int y = (int) paintTowerLocs.keys.charAt(i + 1);
-                MapLocation towerLoc = new MapLocation(x, y);
-                if (nearestPaintTower == null || rc.getLocation().distanceSquaredTo(towerLoc) < rc.getLocation()
-                        .distanceSquaredTo(nearestPaintTower)) {
-                    nearestPaintTower = towerLoc;
-                }
-            }
-        }
-
-        if (nearestPaintTower != null) {
-            int amt = bunnyType.paintCapacity - myPaint;
-            if (rc.canTransferPaint(nearestPaintTower, -1 * amt)) {
-                rc.transferPaint(nearestPaintTower, -1 * amt);
-            }
-            Pathfinder.move(nearestPaintTower, false);
-        }
-
-    }
-
-    static void explore(Direction spawnDirection) throws GameActionException {
-        Direction dirToMove = spawnDirection;
-        MapLocation target = rc.getLocation().translate(dirToMove.dx * WIDTH, dirToMove.dy * HEIGHT);
-        Pathfinder.move(target, true);
-    }
+    // static void explore(/*Direction spawnDirection*/) throws GameActionException {
+    //     Direction dirToMove = spawnDirection;
+    //     if (Utils.outOfExplorationBounds(rc.getLocation())) {
+    //         target = Utils.getRandomInBoundLocation();
+    //     }
+    //     Pathfinder.move(target);
+    // }
 
     static MapInfo findNearbyRuin(RobotController rc, MapInfo[] nearbyTiles) throws GameActionException {
         return null;
