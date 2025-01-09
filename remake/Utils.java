@@ -31,6 +31,18 @@ class Utils extends RobotPlayer {
         return new MapLocation(MAP_WIDTH - loc.x - 1, MAP_HEIGHT - loc.y - 1);
     }
 
+    static int explorationBoundary = 5;
+
+    static boolean outOfExplorationBounds(MapLocation loc) {
+        return loc.x - explorationBoundary < 0 || loc.y - explorationBoundary < 0
+            || loc.x + explorationBoundary >= MAP_WIDTH || loc.y + explorationBoundary >= MAP_HEIGHT;
+    }
+    static MapLocation getRandomInBoundLocation() {
+        // should be within [explorationBoundary+1, MAP_WIDTH-explorationBoundary-1]
+        return new MapLocation(rng.nextInt(MAP_WIDTH - 2*explorationBoundary - 1) + explorationBoundary + 1,
+                               rng.nextInt(MAP_HEIGHT - 2*explorationBoundary - 1) + explorationBoundary + 1);
+    }
+
     static MapLocation randomEnemyLocation() {
         // return new MapLocation(rng.nextInt(MAP_WIDTH-1), rng.nextInt(MAP_HEIGHT-1));
         MapLocation loc = mirror(SPAWN_LOCATION);
