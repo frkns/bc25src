@@ -13,29 +13,50 @@ public class InterestExplore extends Interest {
     Random rng = Robot.rng;
     Direction dir;
     MapLocation next;
+    MapLocation target;
     RobotController rc;
+
+    int width;
+    int height;
 
     public InterestExplore() {
         super();
         name = "Explore    ";
 
         rc = Robot.rc;
+        width = rc.getMapWidth();
+        height = rc.getMapHeight();
         dir = directions[rng.nextInt(directions.length)];
 
+    }
+
+    void reloadTarget(){
+            switch (rng.nextInt(4)){
+                case 0:
+                    target = new MapLocation(rng.nextInt(width),0);
+                    break;
+                case 1:
+                    target = new MapLocation(rng.nextInt(width), height - 1);
+                    break;
+                case 2:
+                    target = new MapLocation(0,rng.nextInt(height));
+                    break;
+                case 3:
+                    target = new MapLocation(width - 1,rng.nextInt(height));
+                    break;
+            }
     }
 
     @Override
     public void initTurn() {
         super.initTurn();
 
-        // Adding some random
-        if(Robot.rng.nextInt(3) == 0){
-            dir = dir.rotateLeft();
-        }
-        if(Robot.rng.nextInt(3) == 0){
-            dir = dir.rotateRight();
+        target = null;
+        while(target == null || rc.getLocation().equals(target)) {
+            reloadTarget();
         }
 
+        Direction dir = rc.getLocation().directionTo(target);
         next = rc.getLocation().add(dir);
 
 
@@ -45,8 +66,7 @@ public class InterestExplore extends Interest {
                     break;
                 }
 
-                dir = dir.rotateRight();
-                next = rc.getLocation().add(dir);
+                reloadTarget();
             } catch (GameActionException e) {
                 e.printStackTrace();
             }
