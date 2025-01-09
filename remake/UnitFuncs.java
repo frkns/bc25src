@@ -79,9 +79,10 @@ class UnitFuncs extends RobotPlayer {
             int dx = curTargetDir.dx;
             int dy = curTargetDir.dy;
             int triesLeft = 10;
+            int boundary = 5;
             while (triesLeft-- > 0 &&
-                   x + dx + 3 >= WIDTH || x + dx - 3 < 0 ||
-                   y + dy + 3 >= HEIGHT || y + dy - 3 < 0) {
+                   x + dx + boundary >= WIDTH || x + dx - boundary < 0 ||
+                   y + dy + boundary >= HEIGHT || y + dy - boundary < 0) {
                 curTargetDir = curTargetDir.rotateLeft();
                 dx = curTargetDir.dx;
                 dy = curTargetDir.dy;
