@@ -238,11 +238,6 @@ class UnitFuncs extends RobotPlayer {
         RobotInfo[] nearbyRobots = rc.senseNearbyRobots();
         MapInfo[] nearbyTiles = rc.senseNearbyMapInfos();
 
-        if (PHASE == 1) {
-            int myPaint = rc.getPaint();
-            if (myPaint < lowPaintPercentage * bunnyType.paintCapacity) {
-                refillPaint(rc.senseNearbyRobots(), myPaint);
-            } else {
 
                 findRuinAndBuildTower(rc, UnitType.LEVEL_ONE_MONEY_TOWER);
                 explore(spawnDirection);

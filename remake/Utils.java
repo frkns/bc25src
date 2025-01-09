@@ -42,7 +42,7 @@ class Utils extends RobotPlayer {
     }
 
 
-    static int distance(MapLocation A, MapLocation B) {
+    static int manhattanDistance(MapLocation A, MapLocation B) {
         return Math.max(Math.abs(A.x - B.x), Math.abs(A.y - B.y));
     }
 

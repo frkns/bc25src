@@ -264,7 +264,7 @@ class Pathfinder extends RobotPlayer{
                 now = now.add(moveDir);
                 ans++;
             }
-            return ans + Utils.distance(now, target);
+            return ans + Utils.manhattanDistance(now, target);
         }
 
         static int getTurnDir(Direction dir) throws GameActionException {
