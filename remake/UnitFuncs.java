@@ -1,6 +1,7 @@
 package remake;
 
 import battlecode.common.*;
+import remake.fast.*;
 
 import java.util.Random;
 
@@ -10,11 +11,13 @@ class UnitFuncs extends RobotPlayer {
     static RobotController rc;
     static UnitType bunnyType;
 
-    static Direction direction;
+//    static Direction direction;
     static MapLocation target;
-
+    // paint refill
     static MapLocation nearestPaintTower = null;
-
+    static FastLocSet paintTowersLocs = new FastLocSet();
+    static double lowPaintPercentage = 0.5;
+    static boolean lowPaint = false;
 
     static void init(RobotController r) throws GameActionException {
         rc = r;
@@ -22,6 +25,29 @@ class UnitFuncs extends RobotPlayer {
     }
 
     /** SOLDIER */
+    static void refillPaint(RobotInfo[] nearbyRobots) throws GameActionException{
+        nearestPaintTower = null; // Assume PaintTower could have been destroyed
+        for (RobotInfo robot : nearbyRobots){
+            if (robot.getTeam() == rc.getTeam()) {
+                if (robot.getType() == UnitType.LEVEL_ONE_PAINT_TOWER
+                        || robot.getType() == UnitType.LEVEL_TWO_PAINT_TOWER
+                        || robot.getType() == UnitType.LEVEL_THREE_PAINT_TOWER) {
+                    if (nearestPaintTower != null && rc.getLocation().distanceSquaredTo(robot.getLocation()) < rc.getLocation().distanceSquaredTo(nearestPaintTower)) {
+                        nearestPaintTower = robot.getLocation();
+                    }
+                }
+            }
+            int myPaint = rc.getPaint();
+            if (nearestPaintTower != null) {
+                int amt = bunnyType.paintCapacity - myPaint;
+                if (rc.canTransferPaint(nearestPaintTower, -1 * amt)) {
+                    rc.transferPaint(nearestPaintTower, -1 * amt);
+                }
+            }
+            PathFinder.move(nearestPaintTower);
+        }
+    }
+
     static void runSoldier() throws GameActionException {
         System.out.println("Running soldier");
 
@@ -29,35 +55,8 @@ class UnitFuncs extends RobotPlayer {
         MapInfo[] nearbyTiles = rc.senseNearbyMapInfos();
 
 
-        for (RobotInfo robot : nearbyRobots){
-            if (robot.getTeam() == rc.getTeam()) {
-                if (robot.getType() == UnitType.LEVEL_ONE_PAINT_TOWER
-                    || robot.getType() == UnitType.LEVEL_TWO_PAINT_TOWER
-                    || robot.getType() == UnitType.LEVEL_THREE_PAINT_TOWER) {
-                    if (nearestPaintTower == null || rc.getLocation().distanceSquaredTo(robot.getLocation()) < rc.getLocation().distanceSquaredTo(nearestPaintTower)) {
-                        nearestPaintTower = robot.getLocation();
-                    }
-                }
-            }
-        }
-
-        int mypaint = rc.getPaint();
-        if (mypaint < 40) {
-            // we should path to nearestPaintTower
-            if (nearestPaintTower != null) {
-                int amt = bunnyType.paintCapacity - mypaint;
-                if (rc.canTransferPaint(nearestPaintTower, -1 * amt)) {
-                    rc.transferPaint(nearestPaintTower, -1 * amt);
-                }
-                target = nearestPaintTower;
-                PathFinder.move(rc, target);
-            }
-        } else {
-            // set regualr target
-        }
-
         if (PHASE == 1) {
-
+            refillPaint(nearbyRobots);
         }
     }
 

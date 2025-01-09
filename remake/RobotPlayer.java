@@ -18,7 +18,7 @@ public class RobotPlayer {
                 PHASE = 2;
             }
             try {
-                // Move switch statements into phases
+                // TODO Move switch statements into phases
                 switch (rc.getType()) {
                     case SOLDIER:
                         UnitFuncs.runSoldier();
