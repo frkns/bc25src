@@ -1,13 +1,12 @@
-package adrien.utils;
+package bastien.utils;
 
-import adrien.Robot;
+import bastien.Robot;
 
 public class MessageUnit {
     Robot robot;
     public MessageUnit(Robot r){
         robot = r;
     }
-
 
     void readMessage(){}
 }

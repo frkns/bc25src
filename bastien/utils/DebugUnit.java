@@ -1,29 +1,24 @@
-package adrien.utils;
+package bastien.utils;
 
+import bastien.Robot;
 import battlecode.common.Clock;
 import battlecode.common.GameConstants;
 import battlecode.common.RobotController;
 
 public class DebugUnit {
-    private static final String tab = "\t";
     private static final String[] indents = {"", "\t", "\t\t", "\t\t\t", "\t\t\t\t", "\t\t\t\t\t", "\t\t\t\t\t"};
-    private static int LIMITS = GameConstants.ROBOT_BYTECODE_LIMIT;
+    private static int BYTECODE_PER_TURNS = GameConstants.ROBOT_BYTECODE_LIMIT;
 
     private static final int[] lastBytecode = {0, 0, 0, 0, 0, 0};
     private static final int[] lastRound = {0, 0, 0, 0, 0, 0};
 
     public static boolean debug = true;
-    private static RobotController robot;
+    private static RobotController rc;
 
-    public static void init(RobotController rc){
-        robot = rc;
-        switch (rc.getType()){
-            case SOLDIER: break;
-            case MOPPER: break;
-            case SPLASHER: break; // Consider upgrading examplefuncsplayer to use splashers!
-            default:
-                LIMITS = GameConstants.TOWER_BYTECODE_LIMIT;
-                break;
+    public static void init(){
+        rc = Robot.rc;
+        if(rc.getType().isTowerType()){
+            BYTECODE_PER_TURNS = GameConstants.TOWER_BYTECODE_LIMIT;
         }
 
         char[] str = Integer.toString(rc.getID(), 26).toCharArray();
@@ -46,8 +41,8 @@ public class DebugUnit {
 
         // Exemple : [Bot Id] round | clock | comparaison | \t * indent text
 
-        int cost = (robot.getRoundNum() - lastRound[level]) * LIMITS + Clock.getBytecodeNum() - lastBytecode[level];
-        lastRound[level] = robot.getRoundNum();
+        int cost = (rc.getRoundNum() - lastRound[level]) * BYTECODE_PER_TURNS + Clock.getBytecodeNum() - lastBytecode[level];
+        lastRound[level] = rc.getRoundNum();
         lastBytecode[level] = Clock.getBytecodeNum();
 
         for (int i = level + 1; i < 6; i++) {

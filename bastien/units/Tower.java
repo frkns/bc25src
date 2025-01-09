@@ -1,18 +1,15 @@
-package adrien.units;
+package bastien.units;
 
 import battlecode.common.*;
-import adrien.Actions.ActionDefend;
-import adrien.Robot;
-import adrien.utils.DebugUnit;
+import bastien.Robot;
+import bastien.utils.DebugUnit;
 
 public class Tower extends Robot {
 
     public Tower(RobotController controlller) {
         super(controlller);
 
-        actions.add(new ActionDefend());
         DebugUnit.debug = false;
-
         attackCost = 0;
     }
 
@@ -43,33 +40,12 @@ public class Tower extends Robot {
         }
     }
 
-    void upgrade(){
-        if(rc.canUpgradeTower(rc.getLocation())){
-            try {
-                rc.upgradeTower(rc.getLocation());
-            } catch (GameActionException e) {
-                e.printStackTrace();
-            }
-        }
-    }
 
     @Override
     public void initTurn() throws GameActionException {
         super.initTurn();
-        rc.attack(null); // Radius attack
 
-        if(rc.getRoundNum() < 10){
-            for (int i = 0; i < 5; i++) {
-                summon();
-            }
-        }
-
-        if(rc.getChips() > 1400){
-            if(Robot.rng.nextInt(100) <= 2){
-                upgrade();
-            }else{
-               summon();
-            }
-        }
+        summon();
+        // upgrade() // To complete
     }
 }
