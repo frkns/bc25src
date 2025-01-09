@@ -40,7 +40,7 @@ public abstract class Robot{
     public static MapInfo[] marks;
     public static MapLocation nearestEmptyRuins;
     public static MapInfo nearestIncorrectMark;
-    public static int attackCost = 0;
+    public static int attackCost;
 
     // -------------- Methodes --------------
     public Robot(RobotController controlller){
