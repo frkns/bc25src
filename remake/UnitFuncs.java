@@ -50,11 +50,11 @@ class UnitFuncs extends RobotPlayer {
                     rc.transferPaint(nearestPaintTower, -1 * amt);
                 }
                 target = nearestPaintTower;
-                PathFinder.move(target);
             }
         } else {
             // set regualr target
         }
+        PathFinder.move(target);
 
         if (PHASE == 1) {
 
