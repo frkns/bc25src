@@ -4,8 +4,14 @@ import battlecode.common.*;
 
 public class RobotPlayer {
     static int PHASE = 1;
+    static int WIDTH;
+    static int HEIGHT;
 
     public static void run(RobotController rc) throws GameActionException {
+        // just init here
+        WIDTH = rc.getMapWidth();
+        HEIGHT = rc.getMapHeight();
+
         Debug.init(rc);
         PathFinder.init(rc);
         Utils.init(rc);

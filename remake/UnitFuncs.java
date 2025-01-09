@@ -10,7 +10,10 @@ class UnitFuncs extends RobotPlayer {
     static RobotController rc;
     static UnitType bunnyType;
 
-    static Direction direction;
+    // static Direction direction;
+    static MapLocation spawnTowerLocation;  // location of the tower that spawned me
+    static Direction spawnDirection;
+
     static MapLocation target;
 
     static MapLocation nearestPaintTower = null;
@@ -19,6 +22,18 @@ class UnitFuncs extends RobotPlayer {
     static void init(RobotController r) throws GameActionException {
         rc = r;
         bunnyType = rc.getType();
+        for (RobotInfo robot : rc.senseNearbyRobots(2)) {
+            if (robot.getType().isTowerType()) {
+                // nearestPaintTower = robot.getLocation();
+                spawnTowerLocation = robot.getLocation();
+                spawnDirection = rc.getLocation().directionTo(spawnTowerLocation).opposite();
+
+                if (PHASE == 1) {
+                    Direction dirToMove = spawnDirection;
+                    target = rc.getLocation().translate(dirToMove.dx * WIDTH, dirToMove.dy * HEIGHT);
+                }
+            }
+        }
     }
 
     /** SOLDIER */
@@ -52,8 +67,32 @@ class UnitFuncs extends RobotPlayer {
                 target = nearestPaintTower;
             }
         } else {
-            // set regualr target
+            // move away from spawn tower
+            // if (target == null) {
+            //     Direction dirToMove = spawnDirection;
+            //     target = rc.getLocation().translate(dirToMove.dx * 100, dirToMove.dy * 100);
+            // }
+
+            Direction curTargetDir = rc.getLocation().directionTo(target);
+            int x = rc.getLocation().x;
+            int y = rc.getLocation().y;
+            int dx = curTargetDir.dx;
+            int dy = curTargetDir.dy;
+            int triesLeft = 10;
+            while (triesLeft-- > 0 &&
+                   x + dx + 3 >= WIDTH || x + dx - 3 < 0 ||
+                   y + dy + 3 >= HEIGHT || y + dy - 3 < 0) {
+                curTargetDir = curTargetDir.rotateLeft();
+                dx = curTargetDir.dx;
+                dy = curTargetDir.dy;
+            }
+            if (triesLeft == 0) {
+                System.out.println("Couldn't find a valid target");
+            }
+            target = new MapLocation(x + dx * 10, y + dy * 10);
+
         }
+
         PathFinder.move(target);
 
         if (PHASE == 1) {
