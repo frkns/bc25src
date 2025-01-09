@@ -15,6 +15,7 @@ class Pathfinder extends RobotPlayer{
         rc = r;
     }
 
+
     static void tryMove(Direction dir, boolean allowAttack) throws GameActionException {
         if (dir == Direction.CENTER)
             return;
@@ -40,6 +41,10 @@ class Pathfinder extends RobotPlayer{
         tryMove(dir, allowAttack);
     }
 
+    // let's try to keep functions as pure as possible. so no attack by default
+    static void move(MapLocation loc) throws GameActionException {
+        move(loc, false);
+    }
 
     static class BugNav {
         static DirectionStack dirStack = new DirectionStack();
@@ -71,7 +76,7 @@ class Pathfinder extends RobotPlayer{
             if (prevTarget == null || target.distanceSquaredTo(prevTarget) > 2) {
                 resetPathfinding();
             }
-            
+
             Debug.printString(Debug.INFO, String.format("move%sst%dcnt%d", target, stuckCnt, dirStack.size));
             prevTarget = target;
             if (visitedLocs.contains(rc.getLocation())) {
