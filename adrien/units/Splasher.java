@@ -16,7 +16,7 @@ public class Splasher extends Robot {
     public Splasher(RobotController controlller){
         super(controlller);
 
-        interests.add(new InterestConsistancy());
+        // interests.add(new InterestConsistancy());
         interests.add(new InterestMark());
         interests.add(new InterestRune());
         interests.add(new InterestExplore());

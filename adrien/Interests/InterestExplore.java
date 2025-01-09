@@ -14,7 +14,6 @@ public class InterestExplore extends Interest {
     Direction dir;
     MapLocation next;
     RobotController rc;
-    int shift = 0; // Number of rotation to turn left before get back to original direction
 
     public InterestExplore() {
         super();
@@ -37,11 +36,6 @@ public class InterestExplore extends Interest {
             dir = dir.rotateRight();
         }
 
-
-        if(shift > 0){
-            dir = dir.rotateLeft();
-            shift--;
-        }
         next = rc.getLocation().add(dir);
 
 
@@ -52,18 +46,16 @@ public class InterestExplore extends Interest {
                 }
 
                 dir = dir.rotateRight();
-                shift++;
                 next = rc.getLocation().add(dir);
             } catch (GameActionException e) {
                 e.printStackTrace();
             }
         }
-
     }
 
     @Override
     public int getScore(MapLocation loc) {
-        if(next != null && loc.isAdjacentTo(next)){
+        if(next != null && loc.distanceSquaredTo(next)<=1){
             return Robot.INTEREST_EXPLORE;
         }
         return 0;

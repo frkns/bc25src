@@ -22,7 +22,7 @@ public abstract class Robot{
     };
 
     public static final int INTEREST_CONSISTANCY = 2;
-    public static final int INTEREST_EXPLORE = 2;
+    public static final int INTEREST_EXPLORE = 1;
     public static final int INTEREST_ON_PAINT = 1;
     public static final int INTEREST_MARK = 20;
     public static final int INTEREST_RUNE = 10;

@@ -16,17 +16,22 @@ public class Tower extends Robot {
         attackCost = 0;
     }
 
-    void Summon() {
+    void summon() {
         Direction dir = directions[rng.nextInt(directions.length)];
         int robotType = rng.nextInt(100);
         MapLocation nextLoc = rc.getLocation().add(dir).add(dir);
         try {
-            if (robotType < 70) {
+            if (robotType < 50 || rc.getRoundNum() < 20) {
                 if(rc.canBuildRobot(UnitType.SOLDIER, nextLoc)) {
                     rc.buildRobot(UnitType.SOLDIER, nextLoc);
                     DebugUnit.print(2, "Summon SOLDIER on " + nextLoc);
                 }
-            } else {
+            } else if(robotType < 80) {
+                if (rc.canBuildRobot(UnitType.SPLASHER, nextLoc)) {
+                    rc.buildRobot(UnitType.SPLASHER, nextLoc);
+                    DebugUnit.print(2, "Summon SPLASHER on " + nextLoc);
+                }
+            }else{
                 if (rc.canBuildRobot(UnitType.MOPPER, nextLoc)) {
                     rc.buildRobot(UnitType.MOPPER, nextLoc);
                     DebugUnit.print(2, "Summon MOPPER on " + nextLoc);
@@ -38,7 +43,7 @@ public class Tower extends Robot {
         }
     }
 
-    void Upgrade(){
+    void upgrade(){
         if(rc.canUpgradeTower(rc.getLocation())){
             try {
                 rc.upgradeTower(rc.getLocation());
@@ -53,11 +58,17 @@ public class Tower extends Robot {
         super.initTurn();
         rc.attack(null); // Radius attack
 
-        if(rc.getChips() > 1400 || rc.getRoundNum() < 3){
+        if(rc.getRoundNum() < 10){
+            for (int i = 0; i < 5; i++) {
+                summon();
+            }
+        }
+
+        if(rc.getChips() > 1400){
             if(Robot.rng.nextInt(100) <= 2){
-                Upgrade();
+                upgrade();
             }else{
-               Summon();
+               summon();
             }
         }
     }

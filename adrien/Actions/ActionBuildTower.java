@@ -5,7 +5,6 @@ import battlecode.common.UnitType;
 import adrien.Robot;
 
 public class ActionBuildTower extends Action{
-    UnitType buildType;
     UnitType toBuild;
 
 
@@ -16,7 +15,7 @@ public class ActionBuildTower extends Action{
 
     @Override
     public int getScore() {
-        buildType = null;
+        toBuild = null;
 
         if(Robot.nearestEmptyRuins == null){
             return 0;
@@ -35,8 +34,11 @@ public class ActionBuildTower extends Action{
                 break;
         }
 
+        // TODOS: Fix this force money
+        toBuild = UnitType.LEVEL_ONE_MONEY_TOWER;
+
+
         if (rc.canCompleteTowerPattern(toBuild, Robot.nearestEmptyRuins)) {
-            buildType = toBuild;
             return Robot.ACTION_BUILD_TOWER;
         }
 
@@ -49,9 +51,9 @@ public class ActionBuildTower extends Action{
             return;
         }
 
-        if (rc.canCompleteTowerPattern(buildType, Robot.nearestEmptyRuins)){
+        if (rc.canCompleteTowerPattern(toBuild, Robot.nearestEmptyRuins)){
             try {
-                rc.completeTowerPattern(buildType, Robot.nearestEmptyRuins);
+                rc.completeTowerPattern(toBuild, Robot.nearestEmptyRuins);
             } catch (GameActionException e) {
                 e.printStackTrace();
             }

@@ -16,7 +16,7 @@ public class Mopper extends Robot {
     public Mopper(RobotController controlller){
         super(controlller);
 
-        interests.add(new InterestConsistancy());
+        // interests.add(new InterestConsistancy());
         interests.add(new InterestRune());
         interests.add(new InterestExplore());
 

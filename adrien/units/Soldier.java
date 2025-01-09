@@ -16,7 +16,7 @@ public class Soldier extends Robot {
     public Soldier(RobotController controlller){
         super(controlller);
 
-        interests.add(new InterestConsistancy());
+        // interests.add(new InterestConsistancy());
         interests.add(new InterestMark());
         interests.add(new InterestRune());
         interests.add(new InterestExplore());
