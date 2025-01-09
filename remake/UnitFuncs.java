@@ -11,7 +11,10 @@ class UnitFuncs extends RobotPlayer {
     static RobotController rc;
     static UnitType bunnyType;
 
-//    static Direction direction;
+
+    static MapLocation spawnTowerLocation;  // location of the tower that spawned me
+    static Direction spawnDirection;
+
     static MapLocation target;
     // paint refill
     static MapLocation nearestPaintTower = null;
@@ -22,6 +25,18 @@ class UnitFuncs extends RobotPlayer {
     static void init(RobotController r) throws GameActionException {
         rc = r;
         bunnyType = rc.getType();
+        for (RobotInfo robot : rc.senseNearbyRobots(2)) {
+            if (robot.getType().isTowerType()) {
+                // nearestPaintTower = robot.getLocation();
+                spawnTowerLocation = robot.getLocation();
+                spawnDirection = rc.getLocation().directionTo(spawnTowerLocation).opposite();
+
+                if (PHASE == 1) {
+                    Direction dirToMove = spawnDirection;
+                    target = rc.getLocation().translate(dirToMove.dx * WIDTH, dirToMove.dy * HEIGHT);
+                }
+            }
+        }
     }
 
     /** SOLDIER */
