@@ -1,5 +1,5 @@
 // https://github.com/chenyx512/battlecode24/blob/main/src/bot1/fast/FastIterableLocSet.java
-package d_remake.fast;
+package e_action.utils.fast;
 
 import battlecode.common.MapLocation;
 

@@ -8,11 +8,13 @@ public abstract class Action {
     public RobotController rc;
     public String name = "ABSTRACT Act.";
     public int score = 0;
+    public boolean debugAction = false;
 
     public Action(){
         rc = Robot.rc;
     }
 
+    public abstract void initUnit() throws GameActionException;
     public abstract void calcScore() throws GameActionException;
     public abstract int getScore();
     public abstract void play() throws GameActionException;

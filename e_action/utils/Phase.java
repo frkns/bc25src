@@ -1,35 +1,35 @@
 package e_action.utils;
 
 public class Phase {
-    public static int getPhase (int round, int mapSize) {
-        if (mapSize < 1000) {
-            if (round < ActionConstants.SMALL_PHASE1) {
+    public static int getPhase (int round, int mapArea) {
+        if (mapArea < 1000) {
+            if (round < Constants.SMALL_PHASE1) {
                 return 1;
-            } else if (round < ActionConstants.SMALL_PHASE2) {
+            } else if (round < Constants.SMALL_PHASE2) {
                 return 2;
             } else {
                 return 3;
             }
-        } else if (mapSize < 2000) {
-            if (round < ActionConstants.MEDIUM_PHASE1) {
+        } else if (mapArea < 2000) {
+            if (round < Constants.MEDIUM_PHASE1) {
                 return 1;
-            } else if (round < ActionConstants.MEDIUM_PHASE2) {
+            } else if (round < Constants.MEDIUM_PHASE2) {
                 return 2;
             } else {
                 return 3;
             }
-        } else if (mapSize < 3000) {
-            if (round < ActionConstants.LARGE_PHASE1) {
+        } else if (mapArea < 3000) {
+            if (round < Constants.LARGE_PHASE1) {
                 return 1;
-            } else if (round < ActionConstants.LARGE_PHASE2) {
+            } else if (round < Constants.LARGE_PHASE2) {
                 return 2;
             } else {
                 return 3;
             }
         } else {
-            if (round < ActionConstants.HUGE_PHASE1) {
+            if (round < Constants.HUGE_PHASE1) {
                 return 1;
-            } else if (round < ActionConstants.HUGE_PHASE2) {
+            } else if (round < Constants.HUGE_PHASE2) {
                 return 2;
             } else {
                 return 3;

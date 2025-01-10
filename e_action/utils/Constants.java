@@ -1,6 +1,6 @@
 package e_action.utils;
 
-public class ActionConstants {
+public class Constants {
     public static final int SMALL_PHASE1 = 200;
     public static final int SMALL_PHASE2 = 500;
     public static final int MEDIUM_PHASE1 = 300;

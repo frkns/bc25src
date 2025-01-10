@@ -30,7 +30,6 @@ class UnitFuncs extends RobotPlayer {
 
     // Paint refill
     static MapLocation nearestPaintTower = null;
-    // static FastLocSet paintTowerLocs = new FastLocSet();
     static double lowPaintPercentage = 0.3; // TODO make a function of distance from nearest recorded paint tower assume
                                             // will lose 2 paint per tile
     // Exploration
@@ -225,9 +224,6 @@ class UnitFuncs extends RobotPlayer {
             if (robot.getType().isTowerType()) {
                 spawnTowerLocation = robot.getLocation();
                 spawnDirection = rc.getLocation().directionTo(spawnTowerLocation).opposite();
-                // if (getTowerType(robot.getType()) == towerType.PAINT_TOWER) {
-                    // paintTowerLocs.add(robot.getLocation());
-                // }
             }
         }
     }
@@ -236,10 +232,10 @@ class UnitFuncs extends RobotPlayer {
     static void runSoldier() throws GameActionException {
         // System.out.println("Running soldier");
 
-        RobotInfo[] nearbyRobots = rc.senseNearbyRobots();
+        RobotInfo[] nearbyAllies = rc.senseNearbyRobots(-1, rc.getTeam());
         MapInfo[] nearbyTiles = rc.senseNearbyMapInfos();
 
-        for (RobotInfo robot : nearbyRobots) {
+        for (RobotInfo robot : nearbyAllies) {
             if (robot.getType().isTowerType()) {
                 if (getTowerType(robot.getType()) == towerType.PAINT_TOWER) {
                     if (nearestPaintTower == null || rc.getLocation().distanceSquaredTo(robot.getLocation()) < rc.getLocation().distanceSquaredTo(nearestPaintTower)) {
@@ -285,22 +281,11 @@ class UnitFuncs extends RobotPlayer {
         System.out.println("Running splasher");
     }
 
-    // static void explore(/*Direction spawnDirection*/) throws GameActionException {
-    //     Direction dirToMove = spawnDirection;
-    //     if (Utils.outOfExplorationBounds(rc.getLocation())) {
-    //         target = Utils.getRandomInBoundLocation();
-    //     }
-    //     Pathfinder.move(target);
-    // }
-
-    static MapInfo findNearbyRuin(RobotController rc, MapInfo[] nearbyTiles) throws GameActionException {
-        return null;
-    }
-
-    static UnitType chooseTowerType(RobotController rc, MapLocation targetLoc) throws GameActionException {
-        return null;
-    }
-
-    static void createTowerPattern(RobotController rc, MapLocation targetLoc) throws GameActionException {
-    }
+//     static void explore(Direction spawnDirection) throws GameActionException {
+//         Direction dirToMove = spawnDirection;
+//         if (Utils.outOfExplorationBounds(rc.getLocation())) {
+//             target = Utils.getRandomInBoundLocation();
+//         }
+//         Pathfinder.move(target);
+//     }
 }

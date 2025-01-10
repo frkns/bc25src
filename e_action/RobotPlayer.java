@@ -11,6 +11,7 @@ public class RobotPlayer {
     static RobotController rc;
     static Robot robot;
 
+    // Can also be used to reset robot actions
     static void setRobotType(){
         switch (rc.getType()){
             case SOLDIER:

@@ -13,15 +13,25 @@ public class _Template extends Action {
         rc = Robot.rc;
         name = "REPLACE WITH FUNC NAME";
         score = 0;
-        Debug.print(3, Debug.INIT + name);
+        debugAction = false;
+        Debug.print(3, Debug.INIT + name, debugAction);
     }
 
+
     // Initialize variables specific to the function here
-    // Use Robot.variable_name to access the variables (Comms, nearbyMapInfos...) in Robot file
+
+
+    public void initUnit(){
+        Debug.print(3, Debug.INITUNIT + name, debugAction);
+        // Initialize any variable needed when a unit first spawns in
+    }
+
+    // Use Robot.variable_name to access the variables in Robot file
     // e.g. Robot.directions
     public void calcScore() throws GameActionException {
-        Debug.print(3, Debug.CALCSCORE + name);
+        Debug.print(3, Debug.CALCSCORE + name, debugAction);
         // Calculate score and store any variable useful to the play() function
+        // Remember to set the score 0 if the action is illegal/useless this turn!
     }
 
     public int getScore(){
@@ -29,7 +39,7 @@ public class _Template extends Action {
     }
 
     public void play() throws GameActionException {
-        Debug.print(3, Debug.PLAY + name);
+        Debug.print(3, Debug.PLAY + name, debugAction);
         // Code here
     }
 }

@@ -10,6 +10,7 @@ public class Soldier extends Robot {
     public Soldier(RobotController rc){
         super(rc);
 
-        actions.add(new SoldierAttack());
+        actions.add(new Explore());
+        actions.add(new _Template());
     }
 }

@@ -7,6 +7,7 @@ import battlecode.common.RobotController;
 
 public class Debug {
     public static boolean debug = false;
+    public static String INITUNIT = "Init unit ";
     public static String INIT = "Initializing ";
     public static String CALCSCORE = "Calculating Score ";
     public static String PLAY = "Playing ";
@@ -40,8 +41,31 @@ public class Debug {
       * Prints the bytecode used to calculate score for each action and execute action
       * Example: https://discord.com/channels/1316447035242709032/1323051422819815486/1327037155956228146 
       */
-    public static void print(int level, String text){
+    
+    // Default without debugAction
+    public static void print(int level, String text) {
         if(!debug) return;
+
+        int cost = (rc.getRoundNum() - lastRound[level]) * BYTECODE_PER_TURNS + Clock.getBytecodeNum() - lastBytecode[level];
+        lastRound[level] = rc.getRoundNum();
+        lastBytecode[level] = Clock.getBytecodeNum();
+
+        for (int i = level + 1; i < 6; i++) {
+            lastRound[i] = lastRound[level];
+            lastBytecode[i] = lastBytecode[level];
+        }
+
+        if (Clock.getBytecodeNum() - lastByteCodeClockDebugged > 500) {
+            lastByteCodeClockDebugged = Clock.getBytecodeNum();
+
+            System.out.println("%5d | + %5d | ".formatted(Clock.getBytecodeNum(), cost) + indents[level] + text);
+        } else {
+            System.out.println("%5d |         | ".formatted(Clock.getBytecodeNum()) + indents[level] + text);
+        }
+    }
+    
+    public static void print(int level, String text, boolean debugAction) {
+        if(!debug || !debugAction) return;
 
         int cost = (rc.getRoundNum() - lastRound[level]) * BYTECODE_PER_TURNS + Clock.getBytecodeNum() - lastBytecode[level];
         lastRound[level] = rc.getRoundNum();

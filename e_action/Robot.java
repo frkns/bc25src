@@ -27,27 +27,64 @@ public abstract class Robot{
             Direction.NORTHWEST,
     };
 
-    // -------------- Internal info --------------
-    public static int phase;
 
-    // -------------- External infos --------------
+    // -------------- Constants that vary by game --------------
+    public static int MAP_WIDTH;
+    public static int MAP_HEIGHT;
+    public static int MAP_AREA;
+
+    // -------------- Variables set during unit initialization ----------------
+    public static MapLocation spawnTowerLocation;
+    public static Direction spawnDirection;
+
+    // -------------- Variables that vary by turn
+    // Game state info
+    public static int phase;
+    public static int chips;
+    // Comms info
+    // Internal infos
+
+    // External infos
     public static RobotInfo[] allies;
     public static RobotInfo[] enemies;
     public static MapLocation[] ruins;
+    public static MapLocation nearestPaintTower = null;
 
     // -------------- Methods --------------
     public Robot(RobotController r){
         rc = r;
         // messageUnit = new MessageUnit(this);
         Debug.init();
+        Pathfinder.init(rc);
+    }
+
+    // Only runs on a unit's first turn
+    public void init() throws GameActionException{
+        Debug.print(0, "Create unit => " + rc.getType() + " at " + rc.getLocation());
+        for(Action action: actions){
+            action.initUnit();
+        }
     }
 
     public void initTurn() throws GameActionException {
+        MAP_WIDTH = rc.getMapWidth();
+        MAP_HEIGHT = rc.getMapHeight();
+        MAP_AREA = MAP_WIDTH * MAP_HEIGHT;
+
+        phase = Phase.getPhase(rc.getRoundNum(), MAP_AREA);
+        chips = rc.getChips();
+
         allies = rc.senseNearbyRobots(-1, rc.getTeam());
         enemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent()); //Bytecode improvement possible
-        phase = Phase.getPhase(rc.getRoundNum(), rc.getMapWidth() * rc.getMapHeight());
         if (rc.getType().isRobotType()) {
             ruins = rc.senseNearbyRuins(-1);
+        }
+
+        //update nearestPaintTower (assumes the last paintTower we passed by is closest)
+        for (RobotInfo robot : allies) {
+            if (robot.getType().isTowerType() && (Utils.getTowerType(robot.getType()) == Utils.towerType.PAINT_TOWER)) {
+                    nearestPaintTower = robot.getLocation();
+            }
         }
     }
 
@@ -64,15 +101,15 @@ public abstract class Robot{
         int bestScore = 0;
 
         for(Action action: actions){
-            Debug.print(2, action.name + " ...");
+            Debug.print(2, action.name + " ...", action.debugAction);
             action.calcScore();
             int score = action.getScore();
             if(score > bestScore){
                 bestScore = score;
                 bestAction = action;
             }
-            Debug.print(2,  "SCORE : " + score);
-            Debug.print(2,  "");
+            Debug.print(2,  "SCORE : " + score, action.debugAction);
+            Debug.print(2,  "", action.debugAction);
         }
 
         if(bestScore > 0){
