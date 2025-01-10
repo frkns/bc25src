@@ -48,7 +48,7 @@ class TowerFuncs extends RobotPlayer{
 
     static void spawnUnits(RobotController rc) throws GameActionException {
         Direction dir = directions[rng.nextInt(directions.length)]; // TODO spawn them in the direction they should go
-        MapLocation nextLoc = rc.getLocation().add(dir);
+        MapLocation nextLoc = rc.getLocation().add(dir).add(dir);
 
         UnitType Unit = productionList[productionTypeCounter % productionList.length];
         if (rc.canBuildRobot(Unit, nextLoc)) {

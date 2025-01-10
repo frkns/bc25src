@@ -1,16 +1,31 @@
-package e_actions;
+package e_action;
 
-import e_actions.actions.Action;
-import e_actions.utils.*;
+import e_action.actions.Action;
+import e_action.utils.*;
 
 import battlecode.common.*;
 
 import java.util.ArrayDeque;
+import java.util.Random;
 
 public abstract class Robot{
 
     public static RobotController rc;
     public static ArrayDeque<Action> actions = new ArrayDeque<>();
+
+
+    // -------------- Useful constants --------------
+    public static final Random rng = new Random(0);
+    public static final Direction[] directions = {
+            Direction.NORTH,
+            Direction.NORTHEAST,
+            Direction.EAST,
+            Direction.SOUTHEAST,
+            Direction.SOUTH,
+            Direction.SOUTHWEST,
+            Direction.WEST,
+            Direction.NORTHWEST,
+    };
 
     // -------------- Internal info --------------
     public static int phase;

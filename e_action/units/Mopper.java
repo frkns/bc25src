@@ -1,7 +1,7 @@
-package e_actions.units;
+package e_action.units;
 
-import e_actions.Robot;
-import e_actions.actions.unit.*;
+import e_action.Robot;
+import e_action.actions.unit.*;
 
 import battlecode.common.*;
 

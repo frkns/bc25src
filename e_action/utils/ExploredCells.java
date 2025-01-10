@@ -1,4 +1,4 @@
-package e_actions.utils;
+package e_action.utils;
 
 import battlecode.common.MapLocation;
 

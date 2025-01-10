@@ -1,17 +1,17 @@
-package e_actions.actions.unit;
+package e_action.actions.unit;
 
-import e_actions.Robot;
-import e_actions.actions.Action;
-import e_actions.utils.*;
+import e_action.Robot;
+import e_action.actions.Action;
+import e_action.utils.Debug;
+import battlecode.common.RobotController;
 
-import battlecode.common.*;
-
-public class SplasherAttack extends Action {
+public class SoldierAttack extends Action {
     public RobotController rc;
 
-    public SplasherAttack(){
+    public SoldierAttack(){
         rc = Robot.rc;
-        name = "SSPLASHER ATTACK";
+        name = "SOLDIER ATTACK";
+
         Debug.print(3, "Instantiating " + name);
     }
 

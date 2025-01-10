@@ -1,18 +1,17 @@
-package e_actions.actions.tower;
+package e_action.actions.unit;
 
-import e_actions.Robot;
-import e_actions.actions.Action;
-import e_actions.utils.*;
+import e_action.Robot;
+import e_action.actions.Action;
+import e_action.utils.*;
 
 import battlecode.common.*;
 
-public class SpawnUnits extends Action {
+public class SplasherAttack extends Action {
     public RobotController rc;
 
-    public SpawnUnits(){
+    public SplasherAttack(){
         rc = Robot.rc;
-        name = "SPAWN UNITS";
-
+        name = "SSPLASHER ATTACK";
         Debug.print(3, "Instantiating " + name);
     }
 
@@ -23,7 +22,7 @@ public class SpawnUnits extends Action {
 
     public int getScore(){
         // 0 if nothing to do.
-        return ActionConstants.SpawnUnitsScore;
+        return 2;
     }
 
     public void play(){

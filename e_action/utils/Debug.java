@@ -1,6 +1,6 @@
-package e_actions.utils;
+package e_action.utils;
 
-import e_actions.Robot;
+import e_action.Robot;
 import battlecode.common.Clock;
 import battlecode.common.GameConstants;
 import battlecode.common.RobotController;

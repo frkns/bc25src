@@ -1,4 +1,4 @@
-package e_actions.utils;
+package e_action.utils;
 
 public class Phase {
     public static int getPhase (int round, int mapSize) {

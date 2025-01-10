@@ -1,4 +1,4 @@
-package e_actions.utils;
+package e_action.utils;
 
 public class ActionConstants {
     public static final int SMALL_PHASE1 = 200;

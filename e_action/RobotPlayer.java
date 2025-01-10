@@ -1,10 +1,10 @@
-package e_actions;
+package e_action;
 
 import battlecode.common.*;
-import e_actions.units.Mopper;
-import e_actions.units.Soldier;
-import e_actions.units.Splasher;
-import e_actions.units.Tower;
+import e_action.units.Mopper;
+import e_action.units.Soldier;
+import e_action.units.Splasher;
+import e_action.units.Tower;
 
 
 public class RobotPlayer {
