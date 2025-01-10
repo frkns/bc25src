@@ -1,4 +1,4 @@
-package important;
+package temp_test;
 
 import battlecode.common.*;
 import java.util.Arrays;
@@ -44,8 +44,6 @@ public class AttackBase extends RobotPlayer {
     static boolean[] visited = new boolean[3];
     static MapLocation foundLoc = null;
 
-    static final boolean ATTACK_MICRO = true;  // do we want to shift back and forth to avoid tower shots?
-
     static void run() throws GameActionException {
 
         RobotInfo[] nearbyRobots = rc.senseNearbyRobots();
@@ -56,12 +54,10 @@ public class AttackBase extends RobotPlayer {
             if (rc.canAttack(foundLoc)) {
                 attacked = true;
                 rc.attack(foundLoc);
-                if (ATTACK_MICRO) {
-                    Direction dir = rc.getLocation().directionTo(foundLoc).opposite();
-                    if (rc.canMove(dir)) {
-                        rc.move(dir);
-                    }
-                }
+                // Direction dir = rc.getLocation().directionTo(foundLoc).opposite();
+                // if (rc.canMove(dir)) {
+                //     rc.move(dir);
+                // }
             } else {
                 if (rc.canMove(rc.getLocation().directionTo(foundLoc))) {
                     rc.move(rc.getLocation().directionTo(foundLoc));
