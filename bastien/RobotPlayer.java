@@ -1,10 +1,10 @@
-package adrien;
+package bastien;
 
 import battlecode.common.*;
-import adrien.units.Mopper;
-import adrien.units.Soldier;
-import adrien.units.Splasher;
-import adrien.units.Tower;
+import bastien.units.Mopper;
+import bastien.units.Soldier;
+import bastien.units.Splasher;
+import bastien.units.Tower;
 
 import java.util.Random;
 
@@ -43,21 +43,17 @@ public class RobotPlayer {
         }
 
         turnCount = 0;
-        robot.init();
     }
 
-    public static void run(RobotController robotController) throws GameActionException {
-        // System.out.println("I'm alive");
-        rc = robotController;
-        resetRobot();
+    public static void run(RobotController r) throws GameActionException {
+        rc = r;  // Assign r to the public static field rc
+        resetRobot(); // Also used to init robot
 
         while (true) {
             try {
-                if(rc.getRoundNum() > 200 && false){
-                    rc.resign();
-                }
-
-                robot.play();
+                robot.initTurn();
+                robot.playTurn();
+                robot.endTurn();
             }
             catch (GameActionException e) {
                 System.out.println("GameActionException");
