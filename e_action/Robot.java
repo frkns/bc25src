@@ -65,7 +65,7 @@ public abstract class Robot{
 
         for(Action action: actions){
             Debug.print(2, action.name + " ...");
-            action.init();
+            action.calcScore();
             int score = action.getScore();
             if(score > bestScore){
                 bestScore = score;

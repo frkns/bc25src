@@ -13,7 +13,7 @@ public class SpawnUnits extends Action {
         rc = Robot.rc;
         name = "SPAWN UNITS";
         score = 0;
-        Debug.print(3, "Instantiating " + name);
+        Debug.print(3, Debug.INIT + name);
     }
 
     static UnitType[] productionList = {UnitType.SOLDIER, UnitType.MOPPER, UnitType.SPLASHER};
@@ -21,10 +21,10 @@ public class SpawnUnits extends Action {
     static MapLocation spawnLoc;
     static UnitType Unit;
 
-    public void init() throws GameActionException {
-        Debug.print(3, "Init " + name);
+    public void calcScore() throws GameActionException {
+        Debug.print(3, Debug.CALCSCORE + name);
 
-        Direction dir = Robot.directions[Robot.rng.nextInt(Robot.directions.length)]; // TODO spawn them in the direction they should go
+        Direction dir = Robot.directions[Robot.rng.nextInt(Robot.directions.length)];
         if (dir.getDeltaX() != 0 && dir.getDeltaY() != 0) {
             spawnLoc = rc.getLocation().add(dir); // If diagonal we can only spawn 1 tile away
         } else {
@@ -42,7 +42,7 @@ public class SpawnUnits extends Action {
     }
 
     public void play() throws GameActionException {
-        Debug.print(3, "Playing " + name);
+        Debug.print(3, Debug.PLAY + name);
         rc.buildRobot(Unit, spawnLoc);
         productionTypeCounter++;
     }

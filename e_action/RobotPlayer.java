@@ -30,8 +30,8 @@ public class RobotPlayer {
 
     public static void run(RobotController r) throws GameActionException {
         rc = r;  // Assign r to the public static field rc
-        setRobotType();
 
+        setRobotType();
         while (true) {
             try {
                 robot.initTurn();

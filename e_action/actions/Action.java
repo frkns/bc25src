@@ -13,7 +13,7 @@ public abstract class Action {
         rc = Robot.rc;
     }
 
-    public abstract void init() throws GameActionException;
+    public abstract void calcScore() throws GameActionException;
     public abstract int getScore();
     public abstract void play() throws GameActionException;
 }
