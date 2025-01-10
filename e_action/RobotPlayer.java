@@ -1,11 +1,11 @@
 package e_action;
 
-import battlecode.common.*;
 import e_action.units.Mopper;
 import e_action.units.Soldier;
 import e_action.units.Splasher;
 import e_action.units.Tower;
 
+import battlecode.common.*;
 
 public class RobotPlayer {
     static RobotController rc;
