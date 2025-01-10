@@ -5,7 +5,7 @@ import battlecode.common.Clock;
 import battlecode.common.GameConstants;
 import battlecode.common.RobotController;
 
-public class DebugUnit {
+public class Debug {
     public static boolean debug = true;
 
     private static final String[] indents = {"", "\t", "\t\t", "\t\t\t", "\t\t\t\t", "\t\t\t\t\t", "\t\t\t\t\t"};

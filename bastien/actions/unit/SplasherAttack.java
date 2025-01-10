@@ -12,11 +12,11 @@ public class SplasherAttack extends Action {
     public SplasherAttack(){
         rc = Robot.rc;
         name = "SSPLASHER ATTACK";
-        DebugUnit.print(3, "Instantiating " + name);
+        Debug.print(3, "Instantiating " + name);
     }
 
     public void init(){
-        DebugUnit.print(3, "Init " + name);
+        Debug.print(3, "Init " + name);
         // Do stuff here
     }
 
@@ -26,6 +26,6 @@ public class SplasherAttack extends Action {
     }
 
     public void play(){
-        DebugUnit.print(3, "Playing " + name);
+        Debug.print(3, "Playing " + name);
     }
 }

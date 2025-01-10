@@ -2,7 +2,7 @@ package bastien.actions.unit;
 
 import bastien.Robot;
 import bastien.actions.Action;
-import bastien.utils.DebugUnit;
+import bastien.utils.Debug;
 import battlecode.common.RobotController;
 
 public class SoldierAttack extends Action {
@@ -12,11 +12,11 @@ public class SoldierAttack extends Action {
         rc = Robot.rc;
         name = "SOLDIER ATTACK";
 
-        DebugUnit.print(3, "Instantiating " + name);
+        Debug.print(3, "Instantiating " + name);
     }
 
     public void init(){
-        DebugUnit.print(3, "Init " + name);
+        Debug.print(3, "Init " + name);
         // Do stuff here
     }
 
@@ -26,6 +26,6 @@ public class SoldierAttack extends Action {
     }
 
     public void play(){
-        DebugUnit.print(3, "Playing " + name);
+        Debug.print(3, "Playing " + name);
     }
 }

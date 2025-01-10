@@ -24,7 +24,7 @@ public abstract class Robot{
     public Robot(RobotController r){
         rc = r;
         // messageUnit = new MessageUnit(this);
-        DebugUnit.init();
+        Debug.init();
     }
 
     public void initTurn() throws GameActionException {
@@ -37,41 +37,41 @@ public abstract class Robot{
     }
 
     public void playTurn() throws GameActionException {
-        DebugUnit.reset(rc.getRoundNum()); // Reset clock to benchmark
+        Debug.reset(rc.getRoundNum()); // Reset clock to benchmark
 
-        DebugUnit.print(0, "Start turn => " + rc.getType() + " at " + rc.getLocation());
-        DebugUnit.print(1, "Init.");
+        Debug.print(0, "Start turn => " + rc.getType() + " at " + rc.getLocation());
+        Debug.print(1, "Init.");
         initTurn();
 
-        DebugUnit.print(1, "");
-        DebugUnit.print(1, "Calculate actions.");
+        Debug.print(1, "");
+        Debug.print(1, "Calculate actions.");
         Action bestAction = null;
         int bestScore = 0;
 
         for(Action action: actions){
-            DebugUnit.print(2, action.name + " ...");
+            Debug.print(2, action.name + " ...");
             action.init();
             int score = action.getScore();
             if(score > bestScore){
                 bestScore = score;
                 bestAction = action;
             }
-            DebugUnit.print(2,  "SCORE : " + score);
-            DebugUnit.print(2,  "");
+            Debug.print(2,  "SCORE : " + score);
+            Debug.print(2,  "");
         }
 
         if(bestScore > 0){
-            DebugUnit.print(1, "");
-            DebugUnit.print(1, "Playing action: " + bestAction.name + " with score " + bestScore);
+            Debug.print(1, "");
+            Debug.print(1, "Playing action: " + bestAction.name + " with score " + bestScore);
             rc.setIndicatorString(bestAction.name + " - " + bestScore);
             bestAction.play();
         }else{
-            DebugUnit.print(1, "");
-            DebugUnit.print(1, "No action to play");
+            Debug.print(1, "");
+            Debug.print(1, "No action to play");
         }
     }
 
     public void endTurn(){
-        DebugUnit.print(0, "End turn.");
+        Debug.print(0, "End turn.");
     }
 }
