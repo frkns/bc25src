@@ -14,6 +14,7 @@ public abstract class Robot{
 
     // -------------- Internal info --------------
     public static int phase;
+
     // -------------- External infos --------------
     public static RobotInfo[] allies;
     public static RobotInfo[] enemies;

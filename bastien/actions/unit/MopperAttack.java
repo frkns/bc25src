@@ -11,13 +11,13 @@ public class MopperAttack extends Action {
 
     public MopperAttack(){
         rc = Robot.rc;
-        name = "ATTACK";
+        name = "MOPPER ATTACK";
 
-        DebugUnit.print(3, DebugUnit.INSTANTIATE + name);
+        DebugUnit.print(3, "Instantiating " + name);
     }
 
     public void init(){
-        DebugUnit.print(3, DebugUnit.INIT + name);
+        DebugUnit.print(3, "Init " + name);
         // Do stuff here
     }
 
@@ -27,6 +27,6 @@ public class MopperAttack extends Action {
     }
 
     public void play(){
-        DebugUnit.print(3, DebugUnit.PLAY + name);
+        DebugUnit.print(3, "Playing " + name);
     }
 }
