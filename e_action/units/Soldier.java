@@ -11,6 +11,5 @@ public class Soldier extends Robot {
         super(rc);
 
         actions.add(new Explore());
-        actions.add(new _Template());
     }
 }
