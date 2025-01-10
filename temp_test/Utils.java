@@ -17,7 +17,17 @@ public class Utils {
     static int MAP_AREA;
     static MapLocation SPAWN_LOCATION;
 
-    static MapLocation mirror(MapLocation loc) {
+    // vertical symmetry
+    static MapLocation verticalMirror(MapLocation loc) {
+        return new MapLocation(loc.x, MAP_HEIGHT - loc.y - 1);
+    }
+
+    // horizontal symmetry
+    static MapLocation horizontalMirror(MapLocation loc) {
+        return new MapLocation(MAP_WIDTH - loc.x - 1, loc.y);
+    }
+
+    static MapLocation mirror(MapLocation loc) {  // rotational
         return new MapLocation(MAP_WIDTH - loc.x - 1, MAP_HEIGHT - loc.y - 1);
     }
 
@@ -53,5 +63,9 @@ public class Utils {
     // misc
     public static boolean isBitOne(int value, int LSBpos) {
         return (((value >> LSBpos) & 1) == 1);
+    }
+
+    static int manhattanDistance(MapLocation A, MapLocation B) {
+        return Math.max(Math.abs(A.x - B.x), Math.abs(A.y - B.y));
     }
 }
