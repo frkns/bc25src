@@ -4,12 +4,12 @@ import battlecode.common.*;
 
 //phase 1 for soldiers
 //spread out and build cash towers
-public class Splashers extends RobotPlayer{
+public class Splasher extends RobotPlayer{
     static int nearestPaintTowerDistance = 999999;
     static MapLocation nearestPaintTower = null;
     public static MapLocation target;
 
-    public static void run (RobotController rc) throws GameActionException {
+    public static void run(RobotController rc) throws GameActionException {
         int height = rc.getMapHeight();
         int width = rc.getMapWidth();
 
@@ -20,8 +20,15 @@ public class Splashers extends RobotPlayer{
         int distance = 0;
         RobotInfo curBot = null;
 
+        boolean paintTowerNearby = false;
+        int friendlyRobotsNearby = 0;
+
         for (RobotInfo robot : nearbyRobots){
+            if (rc.canUpgradeTower(robot.getLocation())) {
+                rc.upgradeTower(robot.getLocation());
+            }
             if (robot.getTeam() == rc.getTeam()) {
+                friendlyRobotsNearby++;
                 if (robot.getType() == UnitType.LEVEL_ONE_PAINT_TOWER
                     || robot.getType() == UnitType.LEVEL_TWO_PAINT_TOWER
                     || robot.getType() == UnitType.LEVEL_THREE_PAINT_TOWER) {
@@ -37,14 +44,13 @@ public class Splashers extends RobotPlayer{
         if (nearestPaintTower != null && paint < 70) {
             rc.setIndicatorString("Getting some paint!");
             int mxPaint = rc.getType().paintCapacity;
-            System.out.println("mxpaint: " + mxPaint);
             int amt = mxPaint - paint;
             if (rc.canTransferPaint(nearestPaintTower, -1 * amt)) {
                 rc.transferPaint(nearestPaintTower, -1 * amt);
             }
             target = nearestPaintTower;
-        } else
-        if (target == null || rc.getLocation() == target) {
+        }
+        if (paint >= 70 && target == null || rc.getLocation() == target) {
             if (rc.getRoundNum() % 2 == 0)
                 target = Utils.randomEnemyLocation();
             else
@@ -84,6 +90,8 @@ public class Splashers extends RobotPlayer{
         if(rc.canMove(dir) && !(rc.senseMapInfo(rc.getLocation().add(dir)).getPaint().equals(PaintType.ENEMY_PRIMARY)) && !(rc.senseMapInfo(rc.getLocation().add(dir)).getPaint().equals(PaintType.ENEMY_SECONDARY))) {
             rc.move(dir);
         }
+
+        Pathfinder.move(target);
 
         // MapInfo currentTile = rc.senseMapInfo(rc.getLocation());
         // if (!currentTile.getPaint().isAlly() && rc.canAttack(rc.getLocation())){

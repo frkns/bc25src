@@ -37,7 +37,6 @@ public class Splashers extends RobotPlayer{
         if (nearestPaintTower != null && paint < 70) {
             rc.setIndicatorString("Getting some paint!");
             int mxPaint = rc.getType().paintCapacity;
-            System.out.println("mxpaint: " + mxPaint);
             int amt = mxPaint - paint;
             if (rc.canTransferPaint(nearestPaintTower, -1 * amt)) {
                 rc.transferPaint(nearestPaintTower, -1 * amt);
