@@ -6,32 +6,15 @@ import bastien.utils.*;
 import battlecode.common.*;
 
 import java.util.ArrayDeque;
-import java.util.Random;
 
 public abstract class Robot{
-    // -------------- Scores --------------
-    public static int ACTION_PAINT = 30;
-    public static int ACTION_EXPLORE = 15;
-
-    // -------------- Attributes --------------
-    public static final Direction[] directions = {
-            Direction.NORTH,
-            Direction.NORTHEAST,
-            Direction.EAST,
-            Direction.SOUTHEAST,
-            Direction.SOUTH,
-            Direction.SOUTHWEST,
-            Direction.WEST,
-            Direction.NORTHWEST,
-    };
-
-    public static Random rng = new Random();
 
     public static RobotController rc;
     public static ArrayDeque<Action> actions = new ArrayDeque<>();
 
-
-    // -------------- Map infos you could need --------------
+    // -------------- Internal info --------------
+    public static int phase;
+    // -------------- External infos --------------
     public static RobotInfo[] allies;
     public static RobotInfo[] enemies;
     public static MapLocation[] ruins;
@@ -45,8 +28,11 @@ public abstract class Robot{
 
     public void initTurn() throws GameActionException {
         allies = rc.senseNearbyRobots(-1, rc.getTeam());
-        enemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
-        ruins = rc.senseNearbyRuins(-1);
+        enemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent()); //Bytecode improvement possible
+        phase = Phase.getPhase(rc.getRoundNum(), rc.getMapWidth() * rc.getMapHeight());
+        if (rc.getType().isRobotType()) {
+            ruins = rc.senseNearbyRuins(-1);
+        }
     }
 
     public void playTurn() throws GameActionException {
@@ -63,7 +49,7 @@ public abstract class Robot{
 
         for(Action action: actions){
             DebugUnit.print(2, action.name + " ...");
-            // action.init();
+            action.init();
             int score = action.getScore();
             if(score > bestScore){
                 bestScore = score;

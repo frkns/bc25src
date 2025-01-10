@@ -9,7 +9,6 @@ public class DebugUnit {
     public static boolean debug = true;
     public static String INSTANTIATE = "Instantiating ";
     public static String INIT = "Init ";
-    public static String RETURN_SCORE = "Return score";
     public static String PLAY = "Playing ";
 
     private static final String[] indents = {"", "\t", "\t\t", "\t\t\t", "\t\t\t\t", "\t\t\t\t\t", "\t\t\t\t\t"};

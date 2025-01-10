@@ -6,27 +6,12 @@ import bastien.units.Soldier;
 import bastien.units.Splasher;
 import bastien.units.Tower;
 
-import java.util.Random;
-
 
 public class RobotPlayer {
-    static final Direction[] directions = {
-            Direction.NORTH,
-            Direction.NORTHEAST,
-            Direction.EAST,
-            Direction.SOUTHEAST,
-            Direction.SOUTH,
-            Direction.SOUTHWEST,
-            Direction.WEST,
-            Direction.NORTHWEST,
-    };
-
-    static int turnCount = 0;
-    static final Random rng = new Random(6147);
     static RobotController rc;
     static Robot robot;
 
-    static void resetRobot(){
+    static void setRobotType(){
         switch (rc.getType()){
             case SOLDIER:
                 robot = new Soldier(rc);
@@ -41,13 +26,11 @@ public class RobotPlayer {
                 robot = new Tower(rc);
                 break;
         }
-
-        turnCount = 0;
     }
 
     public static void run(RobotController r) throws GameActionException {
         rc = r;  // Assign r to the public static field rc
-        resetRobot(); // Also used to init robot
+        setRobotType();
 
         while (true) {
             try {
@@ -58,13 +41,9 @@ public class RobotPlayer {
             catch (GameActionException e) {
                 System.out.println("GameActionException");
                 e.printStackTrace();
-                resetRobot();
-
             } catch (Exception e) {
                 System.out.println("Exception");
                 e.printStackTrace();
-                resetRobot();
-
             } finally {
                 Clock.yield();
             }

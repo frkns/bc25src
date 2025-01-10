@@ -10,14 +10,13 @@ class Utils extends RobotPlayer {
     static Random rng;
 
     // constants that vary by game
-    static int roundNumber;
     static int MAP_WIDTH;
     static int MAP_HEIGHT;
     static int MAP_AREA;
     static MapLocation SPAWN_LOCATION;
     static boolean DEBUG_FAIL_FAST = false;
 
-    static void init(RobotController r) throws GameActionException{
+    static void init(RobotController r) {
         rc = r;
         rng = new Random(rc.getRoundNum() * 1007 + rc.getID() * 1009);
 
@@ -37,12 +36,12 @@ class Utils extends RobotPlayer {
         return loc.x - explorationBoundary < 0 || loc.y - explorationBoundary < 0
             || loc.x + explorationBoundary >= MAP_WIDTH || loc.y + explorationBoundary >= MAP_HEIGHT;
     }
+
     static MapLocation getRandomInBoundLocation() {
         // should be within [explorationBoundary+1, MAP_WIDTH-explorationBoundary-1]
-        MapLocation res =  new MapLocation(rng.nextInt(MAP_WIDTH - 2*explorationBoundary - 1) + explorationBoundary + 1,
+        return new MapLocation(rng.nextInt(MAP_WIDTH - 2*explorationBoundary - 1) + explorationBoundary + 1,
                                rng.nextInt(MAP_HEIGHT - 2*explorationBoundary - 1) + explorationBoundary + 1);
 
-        return res;
     }
 
     static MapLocation randomEnemyLocation() {

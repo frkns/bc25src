@@ -12,7 +12,6 @@ public class SplasherAttack extends Action {
     public SplasherAttack(){
         rc = Robot.rc;
         name = "ATTACK";
-
         DebugUnit.print(3, DebugUnit.INSTANTIATE + name);
     }
 
@@ -22,7 +21,6 @@ public class SplasherAttack extends Action {
     }
 
     public int getScore(){
-        DebugUnit.print(3, DebugUnit.RETURN_SCORE + name);
         // 0 if nothing to do.
         return 2;
     }

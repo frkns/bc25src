@@ -11,22 +11,15 @@ class Pathfinder extends RobotPlayer{
     static MapLocation stayawayFrom = null;
     static int stuckCnt;
 
-    static void init(RobotController r) throws GameActionException {
+    static void init(RobotController r) {
         rc = r;
     }
-
 
     static void tryMove(Direction dir, boolean allowAttack) throws GameActionException {
         if (dir == Direction.CENTER)
             return;
         if (rc.canMove(dir)) {
             rc.move(dir);
-        }
-        MapLocation myLoc = rc.getLocation();
-        if (allowAttack && rc.senseMapInfo(myLoc).getPaint() == PaintType.EMPTY){
-            if (rc.canAttack(myLoc)){
-                rc.attack(myLoc);
-            }
         }
     }
 
@@ -39,11 +32,6 @@ class Pathfinder extends RobotPlayer{
         if (dir == null)
             return;
         tryMove(dir, allowAttack);
-    }
-
-    // let's try to keep functions as pure as possible. so no attack by default
-    static void move(MapLocation loc) throws GameActionException {
-        move(loc, false);
     }
 
     static class BugNav {
@@ -345,8 +333,6 @@ class DirectionStack {
 
     /**
      * Returns the top n element of the stack
-     * @param n
-     * @return
      */
     final Direction top(int n) {
         return dirs[size - n];
