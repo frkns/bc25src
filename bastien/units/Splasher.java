@@ -1,17 +1,16 @@
 package bastien.units;
 
-import bastien.Actions.ActionExplore;
-import bastien.Actions.ActionPaint;
-import battlecode.common.RobotController;
-import battlecode.common.UnitType;
 import bastien.Robot;
+import bastien.actions.unit.*;
+import bastien.utils.*;
+
+import battlecode.common.*;
+
 
 public class Splasher extends Robot {
-    public Splasher(RobotController controller){
-        super(controller);
-        attackCost = UnitType.SPLASHER.attackCost;
+    public Splasher(RobotController rc){
+        super(rc);
 
-        actions.add(new ActionExplore());
-        actions.add(new ActionPaint());
+        actions.add(new SplasherAttack());
     }
 }

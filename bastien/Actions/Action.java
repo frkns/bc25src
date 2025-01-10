@@ -1,7 +1,8 @@
-package bastien.Actions;
+package bastien.actions;
 
-import battlecode.common.RobotController;
 import bastien.Robot;
+
+import battlecode.common.*;
 
 public abstract class Action {
     public RobotController rc;

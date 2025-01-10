@@ -1,9 +1,9 @@
 package bastien;
 
-import bastien.Actions.Action;
+import bastien.actions.Action;
+import bastien.utils.*;
+
 import battlecode.common.*;
-import bastien.utils.DebugUnit;
-import bastien.utils.MessageUnit;
 
 import java.util.ArrayDeque;
 import java.util.Random;
@@ -28,7 +28,6 @@ public abstract class Robot{
     public static Random rng = new Random();
 
     public static RobotController rc;
-    static MessageUnit messageUnit;
     public static ArrayDeque<Action> actions = new ArrayDeque<>();
 
 
@@ -36,14 +35,11 @@ public abstract class Robot{
     public static RobotInfo[] allies;
     public static RobotInfo[] enemies;
     public static MapLocation[] ruins;
-    public static MapInfo[] marks;
-    public static MapLocation nearestEmptyRuin;
-    public static int attackCost = 0;
 
     // -------------- Methods --------------
-    public Robot(RobotController controlller){
-        rc = controlller;
-        messageUnit = new MessageUnit(this);
+    public Robot(RobotController r){
+        rc = r;
+        // messageUnit = new MessageUnit(this);
         DebugUnit.init();
     }
 
@@ -51,25 +47,12 @@ public abstract class Robot{
         allies = rc.senseNearbyRobots(-1, rc.getTeam());
         enemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
         ruins = rc.senseNearbyRuins(-1);
-        marks = rc.senseNearbyMapInfos(-1);
-
-        nearestEmptyRuin = null;
-        int nearestRuinDistance = 999;
-        for(MapLocation loc: ruins){
-            if(!rc.canSenseRobotAtLocation(loc)){ // No tower at the location, empty ruins
-                int distance = rc.getLocation().distanceSquaredTo(loc);
-                if(distance < nearestRuinDistance){
-                    nearestEmptyRuin = loc;
-                    nearestRuinDistance = distance;
-                }
-            }
-        }
     }
 
     public void playTurn() throws GameActionException {
         DebugUnit.reset(rc.getRoundNum()); // Reset clock to benchmark
 
-        DebugUnit.print(0, "Start turn. " + rc.getType() + " at " + rc.getLocation());
+        DebugUnit.print(0, "Start turn => " + rc.getType() + " at " + rc.getLocation());
         DebugUnit.print(1, "Init.");
         initTurn();
 
@@ -79,8 +62,8 @@ public abstract class Robot{
         int bestScore = 0;
 
         for(Action action: actions){
-            DebugUnit.print(2, action.name + "...");
-            action.init();
+            DebugUnit.print(2, action.name + " ...");
+            // action.init();
             int score = action.getScore();
             if(score > bestScore){
                 bestScore = score;
@@ -92,7 +75,7 @@ public abstract class Robot{
 
         if(bestScore > 0){
             DebugUnit.print(1, "");
-            DebugUnit.print(1, "Playing action     : " + bestAction.name + " with score " + bestScore);
+            DebugUnit.print(1, "Playing action: " + bestAction.name + " with score " + bestScore);
             rc.setIndicatorString(bestAction.name + " - " + bestScore);
             bestAction.play();
         }else{

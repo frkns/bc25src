@@ -47,11 +47,10 @@ public class RobotPlayer {
 
     public static void run(RobotController r) throws GameActionException {
         rc = r;  // Assign r to the public static field rc
-        resetRobot();
+        resetRobot(); // Also used to init robot
 
         while (true) {
             try {
-                rc.getRoundNum();
                 robot.initTurn();
                 robot.playTurn();
                 robot.endTurn();
