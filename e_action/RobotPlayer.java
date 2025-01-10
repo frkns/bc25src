@@ -1,11 +1,11 @@
 package e_action;
 
-import battlecode.common.*;
 import e_action.units.Mopper;
 import e_action.units.Soldier;
 import e_action.units.Splasher;
 import e_action.units.Tower;
 
+import battlecode.common.*;
 
 public class RobotPlayer {
     static RobotController rc;
@@ -30,8 +30,8 @@ public class RobotPlayer {
 
     public static void run(RobotController r) throws GameActionException {
         rc = r;  // Assign r to the public static field rc
-        setRobotType();
 
+        setRobotType();
         while (true) {
             try {
                 robot.initTurn();

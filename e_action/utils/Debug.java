@@ -6,7 +6,10 @@ import battlecode.common.GameConstants;
 import battlecode.common.RobotController;
 
 public class Debug {
-    public static boolean debug = true;
+    public static boolean debug = false;
+    public static String INIT = "Initializing ";
+    public static String CALCSCORE = "Calculating Score ";
+    public static String PLAY = "Playing ";
 
     private static final String[] indents = {"", "\t", "\t\t", "\t\t\t", "\t\t\t\t", "\t\t\t\t\t", "\t\t\t\t\t"};
     private static int BYTECODE_PER_TURNS = GameConstants.ROBOT_BYTECODE_LIMIT;
