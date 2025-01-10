@@ -1,4 +1,4 @@
-package kenny;
+package old;
 
 import java.util.Random;
 import battlecode.common.*;

@@ -1,4 +1,4 @@
-package kenny;
+package old;
 
 import battlecode.common.*;
 

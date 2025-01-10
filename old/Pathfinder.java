@@ -1,8 +1,8 @@
 // Adapted from https://github.com/chenyx512/battlecode24/blob/main/src/bot1/PathFinder.java
-package kenny;
+package old;
 
 import battlecode.common.*;
-import kenny.fast.*;
+import old.fast.*;
 
 class Pathfinder extends RobotPlayer{
     static RobotController rc;
