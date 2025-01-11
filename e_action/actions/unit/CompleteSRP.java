@@ -16,13 +16,10 @@ public class CompleteSRP extends Action {
     public CompleteSRP(){
         rc = Robot.rc;
         name = "BUILD SRP";
+        type = 2;
         debugAction = false;
         Debug.print(3, Debug.INIT + name, debugAction);
     }
-
-
-    // Initialize variables specific to the function here
-
 
     public void initUnit(){
         Debug.print(1, Debug.INITUNIT + name, debugAction);
@@ -81,19 +78,16 @@ public class CompleteSRP extends Action {
 
                         if(tile.hasRuin() || tile.isWall()) {
                             score = 0;
-                            cooldown_reqs = 0;
                             return;
                         }
 
                         if(tile.getPaint() == PaintType.ENEMY_SECONDARY || tile.getPaint() == PaintType.ENEMY_PRIMARY) {
                             score = 0;
-                            cooldown_reqs = 0;
                             return;
                         }
                         if(tile.getPaint() == PaintType.ALLY_SECONDARY && !pattern[x-center.x+2][y-center.y+2]) {
-                            if(Robot.nearbyRuins.length > 0) {
+                            if(Info.nearbyRuins.length > 0) {
                                 score = 0;
-                                cooldown_reqs = 0;
                                 return;
                             } else {
                                 paintLoc = tile.getMapLocation();
@@ -108,16 +102,13 @@ public class CompleteSRP extends Action {
                     }
                 }
                 score = Constants.CompleteSRPScore;
-                cooldown_reqs = 3;
                 return;
             }
         } else {
             score = 0;
-            cooldown_reqs = 0;
             return;
         }
         score = 0;
-        cooldown_reqs = 0;
     }
 
     public int getScore(){

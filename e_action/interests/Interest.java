@@ -9,7 +9,7 @@ import e_action.utils.Constants;
 public abstract class Interest {
     public RobotController rc;
     public String name = "ABSTRACT Int.";
-    public boolean debugAction = false;
+    public boolean debugInterest = false;
 
     public static int [] directionScores = new int[9]; // TODO use cheap hash map instead
 
