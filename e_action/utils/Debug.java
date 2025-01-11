@@ -4,6 +4,7 @@ import e_action.Robot;
 import battlecode.common.Clock;
 import battlecode.common.GameConstants;
 import battlecode.common.RobotController;
+import e_action.actions.Action;
 
 public class Debug {
     public static boolean debug = false;
@@ -83,5 +84,18 @@ public class Debug {
         } else {
             System.out.println("%5d |         | ".formatted(Clock.getBytecodeNum()) + indents[level] + text);
         }
+    }
+
+    public static void setActionIndicatorString(Action actionAction, Action moveAction, int actionScore, int moveScore){
+        if (actionScore > 0 && moveScore > 0) {
+            rc.setIndicatorString(actionAction.name + " + " + moveAction.name + " - " + (actionScore + moveScore));
+        } else if (actionScore > 0) {
+            rc.setIndicatorString(actionAction.name + " + " + "noMove" + " - " + (actionScore));
+        } else {
+            rc.setIndicatorString("noAction" + " + " +  moveAction.name + " - " + (moveScore));
+        }
+    }
+    public static void setActionIndicatorString(Action comboAction, int comboScore){
+        rc.setIndicatorString(comboAction.name + " - " + comboScore);
     }
 }

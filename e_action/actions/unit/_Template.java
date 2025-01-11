@@ -2,7 +2,7 @@ package e_action.actions.unit;
 
 import e_action.Robot;
 import e_action.actions.Action;
-import e_action.utils.Debug;
+import e_action.utils.*;
 
 import battlecode.common.*;
 
@@ -12,26 +12,29 @@ public class _Template extends Action {
     public _Template(){
         rc = Robot.rc;
         name = "REPLACE WITH FUNC NAME";
-        score = 0;
         debugAction = false;
         Debug.print(3, Debug.INIT + name, debugAction);
     }
 
 
     // Initialize variables specific to the function here
-
+    
 
     public void initUnit(){
-        Debug.print(3, Debug.INITUNIT + name, debugAction);
+        Debug.print(1, Debug.INITUNIT + name, debugAction);
         // Initialize any variable needed when a unit first spawns in
     }
 
-    // Use Robot.variable_name to access the variables in Robot file
-    // e.g. Robot.directions
+    // Use Robot.varname to access the variables in the Robot file
+    // Included are: Robot.nearbyAllies, Robot.nearbyRuins... 
     public void calcScore() throws GameActionException {
         Debug.print(3, Debug.CALCSCORE + name, debugAction);
-        // Calculate score and store any variable useful to the play() function
-        // Remember to set the score 0 if the action is illegal/useless this turn!
+        // Calculate score AND store any variables useful to the play() function
+        // If the action is illegal, set score to 0
+        score = 10; 
+        // Return action requirements
+        // None = 0, Action = 1, Move = 2, Action + Move = 3
+        cooldown_reqs = 3;
     }
 
     public int getScore(){
@@ -42,4 +45,7 @@ public class _Template extends Action {
         Debug.print(3, Debug.PLAY + name, debugAction);
         // Code here
     }
+
+    // Add helper functions here
+
 }

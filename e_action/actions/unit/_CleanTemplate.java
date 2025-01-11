@@ -1,36 +1,33 @@
-package e_action.actions.tower;
+package e_action.actions.unit;
 
+import battlecode.common.GameActionException;
+import battlecode.common.RobotController;
 import e_action.Robot;
 import e_action.actions.Action;
 import e_action.utils.Debug;
 
-import battlecode.common.*;
-
-public class _Template extends Action {
+public class _CleanTemplate extends Action {
     public RobotController rc;
 
-    public _Template(){
+    public _CleanTemplate(){
         rc = Robot.rc;
         name = "REPLACE WITH FUNC NAME";
-        score = 0;
         debugAction = false;
         Debug.print(3, Debug.INIT + name, debugAction);
     }
 
 
-    // Initialize variables specific to the function here
+    // Function specific variables
 
 
     public void initUnit(){
-        Debug.print(3, Debug.INITUNIT + name, debugAction);
-        // Initialize any variable needed when a unit first spawns in
+        Debug.print(1, Debug.INITUNIT + name, debugAction);
+
     }
 
-    // Use Robot.variable_name to access the variables in Robot file
-    // e.g. Robot.directions
     public void calcScore() throws GameActionException {
         Debug.print(3, Debug.CALCSCORE + name, debugAction);
-        // Calculate score and store any variable useful to the play() function
+
     }
 
     public int getScore(){
@@ -39,6 +36,9 @@ public class _Template extends Action {
 
     public void play() throws GameActionException {
         Debug.print(3, Debug.PLAY + name, debugAction);
-        // Code here
+
     }
+
+    // Helper functions
+
 }

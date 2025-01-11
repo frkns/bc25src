@@ -4,6 +4,10 @@ package e_action.utils;
 import battlecode.common.*;
 import e_action.utils.fast.*;
 
+
+//TODO track total paint loss
+//TODO treat options enemy paint/empty paint as walls.
+//Check simulation to see whether distance gained is substantial enough. Otherwise go straight through
 public class Pathfinder{
     static RobotController rc;
 

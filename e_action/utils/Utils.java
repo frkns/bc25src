@@ -34,19 +34,6 @@ public class Utils{
         return new MapLocation(Robot.MAP_WIDTH - loc.x - 1, Robot.MAP_HEIGHT - loc.y - 1);
     }
 
-    public static int explorationBoundary = 5;
-    public static boolean outOfExplorationBounds(MapLocation loc) {
-        return loc.x - explorationBoundary < 0 || loc.y - explorationBoundary < 0
-            || loc.x + explorationBoundary >= Robot.MAP_WIDTH || loc.y + explorationBoundary >= Robot.MAP_HEIGHT;
-    }
-
-    public static MapLocation getRandomInBoundLocation() {
-        // should be within [explorationBoundary+1, Robot.MAP_WIDTH-explorationBoundary-1]
-        return new MapLocation(Robot.rng.nextInt(Robot.MAP_WIDTH - 2*explorationBoundary - 1) + explorationBoundary + 1,
-                               Robot.rng.nextInt(Robot.MAP_HEIGHT - 2*explorationBoundary - 1) + explorationBoundary + 1);
-
-    }
-
     public static MapLocation randomEnemyLocation(MapLocation spawnLoc) {
         MapLocation loc = mirror(spawnLoc);
         // add a small offset based on a % of HEIGHT and WIDTH

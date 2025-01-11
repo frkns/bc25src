@@ -23,7 +23,7 @@ public class SpawnUnits extends Action {
     static UnitType Unit;
 
     public void initUnit(){
-        Debug.print(3, Debug.INITUNIT + name, debugAction);
+        Debug.print(1, Debug.INITUNIT + name, debugAction);
 
     }
 
@@ -43,6 +43,8 @@ public class SpawnUnits extends Action {
         } else {
             score = 0;
         }
+        
+        cooldown_reqs = 2;
     }
 
     public int getScore(){

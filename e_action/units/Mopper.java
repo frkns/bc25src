@@ -11,5 +11,6 @@ public class Mopper extends Robot {
         super(rc);
 
         actions.add(new Explore());
+        actions.add(new MopperAttack());
     }
 }

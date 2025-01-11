@@ -45,9 +45,9 @@ public abstract class Robot{
     // Internal infos
 
     // External infos
-    public static RobotInfo[] allies;
-    public static RobotInfo[] enemies;
-    public static MapLocation[] ruins;
+    public static RobotInfo[] nearbyAllies;
+    public static RobotInfo[] nearbyEnemies;
+    public static MapLocation[] nearbyRuins;
     public static MapLocation nearestPaintTower = null;
 
     // -------------- Methods --------------
@@ -74,14 +74,14 @@ public abstract class Robot{
         phase = Phase.getPhase(rc.getRoundNum(), MAP_AREA);
         chips = rc.getChips();
 
-        allies = rc.senseNearbyRobots(-1, rc.getTeam());
-        enemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent()); //Bytecode improvement possible
+        nearbyAllies = rc.senseNearbyRobots(-1, rc.getTeam());
+        nearbyEnemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent()); //Bytecode improvement possible
         if (rc.getType().isRobotType()) {
-            ruins = rc.senseNearbyRuins(-1);
+            nearbyRuins = rc.senseNearbyRuins(-1);
         }
 
         //update nearestPaintTower (assumes the last paintTower we passed by is closest)
-        for (RobotInfo robot : allies) {
+        for (RobotInfo robot : nearbyAllies) {
             if (robot.getType().isTowerType() && (Utils.getTowerType(robot.getType()) == Utils.towerType.PAINT_TOWER)) {
                     nearestPaintTower = robot.getLocation();
             }
@@ -97,28 +97,61 @@ public abstract class Robot{
 
         Debug.print(1, "");
         Debug.print(1, "Calculate actions.");
-        Action bestAction = null;
-        int bestScore = 0;
+        Action bestActionAction = null;
+        Action bestMoveAction = null;
+        Action bestComboAction = null;
+
+        int bestActionScore = 0;
+        int bestMoveScore = 0;
+        int bestComboScore = 0;
 
         for(Action action: actions){
             Debug.print(2, action.name + " ...", action.debugAction);
             action.calcScore();
             int score = action.getScore();
-            if(score > bestScore){
-                bestScore = score;
-                bestAction = action;
+            switch (action.cooldown_reqs){
+                case 1:
+                    if(score > bestActionScore){
+                        bestActionScore = score;
+                        bestActionAction = action;
+                    }
+                    break;
+                case 2:
+                    if(score > bestMoveScore){
+                        bestMoveScore = score;
+                        bestMoveAction = action;
+                    }
+                    break;
+                case 3:
+                    if(score > bestComboScore){
+                        bestComboScore = score;
+                        bestComboAction = action;
+                    }
+                    break;
             }
+
             Debug.print(2,  "SCORE : " + score, action.debugAction);
             Debug.print(2,  "", action.debugAction);
         }
 
-        if(bestScore > 0){
-            Debug.print(1, "");
-            Debug.print(1, "Playing action: " + bestAction.name + " with score " + bestScore);
-            rc.setIndicatorString(bestAction.name + " - " + bestScore);
-            bestAction.play();
-        }else{
-            Debug.print(1, "");
+        Debug.print(1, "");
+        if(bestActionScore > 0 || bestMoveScore > 0 || bestComboScore > 0){
+            if (bestComboScore > bestActionScore + bestMoveScore){
+                Debug.print(1, "Playing combo action: " + bestComboAction.name + " with score " + bestComboScore);
+                bestComboAction.play();
+                Debug.setActionIndicatorString(bestComboAction, bestComboScore);
+            } else {
+                if (bestActionScore > 0) {
+                    Debug.print(1, "Playing action: " + bestActionAction.name + " with score " + bestActionScore);
+                    bestActionAction.play();
+                }
+                if (bestMoveScore > 0) {
+                    Debug.print(1, "Playing move: " + bestMoveAction.name + " with score " + bestMoveScore);
+                    bestMoveAction.play();
+                }
+                Debug.setActionIndicatorString(bestActionAction, bestMoveAction, bestActionScore, bestMoveScore);
+            }
+        } else {
             Debug.print(1, "No action to play");
         }
     }
