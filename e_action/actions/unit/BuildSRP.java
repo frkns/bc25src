@@ -31,6 +31,7 @@ public class BuildSRP extends Action {
 
     // Check all nearby tiles for a visible 5x5 in which a SRP can be drawn
     public void calcScore() throws GameActionException {
+
         Debug.print(3, Debug.CALCSCORE + name, debugAction);
         center = null;
         MapInfo[] nearbyTiles = rc.senseNearbyMapInfos();
