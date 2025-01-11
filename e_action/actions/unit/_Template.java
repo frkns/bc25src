@@ -41,6 +41,7 @@ public class _Template extends Action {
         return score;
     }
 
+    // TODO <-- Use TODO to make notes on potential future improvements
     public void play() throws GameActionException {
         Debug.print(3, Debug.PLAY + name, debugAction);
         // Code here
