@@ -7,12 +7,12 @@ import e_action.utils.Constants;
 import e_action.utils.Debug;
 
 import battlecode.common.*;
+import e_action.utils.SelectTower;
 
 public class BuildTowerPattern extends Action {
     public RobotController rc;
 
     //class attributes
-    public UnitType tower;
     public boolean alwaysDraw = false;
 
     public MapLocation ruinLoc = null;
@@ -28,10 +28,9 @@ public class BuildTowerPattern extends Action {
 
     }
 
-    public BuildTowerPattern(UnitType tower) {
+    public BuildTowerPattern() {
         rc = Robot.rc;
         name = "BUILD TOWER PATTERN";
-        this.tower = tower;
         Debug.print(3, Debug.INIT + name);
     }
 
@@ -100,6 +99,9 @@ public class BuildTowerPattern extends Action {
     // If a pattern can be drawn on a nearby ruin, draw a tile and move towards that tile
     // If the pattern is completed, move towards the ruin
     public void play() throws GameActionException {
+
+        UnitType tower = SelectTower.selectTower();
+
         if(ruinLoc != null) {
             Debug.print(3, Debug.PLAY + name);
             if(alwaysDraw) {
