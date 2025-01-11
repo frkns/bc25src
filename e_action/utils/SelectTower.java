@@ -6,33 +6,45 @@ import e_action.Robot;
 
 import java.util.ArrayList;
 
-//Helper function for the BuildTowerPattern class that decides which tower to build
+// Helper function for the BuildTowerPattern class that decides which tower to build
+// Adjust chip rate cutoffs to minimize excess chips in mid-late game
+
 public class SelectTower {
     public static RobotController rc = Robot.rc;
 
-    public static UnitType selectTower() {
-        int phase = Phase.getPhase(rc.getRoundNum(),Robot.MAP_AREA);
+    public static UnitType getTower() {
+        int mapArea = Robot.MAP_AREA;
+        int chipsRate = Robot.chipsRate;
+        int round = rc.getRoundNum();
 
-        switch(phase) {
-            case 1:
-                if(rc.getChips() > 2500) {
-                    return UnitType.LEVEL_ONE_PAINT_TOWER;
-                } else {
-                    return UnitType.LEVEL_ONE_MONEY_TOWER;
-                }
-            case 2:
-                if(rc.getChips() < 100) {
-                    return UnitType.LEVEL_ONE_MONEY_TOWER;
-                } else {
-                    return UnitType.LEVEL_ONE_PAINT_TOWER;
-                }
-            case 3:
-                if(rc.getChips() < 500) {
-                    return UnitType.LEVEL_ONE_MONEY_TOWER;
-                } else {
-                    return UnitType.LEVEL_ONE_DEFENSE_TOWER;
-                }
+        if(mapArea < 1000) {
+            if(Robot.chipsRate < 60 ) {
+                return UnitType.LEVEL_ONE_PAINT_TOWER;
+            } else {
+                return UnitType.LEVEL_ONE_MONEY_TOWER;
+            }
+        } else if (mapArea < 2000) {
+            if(Robot.chipsRate < 100 ) {
+                return UnitType.LEVEL_ONE_PAINT_TOWER;
+            } else {
+                return UnitType.LEVEL_ONE_MONEY_TOWER;
+            }
+        } else if (mapArea < 3000) {
+            if(Robot.chipsRate < 100 ) {
+                return UnitType.LEVEL_ONE_PAINT_TOWER;
+            } else if(round < 300){
+                return UnitType.LEVEL_ONE_PAINT_TOWER;
+            } else {
+                return UnitType.LEVEL_ONE_DEFENSE_TOWER;
+            }
+        } else {
+            if(Robot.chipsRate < 160 ) {
+                return UnitType.LEVEL_ONE_PAINT_TOWER;
+            } else if (round < 300) {
+                return UnitType.LEVEL_ONE_MONEY_TOWER;
+            } else {
+                return UnitType.LEVEL_ONE_DEFENSE_TOWER;
+            }
         }
-        return null;
     }
 }
