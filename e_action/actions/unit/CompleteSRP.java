@@ -6,14 +6,14 @@ import e_action.utils.*;
 
 import battlecode.common.*;
 
-public class BuildSRP extends Action {
+public class CompleteSRP extends Action {
     public RobotController rc;
 
     public MapLocation center = null;
     public MapInfo[] nearbyTiles;
     public MapLocation paintLoc = null;
 
-    public BuildSRP(){
+    public CompleteSRP(){
         rc = Robot.rc;
         name = "BUILD SRP";
         debugAction = false;

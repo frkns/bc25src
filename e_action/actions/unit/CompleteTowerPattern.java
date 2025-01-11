@@ -3,13 +3,12 @@ package e_action.actions.unit;
 import e_action.Robot;
 import e_action.actions.Action;
 import e_action.utils.Constants;
-import e_action.utils.Constants;
 import e_action.utils.Debug;
 
 import battlecode.common.*;
 import e_action.utils.SelectTower;
 
-public class BuildTowerPattern extends Action {
+public class CompleteTowerPattern extends Action {
     public RobotController rc;
 
     //class attributes
@@ -28,7 +27,7 @@ public class BuildTowerPattern extends Action {
 
     }
 
-    public BuildTowerPattern() {
+    public CompleteTowerPattern() {
         rc = Robot.rc;
         name = "BUILD TOWER PATTERN";
         Debug.print(3, Debug.INIT + name);
