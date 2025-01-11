@@ -87,7 +87,7 @@ public class CompleteTowerPattern extends Action {
                     }
                 }
             }
-            score = Constants.BuildTower;
+            score = Constants.CompleteTowerPatternScore;
             cooldown_reqs = 3;
         }
     }

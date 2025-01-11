@@ -38,6 +38,18 @@ public class Pathfinder{
         tryMove(dir);
     }
 
+    public static Direction getMoveDir(MapLocation loc) throws GameActionException {
+        if (!rc.isMovementReady() || loc == null)
+            return null;
+        target = loc;
+        stayawayFrom = null;
+        Direction dir = BugNav.getMoveDir();
+        if (dir == null) {
+            return null;
+        }
+        return dir;
+    }
+
     public static class BugNav {
         static DirectionStack dirStack = new DirectionStack();
         static MapLocation prevTarget = null; // previous target

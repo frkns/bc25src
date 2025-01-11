@@ -12,11 +12,13 @@ public abstract class Robot{
 
     public static RobotController rc;
     public static ArrayDeque<Action> actions = new ArrayDeque<>();
+    public statit ArrayDque
 
 
     // -------------- Useful constants --------------
     public static final Random rng = new Random(0);
     public static final Direction[] directions = {
+            Direction.CENTER,
             Direction.NORTH,
             Direction.NORTHEAST,
             Direction.EAST,
@@ -137,16 +139,16 @@ public abstract class Robot{
         Debug.print(1, "");
         if(bestActionScore > 0 || bestMoveScore > 0 || bestComboScore > 0){
             if (bestComboScore > bestActionScore + bestMoveScore){
-                Debug.print(1, "Playing combo action: " + bestComboAction.name + " with score " + bestComboScore);
+                Debug.print(1, "Playing combo action: " + bestComboAction.name + " with directionScores " + bestComboScore);
                 bestComboAction.play();
                 Debug.setActionIndicatorString(bestComboAction, bestComboScore);
             } else {
                 if (bestActionScore > 0) {
-                    Debug.print(1, "Playing action: " + bestActionAction.name + " with score " + bestActionScore);
+                    Debug.print(1, "Playing action: " + bestActionAction.name + " with directionScores " + bestActionScore);
                     bestActionAction.play();
                 }
                 if (bestMoveScore > 0) {
-                    Debug.print(1, "Playing move: " + bestMoveAction.name + " with score " + bestMoveScore);
+                    Debug.print(1, "Playing move: " + bestMoveAction.name + " with directionScores " + bestMoveScore);
                     bestMoveAction.play();
                 }
                 Debug.setActionIndicatorString(bestActionAction, bestMoveAction, bestActionScore, bestMoveScore);

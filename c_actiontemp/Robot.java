@@ -150,8 +150,8 @@ public abstract class Robot{
             interest.initTurn();
         }
 
-        DebugUnit.print(1, "Neighbours score.");
-        // Calculating neighbours score
+        DebugUnit.print(1, "Neighbours directionScores.");
+        // Calculating neighbours directionScores
         int[] neighbours = new int[8];
         for(int i=0; i<8; i++){
             Direction dir = directions[i];
@@ -191,7 +191,7 @@ public abstract class Robot{
             DebugUnit.print(1, "Dont move. Stay at : " + rc.getLocation());
         }
 
-        DebugUnit.print(1, "Actions score.");
+        DebugUnit.print(1, "Actions directionScores.");
         Action bestAction = null;
         bestScore = 0;
         for(Action action: actions){

@@ -107,7 +107,7 @@ public class CompleteSRP extends Action {
                         }
                     }
                 }
-                score = Constants.BuildSRP;
+                score = Constants.CompleteSRPScore;
                 cooldown_reqs = 3;
                 return;
             }
