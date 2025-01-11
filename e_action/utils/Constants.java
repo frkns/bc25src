@@ -14,7 +14,7 @@ public class Constants {
     // No suffix indicates a variable used to help calculate the score of an action
 
     // Unit variables
-
+    public static final int _TemplateScore = 1;
     // Tower variables
     public static final int SpawnUnitsScore = 10;
 }

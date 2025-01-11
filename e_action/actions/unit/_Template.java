@@ -31,7 +31,7 @@ public class _Template extends Action {
         Debug.print(3, Debug.CALCSCORE + name, debugAction);
         // Calculate score AND store any variables useful to the play() function
         // If the action is illegal, set score to 0
-        score = 10; 
+        score = Constants._TemplateScore; // Fixed scores and parameters that contribute to final score go in Utils/Constants
         // Return action requirements
         // None = 0, Action = 1, Move = 2, Action + Move = 3
         cooldown_reqs = 3;
