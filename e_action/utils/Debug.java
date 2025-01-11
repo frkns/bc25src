@@ -10,8 +10,10 @@ public class Debug {
     public static boolean debug = false;
     public static String INITUNIT = "Init unit ";
     public static String INIT = "Initializing ";
+    public static String UPDATE_DIR_SCORES = "Adding Move Scores ";
     public static String CALCSCORE = "Calculating Score ";
     public static String PLAY = "Playing ";
+
 
     private static final String[] indents = {"", "\t", "\t\t", "\t\t\t", "\t\t\t\t", "\t\t\t\t\t", "\t\t\t\t\t"};
     private static int BYTECODE_PER_TURNS = GameConstants.ROBOT_BYTECODE_LIMIT;
@@ -39,7 +41,7 @@ public class Debug {
     }
 
     /**
-      * Prints the bytecode used to calculate score for each action and execute action
+      * Prints the bytecode used to calculate directionScores for each action and execute action
       * Example: https://discord.com/channels/1316447035242709032/1323051422819815486/1327037155956228146 
       */
     

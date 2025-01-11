@@ -12,7 +12,7 @@ public class SpawnUnits extends Action {
     public SpawnUnits(){
         rc = Robot.rc;
         name = "SPAWN UNITS";
-        score = 0;
+        type = 2;
         debugAction = false;
         Debug.print(3, Debug.INIT + name, debugAction);
     }
@@ -45,8 +45,6 @@ public class SpawnUnits extends Action {
         } else {
             score = 0;
         }
-        
-        cooldown_reqs = 2;
     }
 
     public int getScore(){

@@ -1,19 +1,23 @@
-package e_action.actions.unit;
+package e_action.interests.unit;
 
+import battlecode.common.Direction;
+import battlecode.common.GameActionException;
+import battlecode.common.MapLocation;
+import battlecode.common.RobotController;
 import e_action.Robot;
-import e_action.actions.Action;
+import e_action.interests.Interest;
 import e_action.utils.*;
 
-import battlecode.common.*;
+import java.util.Objects;
 
-public class Explore extends Action {
+public class Explore extends Interest {
     public RobotController rc;
 
     public Explore(){
         rc = Robot.rc;
         name = "EXPLORE";
-        debugAction = false;
-        Debug.print(3, Debug.INIT + name, debugAction);
+        debugInterest = false;
+        Debug.print(3, Debug.INIT + name, debugInterest);
     }
 
 
@@ -21,28 +25,22 @@ public class Explore extends Action {
     public static int explorationBoundary = 5;
 
     public void initUnit()  throws GameActionException {
-        Debug.print(1, Debug.INITUNIT + name, debugAction);
+        Debug.print(1, Debug.INITUNIT + name, debugInterest);
     }
 
     //TODO Make based on rounds, painted tiles, or even have tower send message to robot
-    public void calcScore() throws GameActionException {
-        Debug.print(3, Debug.CALCSCORE + name, debugAction);
-        score = 2;
-        cooldown_reqs = 2;
-     }
-
-    
-    public int getScore(){
-        return score;
-    }
-
-    public void play() throws GameActionException {
-        Debug.print(3, Debug.PLAY + name, debugAction);
+    public void updateDirectionScores() throws GameActionException {
+        Debug.print(3, Debug.UPDATE_DIR_SCORES + name, debugInterest);
         if (target == null || rc.getLocation().distanceSquaredTo(target) < 3 || outOfExplorationBounds(rc.getLocation())) {
             target = getRandomInBoundLocation();
         }
-        Pathfinder.move(target);
-    }
+        Direction dir = Pathfinder.getMoveDir(target);
+        if (dir != null) {
+            addDirectionScore(dir, Constants.ExploreScore);
+        }
+     }
+
+
 
     public static boolean outOfExplorationBounds(MapLocation loc) {
         return loc.x - explorationBoundary < 0 || loc.y - explorationBoundary < 0

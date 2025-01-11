@@ -1,5 +1,6 @@
 package e_action;
 
+import e_action.interests.Interest;
 import e_action.actions.Action;
 import e_action.utils.*;
 
@@ -12,47 +13,9 @@ public abstract class Robot{
 
     public static RobotController rc;
     public static ArrayDeque<Action> actions = new ArrayDeque<>();
+    public static ArrayDeque<Interest> interests = new ArrayDeque<>();
 
 
-    // -------------- Useful constants --------------
-    public static final Random rng = new Random(0);
-    public static final Direction[] directions = {
-            Direction.NORTH,
-            Direction.NORTHEAST,
-            Direction.EAST,
-            Direction.SOUTHEAST,
-            Direction.SOUTH,
-            Direction.SOUTHWEST,
-            Direction.WEST,
-            Direction.NORTHWEST,
-    };
-
-
-    // -------------- Constants that vary by game --------------
-    public static int MAP_WIDTH;
-    public static int MAP_HEIGHT;
-    public static int MAP_AREA;
-
-    // -------------- Variables set during unit initialization ----------------
-    public static MapLocation spawnTowerLocation;
-    public static Direction spawnDirection;
-
-    // -------------- Variables that vary by turn
-    // Game state info
-    public static int phase;
-    public static int chips;
-    public static int chipsRate;
-    // Comms info
-    // Internal infos
-
-    // External infos
-    public static RobotInfo[] nearbyAllies;
-    public static RobotInfo[] nearbyEnemies;
-    public static MapLocation[] nearbyRuins;
-    public static MapLocation nearestPaintTower = null;
-    public static MapInfo[] nearbyTiles;
-
-    // -------------- Methods --------------
     public Robot(RobotController r){
         rc = r;
         // messageUnit = new MessageUnit(this);
@@ -63,33 +26,19 @@ public abstract class Robot{
     // Only runs on a unit's first turn
     public void init() throws GameActionException{
         Debug.print(0, "Create unit => " + rc.getType() + " at " + rc.getLocation());
+        Info.init();
+        for (Interest interest: interests){
+            interest.initUnit();
+        }
         for(Action action: actions){
             action.initUnit();
         }
     }
 
     public void initTurn() throws GameActionException {
-        MAP_WIDTH = rc.getMapWidth();
-        MAP_HEIGHT = rc.getMapHeight();
-        MAP_AREA = MAP_WIDTH * MAP_HEIGHT;
-
-        phase = Phase.getPhase(rc.getRoundNum(), MAP_AREA);
-        chips = rc.getChips();
-        chipsRate = ChipProductionRate.calculate();
-
-        nearbyAllies = rc.senseNearbyRobots(-1, rc.getTeam());
-        nearbyEnemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent()); //Bytecode improvement possible
-        nearbyTiles = rc.senseNearbyMapInfos();
-        if (rc.getType().isRobotType()) {
-            nearbyRuins = rc.senseNearbyRuins(-1);
-        }
-
-        //update nearestPaintTower (assumes the last paintTower we passed by is closest)
-        for (RobotInfo robot : nearbyAllies) {
-            if (robot.getType().isTowerType() && (Utils.getTowerType(robot.getType()) == Utils.towerType.PAINT_TOWER)) {
-                    nearestPaintTower = robot.getLocation();
-            }
-        }
+        Interest.resetDirectionScores();
+        Info.update();
+        // Comms.update();
     }
 
     public void playTurn() throws GameActionException {
@@ -100,33 +49,28 @@ public abstract class Robot{
         initTurn();
 
         Debug.print(1, "");
+        Debug.print(1, "Calculate interests.");
+        for (Interest interest: interests){
+            Debug.print(2, interest.name + " ...", interest.debugInterest);
+            interest.updateDirectionScores();
+        }
+        
+
+        Debug.print(1, "");
         Debug.print(1, "Calculate actions.");
-        Action bestActionAction = null;
-        Action bestMoveAction = null;
-        Action bestComboAction = null;
-
-        int bestActionScore = 0;
-        int bestMoveScore = 0;
-        int bestComboScore = 0;
-
         for(Action action: actions){
             Debug.print(2, action.name + " ...", action.debugAction);
             action.calcScore();
             int score = action.getScore();
-            switch (action.cooldown_reqs){
-                case 1:
+            switch (action.type){
+                case 1: // Regular action
                     if(score > bestActionScore){
                         bestActionScore = score;
                         bestActionAction = action;
                     }
                     break;
-                case 2:
-                    if(score > bestMoveScore){
-                        bestMoveScore = score;
-                        bestMoveAction = action;
-                    }
-                    break;
-                case 3:
+                case 2: // Combo action
+
                     if(score > bestComboScore){
                         bestComboScore = score;
                         bestComboAction = action;
@@ -139,22 +83,9 @@ public abstract class Robot{
         }
 
         Debug.print(1, "");
-        if(bestActionScore > 0 || bestMoveScore > 0 || bestComboScore > 0){
-            if (bestComboScore > bestActionScore + bestMoveScore){
-                Debug.print(1, "Playing combo action: " + bestComboAction.name + " with score " + bestComboScore);
-                bestComboAction.play();
-                Debug.setActionIndicatorString(bestComboAction, bestComboScore);
-            } else {
-                if (bestActionScore > 0) {
-                    Debug.print(1, "Playing action: " + bestActionAction.name + " with score " + bestActionScore);
-                    bestActionAction.play();
-                }
-                if (bestMoveScore > 0) {
-                    Debug.print(1, "Playing move: " + bestMoveAction.name + " with score " + bestMoveScore);
-                    bestMoveAction.play();
-                }
-                Debug.setActionIndicatorString(bestActionAction, bestMoveAction, bestActionScore, bestMoveScore);
-            }
+
+        // Debug.print(1, "Playing action: " + bestMoveAction.name + " with directionScores " + bestMoveScore)
+        // Debug.setActionIndicatorString();
         } else {
             Debug.print(1, "No action to play");
         }

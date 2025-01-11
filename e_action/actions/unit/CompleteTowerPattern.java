@@ -22,6 +22,7 @@ public class CompleteTowerPattern extends Action {
 
     public boolean hasPaint = false;
 
+
     public void initUnit(){
         Debug.print(1, Debug.INITUNIT + name, debugAction);
 
@@ -41,7 +42,7 @@ public class CompleteTowerPattern extends Action {
         int distance = Integer.MAX_VALUE;
 
         Debug.print(3, Debug.CALCSCORE + name);
-        for(MapLocation ruin : Robot.nearbyRuins) {
+        for(MapLocation ruin : Info.nearbyRuins) {
             if(!rc.isLocationOccupied(ruin)) {
                 if(rc.getLocation().distanceSquaredTo(ruin) < distance) {
                     distance = rc.getLocation().distanceSquaredTo(ruin);
@@ -87,7 +88,7 @@ public class CompleteTowerPattern extends Action {
                     }
                 }
             }
-            score = Constants.BuildTower;
+            score = Constants.CompleteTowerPatternScore;
             cooldown_reqs = 3;
         }
     }
