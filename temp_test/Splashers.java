@@ -36,11 +36,18 @@ public class Splashers extends RobotPlayer{
             // }
         }
 
+        // better splasher refill
         int paint = rc.getPaint();
-        if (nearestPaintTower != null && paint < 70) {
+        int towerPaint = -1;
+        if (nearestPaintTower != null) {
+            if (rc.canSenseRobotAtLocation(nearestPaintTower))
+                towerPaint = rc.senseRobotAtLocation(nearestPaintTower).getPaintAmount();
+        }
+        if (towerPaint != -1 && paint < 70) {
             rc.setIndicatorString("Getting some paint!");
             int mxPaint = rc.getType().paintCapacity;
             int amt = mxPaint - paint;
+            amt = Math.min(amt, towerPaint);  // cannot take more than the tower has
             if (rc.canTransferPaint(nearestPaintTower, -1 * amt)) {
                 rc.transferPaint(nearestPaintTower, -1 * amt);
                 System.out.println("Transferred " + amt + " paint!!!");

@@ -50,7 +50,9 @@ public class RobotPlayer {
     public static int phase2;
     public static int phase3;
     public static int nextBot = 1;
+
     public static int birthRound;
+    public static MapLocation CENTER;
 
     public static void run(RobotController rc) throws GameActionException {
 
@@ -61,6 +63,7 @@ public class RobotPlayer {
         AttackBase.init(rc);
         Pathfinder.init(rc);
         birthRound = rc.getRoundNum();
+        CENTER = new MapLocation(rc.getMapWidth()/2, rc.getMapHeight()/2);
 
         while (true) {
             // This code runs during the entire lifespan of the robot, which is why it is in an infinite
@@ -76,13 +79,15 @@ public class RobotPlayer {
                 // use different strategies on different robots. If you wish, you are free to rewrite
                 // this into a different control structure!
                 if (birthRound <= 4 && rc.getType() == UnitType.SOLDIER) {
+                    assert(!rc.getType().isTowerType());
                     AttackBase.run();
-                } else
-                switch (rc.getType()){
-                    case SOLDIER: runSoldier(rc); break;
-                    case MOPPER: runMopper(rc); break;
-                    case SPLASHER: runSplasher(rc); // Consider upgrading examplefuncsplayer to use splashers!
-                    default: runTower(rc); break;
+                } else {
+                    switch (rc.getType()) {
+                        case SOLDIER: runSoldier(rc); break;
+                        case MOPPER: runMopper(rc); break;
+                        case SPLASHER: runSplasher(rc); // Consider upgrading examplefuncsplayer to use splashers!
+                        default: runTower(rc); break;
+                        }
                     }
                 }
              catch (GameActionException e) {
@@ -114,9 +119,19 @@ public class RobotPlayer {
      * This code is wrapped inside the infinite loop in run(), so it is called once per turn.
      */
     public static void runTower(RobotController rc) throws GameActionException{
-        // Pick a direction to build in.
         Direction dir = directions[rng.nextInt(directions.length)];
         MapLocation nextLoc = rc.getLocation().add(dir);
+
+        // Pick a direction to build in.
+        if (rc.getRoundNum() <= 4) {
+            dir = rc.getLocation().directionTo(CENTER);
+            nextLoc = rc.getLocation().add(dir);
+            if (rc.canBuildRobot(UnitType.SOLDIER, nextLoc)) {
+                rc.buildRobot(UnitType.SOLDIER, nextLoc);
+            }
+        }
+
+        // rc.setIndicatorDot(nextLoc, 255, 0, 0);
 
         RobotInfo[] robots = rc.senseNearbyRobots();
 
@@ -154,6 +169,7 @@ public class RobotPlayer {
                 }
             }
         }
+
         if(nextBot == 1) {
             if(rc.canBuildRobot(UnitType.SOLDIER,nextLoc)) {
                 rc.buildRobot(UnitType.SOLDIER,nextLoc);
@@ -207,7 +223,7 @@ public class RobotPlayer {
      * Run a single turn for a Soldier.
      * This code is wrapped inside the infinite loop in run(), so it is called once per turn.
      */
-    public static void runSoldier(RobotController rc) throws GameActionException{
+    public static void runSoldier(RobotController rc) throws GameActionException {
 
         if(rc.getRoundNum() < phase2) {
             Phase1.run(rc);
