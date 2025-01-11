@@ -99,7 +99,7 @@ public class CompleteTowerPattern extends Action {
     // If the pattern is completed, move towards the ruin
     public void play() throws GameActionException {
 
-        UnitType tower = SelectTower.selectTower();
+        UnitType tower = SelectTower.getTower();
 
         if(ruinLoc != null) {
             Debug.print(3, Debug.PLAY + name);

@@ -1,5 +1,7 @@
 package e_action.utils;
 
+// LEGACY CODE
+// Use Chips/turn rate for unit spawn behaviour and tower selection
 public class Phase {
     public static int getPhase (int round, int mapArea) {
         if (mapArea < 1000) {
