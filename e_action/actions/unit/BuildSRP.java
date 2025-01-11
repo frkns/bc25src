@@ -10,7 +10,7 @@ public class BuildSRP extends Action {
     public RobotController rc;
 
     public MapLocation center = null;
-    public MapInfo[] nearbyTiles = rc.senseNearbyMapInfos();
+    public MapInfo[] nearbyTiles;
     public MapLocation paintLoc = null;
 
     public BuildSRP(){
