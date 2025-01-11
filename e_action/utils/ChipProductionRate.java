@@ -16,9 +16,9 @@ public class ChipProductionRate {
         } else {
             if(rc.getChips() > prevChips && prevRate - (rc.getChips() - prevChips) <= 60) {
                 prevRate = rc.getChips() - prevChips;
-                prevChips = rc.getChips();
             }
         }
+        prevChips = rc.getChips();
         return prevRate;
     }
 }
