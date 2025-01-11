@@ -38,7 +38,7 @@ public class SpawnUnits extends Action {
         }
         Unit = productionList[productionTypeCounter % productionList.length];
 
-        if (rc.canBuildRobot(Unit, spawnLoc)) {
+        if (rc.canBuildRobot(Unit, spawnLoc) && shouldSpawn()) {
             score = Constants.SpawnUnitsScore;
         } else {
             score = 0;
@@ -56,5 +56,52 @@ public class SpawnUnits extends Action {
 
         rc.buildRobot(Unit, spawnLoc);
         productionTypeCounter++;
+    }
+
+    //helper function that determines when units should be spawned
+    public boolean shouldSpawn() {
+        int mapArea = Robot.MAP_AREA;
+        int chips = Robot.chips;
+        int chipRate = Robot.chipsRate;
+
+        if(mapArea < 1000) {
+            if(chips > 2250) {
+                return true;
+            } else if (chipRate >= 60){
+                return true;
+            } else {
+                return false;
+            }
+        } else if (mapArea < 2000) {
+            if(chips > 2250) {
+                return true;
+            } else if (chipRate >= 100){
+                return true;
+            } else if(rc.getRoundNum()> 300){
+                return true;
+            } else {
+                return false;
+            }
+        } else if (mapArea < 3000) {
+            if(chips > 2250) {
+                return true;
+            } else if (chipRate >= 100){
+                return true;
+            } else if(rc.getRoundNum()> 300){
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            if(chips > 2250) {
+                return true;
+            } else if (chipRate >= 120){
+                return true;
+            } else if(rc.getRoundNum()> 200){
+                return true;
+            } else {
+                return false;
+            }
+        }
     }
 }
