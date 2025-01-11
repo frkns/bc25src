@@ -41,6 +41,7 @@ public abstract class Robot{
     // Game state info
     public static int phase;
     public static int chips;
+    public static int chipsRate;
     // Comms info
     // Internal infos
 
@@ -49,6 +50,7 @@ public abstract class Robot{
     public static RobotInfo[] nearbyEnemies;
     public static MapLocation[] nearbyRuins;
     public static MapLocation nearestPaintTower = null;
+    public static MapInfo[] nearbyTiles;
 
     // -------------- Methods --------------
     public Robot(RobotController r){
@@ -73,9 +75,11 @@ public abstract class Robot{
 
         phase = Phase.getPhase(rc.getRoundNum(), MAP_AREA);
         chips = rc.getChips();
+        chipsRate = ChipProductionRate.calculate();
 
         nearbyAllies = rc.senseNearbyRobots(-1, rc.getTeam());
         nearbyEnemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent()); //Bytecode improvement possible
+        nearbyTiles = rc.senseNearbyMapInfos();
         if (rc.getType().isRobotType()) {
             nearbyRuins = rc.senseNearbyRuins(-1);
         }
