@@ -22,6 +22,8 @@ public class SpawnUnits extends Action {
     static MapLocation spawnLoc;
     static UnitType Unit;
 
+    public int spawnedUnits = 0;
+
     public void initUnit(){
         Debug.print(1, Debug.INITUNIT + name, debugAction);
 
@@ -55,6 +57,7 @@ public class SpawnUnits extends Action {
         Debug.print(3, Debug.PLAY + name, debugAction);
 
         rc.buildRobot(Unit, spawnLoc);
+        spawnedUnits++;
         productionTypeCounter++;
     }
 
@@ -63,6 +66,19 @@ public class SpawnUnits extends Action {
         int mapArea = Robot.MAP_AREA;
         int chips = Robot.chips;
         int chipRate = Robot.chipsRate;
+
+        //spawns 3 soldiers at the start
+        if(rc.getRoundNum() < 6) {
+            if(rc.getType() == UnitType.LEVEL_ONE_MONEY_TOWER) {
+                 if(spawnedUnits  < 1) {
+                     return true;
+                 }
+            } else {
+                if(spawnedUnits < 2) {
+                    return true;
+                }
+            }
+        }
 
         if(mapArea < 1000) {
             if(chips > 2250) {
