@@ -1,22 +1,25 @@
 // Adapted from https://github.com/chenyx512/battlecode24/blob/main/src/bot1/PathFinder.java
-package d_remake;
+package e_action.utils;
 
 import battlecode.common.*;
-import e_action.utils.fast.FastLocSet;
-import e_action.utils.fast.FastMath;
+import e_action.utils.fast.*;
 
-class Pathfinder extends RobotPlayer{
+
+//TODO track total paint loss
+//TODO treat options enemy paint/empty paint as walls.
+//Check simulation to see whether distance gained is substantial enough. Otherwise go straight through
+public class Pathfinder{
     static RobotController rc;
 
     static MapLocation target = null;
     static MapLocation stayawayFrom = null;
     static int stuckCnt;
 
-    static void init(RobotController r) {
+    public static void init(RobotController r) {
         rc = r;
     }
 
-    static void tryMove(Direction dir, boolean allowAttack) throws GameActionException {
+    public static void tryMove(Direction dir) throws GameActionException {
         if (dir == Direction.CENTER)
             return;
         if (rc.canMove(dir)) {
@@ -24,7 +27,7 @@ class Pathfinder extends RobotPlayer{
         }
     }
 
-    static void move(MapLocation loc, boolean allowAttack) throws GameActionException {
+    public static void move(MapLocation loc) throws GameActionException {
         if (!rc.isMovementReady() || loc == null)
             return;
         target = loc;
@@ -32,10 +35,10 @@ class Pathfinder extends RobotPlayer{
         Direction dir = BugNav.getMoveDir();
         if (dir == null)
             return;
-        tryMove(dir, allowAttack);
+        tryMove(dir);
     }
 
-    static class BugNav {
+    public static class BugNav {
         static DirectionStack dirStack = new DirectionStack();
         static MapLocation prevTarget = null; // previous target
         static FastLocSet visitedLocs = new FastLocSet();
@@ -66,7 +69,7 @@ class Pathfinder extends RobotPlayer{
                 resetPathfinding();
             }
 
-            Debug.printString(Debug.INFO, String.format("move%sst%dcnt%d", target, stuckCnt, dirStack.size));
+
             prevTarget = target;
             if (visitedLocs.contains(rc.getLocation())) {
                 stuckCnt++;
@@ -150,7 +153,6 @@ class Pathfinder extends RobotPlayer{
                 }
                 if (dirStack.size >= stackDepthCutoff) {
                     int cutoff = stackDepthCutoff + 8;
-                    Debug.printString(Debug.PATHFINDING, "reset");
                     dirStack.clear();
                     stackDepthCutoff = cutoff;
                 }
@@ -177,7 +179,9 @@ class Pathfinder extends RobotPlayer{
                 if (ans > MAX_DEPTH || Clock.getBytecodesLeft() < BYTECODE_CUTOFF) {
                     break;
                 }
-                Debug.setIndicatorDot(Debug.PATHFINDING, now, originalTurnDir == 0? 255 : 0, 0, originalTurnDir == 0? 0 : 255);
+                if (now != null) {
+                    rc.setIndicatorDot(now, originalTurnDir == 0? 255 : 0, 0, originalTurnDir == 0? 0 : 255);
+                }
                 Direction moveDir = now.directionTo(target);
                 if (dirStack.size == 0) {
                     if (!canPass(now, moveDir)) {
@@ -257,11 +261,8 @@ class Pathfinder extends RobotPlayer{
         }
 
         static int getTurnDir(Direction dir) throws GameActionException {
-            Debug.bytecodeDebug += "  turnDir=" + Clock.getBytecodeNum();
             int ansL = simulate(0, dir);
             int ansR = simulate(1, dir);
-            Debug.bytecodeDebug += "  turnDir=" + Clock.getBytecodeNum();
-            Debug.printString(Debug.PATHFINDING, String.format("t%d|%d", ansL, ansR));
             if (ansL == ansR) return FastMath.rand256() % 2;
             if ((ansL <= ansR && ansL != -1) || ansR == -1) {
                 return 0;
@@ -271,7 +272,7 @@ class Pathfinder extends RobotPlayer{
         }
 
         // clear some of the previous data
-        static void resetPathfinding() {
+        public static void resetPathfinding() {
             stackDepthCutoff = 8;
             dirStack.clear();
             stuckCnt = 0;

@@ -1,9 +1,7 @@
 // https://github.com/chenyx512/battlecode24/blob/main/src/bot1/fast/FastMath.java
-package d_remake.fast;
+package e_action.utils.fast;
 
-import battlecode.common.Direction;
-import battlecode.common.MapLocation;
-import battlecode.common.RobotController;
+import battlecode.common.*;
 
 //awful hacks for faster math
 public class FastMath {

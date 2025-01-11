@@ -10,6 +10,6 @@ public class Splasher extends Robot {
     public Splasher(RobotController rc){
         super(rc);
 
-        actions.add(new SplasherAttack());
+        actions.add(new Explore());
     }
 }

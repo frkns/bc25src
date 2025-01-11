@@ -1,19 +1,17 @@
 package e_action.actions.unit;
 
 import battlecode.common.GameActionException;
-import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import e_action.Robot;
 import e_action.actions.Action;
 import e_action.utils.Debug;
-import e_action.utils.Pathfinder;
 
-public class MopperAttack extends Action {
+public class MopSwing extends Action {
     public RobotController rc;
 
-    public MopperAttack(){
+    public MopSwing(){
         rc = Robot.rc;
-        name = "MOPPER ATTACK";
+        name = "MOP SWING";
         debugAction = false;
         Debug.print(3, Debug.INIT + name, debugAction);
     }
@@ -28,8 +26,8 @@ public class MopperAttack extends Action {
 
     public void calcScore() throws GameActionException {
         Debug.print(3, Debug.CALCSCORE + name, debugAction);
-        score = 4;
-        cooldown_reqs = 1;
+        score = 5;
+        cooldown_reqs = 3;
      }
 
     

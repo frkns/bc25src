@@ -13,7 +13,8 @@ public class SpawnUnits extends Action {
         rc = Robot.rc;
         name = "SPAWN UNITS";
         score = 0;
-        Debug.print(3, Debug.INIT + name);
+        debugAction = false;
+        Debug.print(3, Debug.INIT + name, debugAction);
     }
 
     static UnitType[] productionList = {UnitType.SOLDIER, UnitType.MOPPER, UnitType.SPLASHER};
@@ -21,8 +22,13 @@ public class SpawnUnits extends Action {
     static MapLocation spawnLoc;
     static UnitType Unit;
 
+    public void initUnit(){
+        Debug.print(1, Debug.INITUNIT + name, debugAction);
+
+    }
+
     public void calcScore() throws GameActionException {
-        Debug.print(3, Debug.CALCSCORE + name);
+        Debug.print(3, Debug.CALCSCORE + name, debugAction);
 
         Direction dir = Robot.directions[Robot.rng.nextInt(Robot.directions.length)];
         if (dir.getDeltaX() != 0 && dir.getDeltaY() != 0) {
@@ -33,8 +39,12 @@ public class SpawnUnits extends Action {
         Unit = productionList[productionTypeCounter % productionList.length];
 
         if (rc.canBuildRobot(Unit, spawnLoc)) {
-            score = ActionConstants.SpawnUnitsScore;
+            score = Constants.SpawnUnitsScore;
+        } else {
+            score = 0;
         }
+        
+        cooldown_reqs = 2;
     }
 
     public int getScore(){
@@ -42,7 +52,8 @@ public class SpawnUnits extends Action {
     }
 
     public void play() throws GameActionException {
-        Debug.print(3, Debug.PLAY + name);
+        Debug.print(3, Debug.PLAY + name, debugAction);
+
         rc.buildRobot(Unit, spawnLoc);
         productionTypeCounter++;
     }

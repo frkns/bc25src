@@ -27,27 +27,64 @@ public abstract class Robot{
             Direction.NORTHWEST,
     };
 
-    // -------------- Internal info --------------
-    public static int phase;
 
-    // -------------- External infos --------------
-    public static RobotInfo[] allies;
-    public static RobotInfo[] enemies;
-    public static MapLocation[] ruins;
+    // -------------- Constants that vary by game --------------
+    public static int MAP_WIDTH;
+    public static int MAP_HEIGHT;
+    public static int MAP_AREA;
+
+    // -------------- Variables set during unit initialization ----------------
+    public static MapLocation spawnTowerLocation;
+    public static Direction spawnDirection;
+
+    // -------------- Variables that vary by turn
+    // Game state info
+    public static int phase;
+    public static int chips;
+    // Comms info
+    // Internal infos
+
+    // External infos
+    public static RobotInfo[] nearbyAllies;
+    public static RobotInfo[] nearbyEnemies;
+    public static MapLocation[] nearbyRuins;
+    public static MapLocation nearestPaintTower = null;
 
     // -------------- Methods --------------
     public Robot(RobotController r){
         rc = r;
         // messageUnit = new MessageUnit(this);
         Debug.init();
+        Pathfinder.init(rc);
+    }
+
+    // Only runs on a unit's first turn
+    public void init() throws GameActionException{
+        Debug.print(0, "Create unit => " + rc.getType() + " at " + rc.getLocation());
+        for(Action action: actions){
+            action.initUnit();
+        }
     }
 
     public void initTurn() throws GameActionException {
-        allies = rc.senseNearbyRobots(-1, rc.getTeam());
-        enemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent()); //Bytecode improvement possible
-        phase = Phase.getPhase(rc.getRoundNum(), rc.getMapWidth() * rc.getMapHeight());
+        MAP_WIDTH = rc.getMapWidth();
+        MAP_HEIGHT = rc.getMapHeight();
+        MAP_AREA = MAP_WIDTH * MAP_HEIGHT;
+
+        phase = Phase.getPhase(rc.getRoundNum(), MAP_AREA);
+        chips = rc.getChips();
+
+        nearbyAllies = rc.senseNearbyRobots(-1, rc.getTeam());
+        nearbyEnemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent()); //Bytecode improvement possible
         if (rc.getType().isRobotType()) {
-            ruins = rc.senseNearbyRuins(-1);
+            nearbyRuins = rc.senseNearbyRuins(-1);
+        }
+
+        //update nearestPaintTower (assumes the last paintTower we passed by is closest)
+        for (RobotInfo robot : nearbyAllies) {
+            if (robot.getType().isTowerType() && (Utils.getTowerType(robot.getType()) == Utils.towerType.PAINT_TOWER)) {
+                    nearestPaintTower = robot.getLocation();
+            }
         }
     }
 
@@ -60,28 +97,61 @@ public abstract class Robot{
 
         Debug.print(1, "");
         Debug.print(1, "Calculate actions.");
-        Action bestAction = null;
-        int bestScore = 0;
+        Action bestActionAction = null;
+        Action bestMoveAction = null;
+        Action bestComboAction = null;
+
+        int bestActionScore = 0;
+        int bestMoveScore = 0;
+        int bestComboScore = 0;
 
         for(Action action: actions){
-            Debug.print(2, action.name + " ...");
+            Debug.print(2, action.name + " ...", action.debugAction);
             action.calcScore();
             int score = action.getScore();
-            if(score > bestScore){
-                bestScore = score;
-                bestAction = action;
+            switch (action.cooldown_reqs){
+                case 1:
+                    if(score > bestActionScore){
+                        bestActionScore = score;
+                        bestActionAction = action;
+                    }
+                    break;
+                case 2:
+                    if(score > bestMoveScore){
+                        bestMoveScore = score;
+                        bestMoveAction = action;
+                    }
+                    break;
+                case 3:
+                    if(score > bestComboScore){
+                        bestComboScore = score;
+                        bestComboAction = action;
+                    }
+                    break;
             }
-            Debug.print(2,  "SCORE : " + score);
-            Debug.print(2,  "");
+
+            Debug.print(2,  "SCORE : " + score, action.debugAction);
+            Debug.print(2,  "", action.debugAction);
         }
 
-        if(bestScore > 0){
-            Debug.print(1, "");
-            Debug.print(1, "Playing action: " + bestAction.name + " with score " + bestScore);
-            rc.setIndicatorString(bestAction.name + " - " + bestScore);
-            bestAction.play();
-        }else{
-            Debug.print(1, "");
+        Debug.print(1, "");
+        if(bestActionScore > 0 || bestMoveScore > 0 || bestComboScore > 0){
+            if (bestComboScore > bestActionScore + bestMoveScore){
+                Debug.print(1, "Playing combo action: " + bestComboAction.name + " with score " + bestComboScore);
+                bestComboAction.play();
+                Debug.setActionIndicatorString(bestComboAction, bestComboScore);
+            } else {
+                if (bestActionScore > 0) {
+                    Debug.print(1, "Playing action: " + bestActionAction.name + " with score " + bestActionScore);
+                    bestActionAction.play();
+                }
+                if (bestMoveScore > 0) {
+                    Debug.print(1, "Playing move: " + bestMoveAction.name + " with score " + bestMoveScore);
+                    bestMoveAction.play();
+                }
+                Debug.setActionIndicatorString(bestActionAction, bestMoveAction, bestActionScore, bestMoveScore);
+            }
+        } else {
             Debug.print(1, "No action to play");
         }
     }

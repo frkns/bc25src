@@ -1,6 +1,6 @@
 package e_action.utils;
 
-public class ActionConstants {
+public class Constants {
     public static final int SMALL_PHASE1 = 200;
     public static final int SMALL_PHASE2 = 500;
     public static final int MEDIUM_PHASE1 = 300;
@@ -14,6 +14,9 @@ public class ActionConstants {
     // No suffix indicates a variable used to help calculate the score of an action
 
     // Unit variables
+    public static final int _TemplateScore = 1;
+    public static final int BuildTower = 1;
+    public static final int BuildSRP = 1;
 
     // Tower variables
     public static final int SpawnUnitsScore = 10;
