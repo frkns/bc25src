@@ -255,6 +255,8 @@ class UnitFuncs extends RobotPlayer {
         if (true) {
             int myPaint = rc.getPaint();
             if (myPaint < lowPaintPercentage * bunnyType.paintCapacity) {
+                // Only moppers can give paint to allies!
+                /*
                 if (nearestPaintTower != null) {
                     int amt = bunnyType.paintCapacity - myPaint;
                     if (rc.canTransferPaint(nearestPaintTower, -1 * amt)) {
@@ -262,6 +264,7 @@ class UnitFuncs extends RobotPlayer {
                     }
                     target = nearestPaintTower;
                 }
+                */
             } else {
                 findRuinAndBuildTower(rc, UnitType.LEVEL_ONE_MONEY_TOWER);
                 // explore(/*spawnDirection*/);
