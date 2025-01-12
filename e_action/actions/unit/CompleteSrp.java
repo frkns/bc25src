@@ -7,14 +7,14 @@ import e_action.utils.*;
 
 import battlecode.common.*;
 
-public class CompleteSrp_NEEDSUPDATE extends Action {
+public class CompleteSrp extends Action {
     public RobotController rc;
 
     public MapLocation center = null;
     public MapInfo[] nearbyTiles;
     public MapLocation paintLoc = null;
 
-    public CompleteSrp_NEEDSUPDATE(){
+    public CompleteSrp(){
         rc = Robot.rc;
         name = "COMPLETE SRP";
         debugAction = false;
@@ -102,6 +102,7 @@ public class CompleteSrp_NEEDSUPDATE extends Action {
                     }
                 }
                 score = Constants.CompleteSrpScore;
+                targetLoc = paintLoc;
                 return;
             }
         } else {
@@ -115,12 +116,7 @@ public class CompleteSrp_NEEDSUPDATE extends Action {
     public void play() throws GameActionException {
         Debug.print(3, Debug.PLAY + name, debugAction);
         if(paintLoc != null) {
-
             PaintSrpGrid.fillInPattern(paintLoc);
-
-            if(rc.canMove(rc.getLocation().directionTo(center))) {
-                rc.move(rc.getLocation().directionTo(center));
-            }
         }
     }
 

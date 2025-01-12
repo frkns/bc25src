@@ -7,7 +7,7 @@ import e_action.knowledge._Info;
 
 import battlecode.common.*;
 
-public class CompleteTowerPattern_NEEDSUPDATE extends Action {
+public class CompleteTowerPattern extends Action {
     public RobotController rc;
 
     //class attributes
@@ -21,13 +21,15 @@ public class CompleteTowerPattern_NEEDSUPDATE extends Action {
 
     public boolean hasPaint = false;
 
+    public Boolean useSecondary = null;
+    public MapLocation paintLocation = null;
 
     public void initUnit(){
         Debug.print(1, Debug.INITUNIT + name, debugAction);
 
     }
 
-    public CompleteTowerPattern_NEEDSUPDATE() {
+    public CompleteTowerPattern() {
         rc = Robot.rc;
         name = "COMPLETE TOWER PATTERN";
         debugAction = false;
@@ -87,13 +89,7 @@ public class CompleteTowerPattern_NEEDSUPDATE extends Action {
                     }
                 }
             }
-            score = Constants.CompleteTowerPatternScore;
         }
-    }
-
-    // If a pattern can be drawn on a nearby ruin, draw a tile and move towards that tile
-    // If the pattern is completed, move towards the ruin
-    public void play() throws GameActionException {
 
         UnitType tower = selectTower();
 
@@ -121,6 +117,17 @@ public class CompleteTowerPattern_NEEDSUPDATE extends Action {
                 } else {
                     drawRuin(tower, ruinLoc);
                 }
+            }
+        }
+    }
+
+    // If a pattern can be drawn on a nearby ruin, draw a tile and move towards that tile
+    // If the pattern is completed, move towards the ruin
+    public void play() throws GameActionException {
+        if(paintLocation != null) {
+            if(rc.canAttack(paintLocation)) {
+                rc.attack(paintLocation,useSecondary);
+                paintLocation = null;
             }
         }
     }
@@ -162,16 +169,13 @@ public class CompleteTowerPattern_NEEDSUPDATE extends Action {
         }
 
         if (paintLoc != null) {
-            if (rc.canAttack(paintLoc)) {
-                rc.attack(paintLoc, paint);
-            }
-            if (rc.canMove(rc.getLocation().directionTo(paintLoc))) {
-                rc.move(rc.getLocation().directionTo(paintLoc));
-            }
+            paintLocation = paintLoc;
+            score = Constants.CompleteTowerPatternScore;
+            useSecondary = paint;
+            targetLoc = paintLoc;
         } else {
-            if (rc.canMove(rc.getLocation().directionTo(ruin))) {
-                rc.move(rc.getLocation().directionTo(ruin));
-            }
+            score = Constants.CompleteTowerPatternScore;
+            targetLoc = ruinLoc;
         }
     }
 

@@ -13,5 +13,7 @@ public class Soldier extends Robot {
         super(rc);
 
         interests.add(new Explore());
+        actions.add(new CompleteSrp());
+        actions.add(new CompleteTowerPattern());
     }
 }
