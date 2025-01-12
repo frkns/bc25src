@@ -1,0 +1,35 @@
+task runDebug(type: JavaExec) {
+  description 'Runs a match without starting the client.'
+  group 'battlecode'
+  dependsOn build
+
+  mainClass = 'battlecode.server.Main'
+  classpath = sourceSets.main.runtimeClasspath
+  args = ['-c=-']
+  jvmArgs = [
+          '--add-opens=java.base/jdk.internal.misc=ALL-UNNAMED',
+          '--add-opens=java.base/jdk.internal.math=ALL-UNNAMED',
+          '--add-opens=java.base/jdk.internal.util=ALL-UNNAMED',
+          '--add-opens=java.base/jdk.internal.access=ALL-UNNAMED',
+          '--add-opens=java.base/sun.security.action=ALL-UNNAMED',
+          '-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005',
+          '-Dbc.server.wait-for-client=' + (project.findProperty('waitForClient') ?: 'false'),
+          '-Dbc.server.mode=headless',
+          '-Dbc.server.map-path=maps',
+          '-Dbc.server.robot-player-to-system-out=' + (project.findProperty('outputVerbose') ?: 'true'),
+          '-Dbc.server.debug=false',
+          '-Dbc.engine.debug-methods=' + (project.findProperty('debug') ?: 'false'),
+          '-Dbc.engine.enable-profiler=' + (project.findProperty('enableProfiler') ?: 'false'),
+          '-Dbc.engine.show-indicators=' + (project.findProperty('showIndicators') ?: 'true'),
+          '-Dbc.game.team-a=' + project.property('teamA'),
+          '-Dbc.game.team-b=' + project.property('teamB'),
+          '-Dbc.game.team-a.url=' + (project.findProperty('classLocationA') ?: defaultClassLocation),
+          '-Dbc.game.team-b.url=' + (project.findProperty('classLocationB') ?: defaultClassLocation),
+          '-Dbc.game.team-a.package=' + (project.findProperty('packageNameA') ?: project.property('teamA')),
+          '-Dbc.game.team-b.package=' + (project.findProperty('packageNameB') ?: project.property('teamB')),
+          '-Dbc.game.maps=' + project.property('maps'),
+          '-Dbc.server.validate-maps=' + project.property('validateMaps'),
+          '-Dbc.server.alternate-order=' + project.property('alternateOrder'),
+          '-Dbc.server.save-file=' + (project.findProperty('replay') ?: defaultReplay),
+  ]
+}
