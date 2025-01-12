@@ -1,5 +1,5 @@
 // https://github.com/chenyx512/battlecode24/blob/main/src/bot1/fast/FastLocSet.java
-package vheurisitc.fast;
+package vheuristic.fast;
 
 import battlecode.common.*;
 

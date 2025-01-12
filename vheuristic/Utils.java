@@ -1,4 +1,4 @@
-package vheurisitc;
+package vheuristic;
 
 import java.util.Random;
 import battlecode.common.*;

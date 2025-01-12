@@ -1,4 +1,4 @@
-package vheurisitc;
+package vheuristic;
 
 import battlecode.common.*;
 import org.apache.lucene.index.Payload;

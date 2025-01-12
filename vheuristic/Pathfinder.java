@@ -1,8 +1,8 @@
 // Adapted from https://github.com/chenyx512/battlecode24/blob/main/src/bot1/PathFinder.java
-package vheurisitc;
+package vheuristic;
 
 import battlecode.common.*;
-import vheurisitc.fast.*;
+import vheuristic.fast.*;
 
 class Pathfinder extends RobotPlayer{
     static RobotController rc;

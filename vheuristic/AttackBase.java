@@ -1,4 +1,4 @@
-package vheurisitc;
+package vheuristic;
 
 import battlecode.common.*;
 import java.util.Arrays;
