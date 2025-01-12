@@ -50,6 +50,7 @@ public class Pathfinder{
         return dir;
     }
 
+
     public static class BugNav {
         static DirectionStack dirStack = new DirectionStack();
         static MapLocation prevTarget = null; // previous target
@@ -321,7 +322,7 @@ public class Pathfinder{
                 //     return !rc.senseMapInfo(newLoc).isWall();
                 // }
             } else {
-                return false;
+                return true;
                 // return MapRecorder.getPassible(newLoc);
             }
         }
