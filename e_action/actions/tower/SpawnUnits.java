@@ -53,6 +53,13 @@ public class SpawnUnits extends Action {
         Debug.print(3, Debug.PLAY + name, debugAction);
 
         rc.buildRobot(Unit, spawnLoc);
+
+        // Exemple
+        int id = rc.senseRobotAtLocation(spawnLoc).getID();
+        Debug.print(0, "### Test ### Send message to " + id);
+        Communication.sendClassMessage(id, 42);
+        Communication.sendLocationMessage(id, 4, new MapLocation(0, 0)); // can send an int with the location
+
         spawnedUnits++;
         productionTypeCounter++;
     }

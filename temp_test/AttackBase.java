@@ -43,6 +43,10 @@ public class AttackBase extends RobotPlayer {
 
     static boolean[] visited = new boolean[3];
     static MapLocation foundLoc = null;
+    static MapInfo foundLocInfo = null;
+
+    // simpler if false but also take more damage
+    static final boolean ATTACK_MICRO = true;  // do we want to shift back and forth to avoid tower shots?
 
     static void run() throws GameActionException {
 
@@ -54,23 +58,30 @@ public class AttackBase extends RobotPlayer {
             if (rc.canAttack(foundLoc)) {
                 attacked = true;
                 rc.attack(foundLoc);
-                // Direction dir = rc.getLocation().directionTo(foundLoc).opposite();
-                // if (rc.canMove(dir)) {
-                //     rc.move(dir);
-                // }
+                if (ATTACK_MICRO) {
+                    Direction dir = rc.getLocation().directionTo(foundLoc).opposite();
+                    if (rc.canMove(dir)) {
+                        rc.move(dir);
+                    }
+                }
             } else {
                 if (rc.canMove(rc.getLocation().directionTo(foundLoc))) {
                     rc.move(rc.getLocation().directionTo(foundLoc));
-                } else
-                Pathfinder.move(foundLoc);
-            }
-            if (rc.canAttack(foundLoc)) {
-                attacked = true;
-                rc.attack(foundLoc);
+                } else {
+                    Pathfinder.move(foundLoc);
+                }
+                if (rc.canAttack(foundLoc)) {
+                    attacked = true;
+                    rc.attack(foundLoc);
+                }
             }
 
             if (!attacked) {
                 System.out.println("!!! I *should've* attacked the enemy tower but i can't !!!");
+
+                // System.out.println("Haha I destroyed the enemy tower");
+                // birthRound = rc.getRoundNum();  // no longer do it
+                // rushTowerDestroyed = true;
             }
         }
 
@@ -85,6 +96,7 @@ public class AttackBase extends RobotPlayer {
                     robot = rc.senseRobotAtLocation(tile.getMapLocation());
                     if (robot != null && robot.getTeam() != rc.getTeam() && robot.getType() == spawnTowerType) {
                         System.out.println("Found enemy tower @ " + tile.getMapLocation());
+                        foundLocInfo = tile;
                         foundLoc = tile.getMapLocation();
                         if (!rc.canAttack(foundLoc)) {
                             Pathfinder.move(foundLoc);
@@ -123,9 +135,17 @@ public class AttackBase extends RobotPlayer {
             Pathfinder.move(target);
         }
 
+        MapLocation loc = rc.getLocation();
+        MapInfo locInfo = rc.senseMapInfo(loc);
+
+        if (locInfo.getPaint() == PaintType.EMPTY && rc.canPaint(loc)) {
+            rc.attack(loc);
+        }
+
         if (foundLoc != null && !rc.canSenseRobotAtLocation(foundLoc)) {
             System.out.println("Haha I destroyed the enemy tower");
             birthRound = rc.getRoundNum();  // no longer do it
+            rushTowerDestroyed = true;
         }
 
         prevLoc = rc.getLocation();

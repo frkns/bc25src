@@ -37,6 +37,7 @@ public abstract class Interest {
         if (!Robot.rc.canMove(_Info.directions[7])) directionScores[7] = 0;
         if (!Robot.rc.canMove(_Info.directions[8])) directionScores[8] = 0;
     }
+
     public static Direction calcBestDir (Action action){
         int score;
         int bestScore = 0;

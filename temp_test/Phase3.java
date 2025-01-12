@@ -66,20 +66,17 @@ public class Phase3 extends RobotPlayer{
         }
 
         boolean attack = false;
-        if(!FillPattern.play(rc,UnitType.LEVEL_ONE_DEFENSE_TOWER)) {
+        if(!FillPattern.play(rc,UnitType.LEVEL_ONE_DEFENSE_TOWER,false)) {
             attack = true;
         }
         //System.out.println("ran");
 
         if(attack == true) {
-            if(rc.canAttack(rc.getLocation()) && rc.senseMapInfo(rc.getLocation()).getPaint() == PaintType.EMPTY) {
-                //rc.attack(rc.getLocation());
-                FillPattern.fillInPattern(rc,rc.getLocation());
+            MapLocation fill = FillPattern.locatePattern(rc);
+            if(fill != null) {
+                FillPattern.fillInPattern(rc,fill);
             } else {
-                MapLocation fill = FillPattern.locatePattern(rc);
-                if(fill != null) {
-                    FillPattern.fillInPattern(rc,fill);
-                }
+                FillPattern.fillInPattern(rc,rc.getLocation());
             }
         }
 
