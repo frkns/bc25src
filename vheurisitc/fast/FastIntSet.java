@@ -1,5 +1,5 @@
 // https://github.com/chenyx512/battlecode24/blob/main/src/bot1/fast/FastIntSet.java
-package important.fast;
+package vheurisitc.fast;
 
 public class FastIntSet {
     public StringBuilder keys;

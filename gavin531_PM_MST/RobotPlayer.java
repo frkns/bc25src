@@ -1,4 +1,4 @@
-package temp_test;
+package gavin531_PM_MST;
 
 import battlecode.common.*;
 
@@ -17,8 +17,6 @@ public class RobotPlayer {
      * these variables are static, in Battlecode they aren't actually shared between your robots.
      */
     static int turnCount = 0;
-    public static int[] moneyHistory = new int[5];
-    public static MapLocation[] locationHistory = new MapLocation[8];
 
     /**
      * A random number generator.
@@ -58,25 +56,8 @@ public class RobotPlayer {
     public static boolean rushTowerDestroyed = false;
     public static MapLocation CENTER;
 
-    static MapLocation spawnTowerLocation;
-    static UnitType spawnTowerType;
+    public static void run(RobotController rc) throws GameActionException {
 
-    static RobotController rc;
-
-    public static void run(RobotController r) throws GameActionException {
-        rc = r;
-
-        RobotInfo[] nearbyRobots = rc.senseNearbyRobots();
-        for (RobotInfo robot : nearbyRobots) {
-            if (robot.getTeam() == rc.getTeam()) {
-                if (robot.getType().isTowerType()) {
-                    if (spawnTowerLocation == null || rc.getLocation().distanceSquaredTo(robot.getLocation()) < rc.getLocation().distanceSquaredTo(spawnTowerLocation)) {
-                        spawnTowerLocation = robot.getLocation();
-                        spawnTowerType = robot.getType().getBaseType();
-                    }
-                }
-            }
-        }
         phase2 = (int)((((rc.getMapHeight()+rc.getMapWidth())/2) * 4.5) + 30);
         phase3 = (int)((((rc.getMapHeight()+rc.getMapWidth())/2) * 5.775) + 60.5);
 
@@ -95,24 +76,24 @@ public class RobotPlayer {
 
             // Try/catch blocks stop unhandled exceptions, which cause your robot to explode.
             try {
-                // if (birthRound <= 4 && rc.getType() == UnitType.SOLDIER) {
-                //     rusher = true;
-                //     assert(!rc.getType().isTowerType());
-                //     AttackBase.run();
-                // } else
-                switch (rc.getType()) {
-                    case SOLDIER: runSoldier(rc); break;
-                    case MOPPER: runMopper(rc); break;
-                    case SPLASHER: runSplasher(rc); // Consider upgrading examplefuncsplayer to use splashers!
-                    default: runTower(rc); break;
+                // The same run() function is called for every robot on your team, even if they are
+                // different types. Here, we separate the control depending on the UnitType, so we can
+                // use different strategies on different robots. If you wish, you are free to rewrite
+                // this into a different control structure!
+                if (birthRound <= 4 && rc.getType() == UnitType.SOLDIER) {
+                    rusher = true;
+                    assert(!rc.getType().isTowerType());
+                    AttackBase.run();
+                } else {
+                    switch (rc.getType()) {
+                        case SOLDIER: runSoldier(rc); break;
+                        case MOPPER: runMopper(rc); break;
+                        case SPLASHER: runSplasher(rc); // Consider upgrading examplefuncsplayer to use splashers!
+                        default: runTower(rc); break;
+                        }
+                    }
                 }
-
-                // update stuff
-                moneyHistory[rc.getRoundNum() % moneyHistory.length] = rc.getMoney();
-                locationHistory[rc.getRoundNum() % locationHistory.length] = rc.getLocation();
-
-
-            } catch (GameActionException e) {
+             catch (GameActionException e) {
                 // Oh no! It looks like we did something illegal in the Battlecode world. You should
                 // handle GameActionExceptions judiciously, in case unexpected events occur in the game
                 // world. Remember, uncaught exceptions cause your robot to explode!
@@ -145,13 +126,13 @@ public class RobotPlayer {
         MapLocation nextLoc = rc.getLocation().add(dir);
 
         // Pick a direction to build in.
-        // if (rc.getRoundNum() <= 4) {
-        //     dir = rc.getLocation().directionTo(CENTER);
-        //     nextLoc = rc.getLocation().add(dir);
-        //     if (rc.canBuildRobot(UnitType.SOLDIER, nextLoc)) {
-        //         rc.buildRobot(UnitType.SOLDIER, nextLoc);
-        //     }
-        // }
+        if (rc.getRoundNum() <= 4) {
+            dir = rc.getLocation().directionTo(CENTER);
+            nextLoc = rc.getLocation().add(dir);
+            if (rc.canBuildRobot(UnitType.SOLDIER, nextLoc)) {
+                rc.buildRobot(UnitType.SOLDIER, nextLoc);
+            }
+        }
 
         // rc.setIndicatorDot(nextLoc, 255, 0, 0);
 
@@ -245,21 +226,23 @@ public class RobotPlayer {
      * Run a single turn for a Soldier.
      * This code is wrapped inside the infinite loop in run(), so it is called once per turn.
      */
+    public static int[] moneyHistory = new int[5];
     public static void runSoldier(RobotController rc) throws GameActionException {
+        moneyHistory[rc.getRoundNum() % moneyHistory.length] = rc.getMoney();
 
         // emphemeral Sprint 1 code
-        // boolean diff = false;
-        // for (int i = 1; i < moneyHistory.length; i++) {
-        //     if (moneyHistory[i] != moneyHistory[0]) {
-        //         diff = true;
-        //         break;
-        //     }
-        // }
-        // if ((rc.getRoundNum() > 20 && !diff) || (rusher && rushTowerDestroyed)) {
-        //     // start painting everything so we can win the game
-        //     Sprint1.runSprint1(rc);
-        //     return;
-        // }
+        boolean diff = false;
+        for (int i = 1; i < moneyHistory.length; i++) {
+            if (moneyHistory[i] != moneyHistory[0]) {
+                diff = true;
+                break;
+            }
+        }
+        if ((rc.getRoundNum() > 20 && !diff) || (rusher && rushTowerDestroyed)) {
+            // start painting everything so we can win the game
+            Sprint1.runSprint1(rc);
+            return;
+        }
 
         if(rc.getRoundNum() < phase2) {
             Phase1.run(rc);

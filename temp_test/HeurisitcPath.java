@@ -1,0 +1,89 @@
+package temp_test;
+
+import battlecode.common.*;
+import java.util.Arrays;
+import java.util.Comparator;
+
+public class HeurisitcPath extends RobotPlayer {
+    // keep track of the last 8 positions and have a cost for all 8 directions,
+    // increasing the cost a bit if it's one of the last 8 positions.
+    // plus some other costs for preferring to stay on my own paint, avoiding enemy paint etc
+    // also try to move away from the our spawn tower
+
+    public static void move() throws GameActionException {
+        int[] directionCost = new int[8];
+
+        boolean[] directionMovable = new boolean[8];
+        for (int i = 0; i++ < 8;) {
+            directionMovable[i] = rc.canMove(directions[i]);
+        }
+
+        int[] prevLocDeltaXs = new int[8];
+        int[] prevLocDeltaYs = new int[8];
+        for (int i = 0; i++ < 8;) {
+            MapLocation loc = locationHistory[i];
+            if (loc == null) {
+                prevLocDeltaXs[i] = 42;  // some random sentinel value
+                prevLocDeltaYs[i] = 42;
+                continue;
+            }
+            Direction dir = rc.getLocation().directionTo(loc);
+            prevLocDeltaXs[i] = dir.dx;
+            prevLocDeltaYs[i] = dir.dy;
+        }
+
+        Direction toSpawnTower = rc.getLocation().directionTo(spawnTowerLocation);
+        int toSpawnTowerSpawnDeltaX = toSpawnTower.dx;
+        int toSpawnTowerSpawnDeltaY = toSpawnTower.dy;
+
+        int INF = (int)2e9;
+        for (int i = 0; i++ < 8;) {
+            // if we can't move there, set the cost to infinity
+            if (!directionMovable[i]) {
+                directionCost[i] = INF;
+                continue;
+            }
+
+            // add a cost for moving in a direction that gets closer to the last 8 positions
+            Direction dir = directions[i];
+            for (int deltaX : prevLocDeltaXs) {
+                if (deltaX == dir.dx) {
+                    directionCost[i] += 500;
+                }
+            }
+            for (int deltaY : prevLocDeltaYs) {
+                if (deltaY == dir.dy) {
+                    directionCost[i] += 500;
+                }
+            }
+
+            // add a cost for moving in a direction that gets closer to the tower that spawned us
+            if (dir.dx == toSpawnTowerSpawnDeltaX) {
+                directionCost[i] += 500;
+            }
+            if (dir.dy == toSpawnTowerSpawnDeltaY) {
+                directionCost[i] += 500;
+            }
+
+            // add a cost if the tile is enemy paint
+            if (rc.senseMapInfo(rc.getLocation().add(dir)).getPaint().isEnemy()) {
+                directionCost[i] += 2000;
+            }
+        }
+
+        // find the minimum cost Direction and move there
+        int minCost = INF;
+        Direction minDir = null;
+        for (int i = 0; i < 8; i++) {
+            if (directionCost[i] < minCost) {
+                minCost = directionCost[i];
+                minDir = directions[i];
+            }
+        }
+        rc.move(minDir);
+    }
+
+
+
+
+}

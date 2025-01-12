@@ -1,14 +1,20 @@
-package important;
+package vheurisitc;
 
 import battlecode.common.*;
+import org.apache.lucene.index.Payload;
 
-public class FillPattern extends RobotPlayer {
+import java.awt.*;
+import java.util.Map;
+
+public class FillPattern extends RobotPlayer{
 
     static int state = 0; //0 = wandering, 1 = filling rune, 2 = filling pattern
+    static MapLocation lastRuin = null;
 
     //locates nearest ruin and attempts to build a pattern
     //run once every turn
-    public static boolean play(RobotController rc, UnitType tower) throws GameActionException {
+    //temporary: added the alwaysDrawRuin which forces the drawing of the specified ruin (temporary fix to the code drawing an undesired ruin)
+    public static boolean play(RobotController rc, UnitType tower, boolean alwaysDrawRuin) throws GameActionException {
 
         //rc.setIndicatorString(state+"");
 
@@ -29,6 +35,14 @@ public class FillPattern extends RobotPlayer {
                     distance = rc.getLocation().distanceSquaredTo(ruin);
                     ruinLoc = ruin;
                 }
+            }
+        }
+
+        if(lastRuin != null && rc.getChips() >= 1000) {
+            if(rc.canMove(rc.getLocation().directionTo(lastRuin))) {
+                rc.move(rc.getLocation().directionTo(lastRuin));
+            } else {
+                return false;
             }
         }
 
@@ -73,6 +87,12 @@ public class FillPattern extends RobotPlayer {
                     }
                 }
             }
+
+            if(alwaysDrawRuin) {
+                drawRuin(rc,tower,ruinLoc);
+                return true;
+            }
+
             if(!hasPaint) {
                 drawRuin(rc,tower,ruinLoc);
                 return true;
@@ -113,6 +133,7 @@ public class FillPattern extends RobotPlayer {
 
         if(rc.canCompleteTowerPattern(tower,ruin)) {
             rc.completeTowerPattern(tower,ruin);
+            lastRuin = null;
         }
 
         Boolean paint = null;
@@ -149,17 +170,22 @@ public class FillPattern extends RobotPlayer {
                 rc.move(rc.getLocation().directionTo(paintLoc));
             }
         } else {
-            if (rc.canMove(rc.getLocation().directionTo(ruin))) {
-                rc.move(rc.getLocation().directionTo(ruin));
+            if(rc.getChips() >= 1000) {
+                if (rc.canMove(rc.getLocation().directionTo(ruin))) {
+                    rc.move(rc.getLocation().directionTo(ruin));
+                }
+                return;
             }
+            lastRuin = ruin;
         }
     }
+
 
     public static void fillInPattern(RobotController rc ,MapLocation loc) throws GameActionException {
         boolean[][] pattern = rc.getResourcePattern();
 
         if(rc.canSenseLocation(loc) && rc.canAttack(loc) && !rc.senseMapInfo(loc).hasRuin()) {
-            boolean useSecondary = pattern[loc.x%5][loc.y%5];
+            boolean useSecondary = pattern[(loc.x+(loc.y/3))%4][4-(loc.y%3)];
             rc.setIndicatorString(loc+"+"+useSecondary);
             if(!((rc.senseMapInfo(loc).getPaint() == PaintType.ALLY_SECONDARY && useSecondary) || (rc.senseMapInfo(loc).getPaint() == PaintType.ALLY_PRIMARY && !useSecondary))) {
                 rc.attack(loc, useSecondary);
@@ -168,80 +194,86 @@ public class FillPattern extends RobotPlayer {
         }
     }
 
+
     public static MapLocation locatePattern(RobotController rc) throws GameActionException {
         MapLocation center = null;
         MapInfo[] nearbyTiles = rc.senseNearbyMapInfos();
+        boolean ruin = false;
 
         int[][] corners = {
-                {0, 0},
-                {0, 4},
-                {4, 0},
-                {4, 4}
+                {-2, -2},
+                {2, 2},
+                {-2, 2},
+                {2, -2}
         };
 
         boolean[][] pattern = rc.getResourcePattern();
         int closest = Integer.MAX_VALUE;
 
         for(MapInfo tile : nearbyTiles) {
-            int x = tile.getMapLocation().x%5;
-            int y = tile.getMapLocation().y%5;
-            if(x== 4|| x == 0) {
-                if(y == 4 || y == 0) {
+
+            if(tile.hasRuin() && !rc.isLocationOccupied(tile.getMapLocation())) {
+                ruin = true;
+            }
+
+            int x = tile.getMapLocation().x;
+            int y = tile.getMapLocation().y;
+            if(y%3 == 2 &&  (x+((y-1)/3))%4 == 2) {
+                if(rc.getLocation().distanceSquaredTo(tile.getMapLocation()) < closest) {
                     boolean found = true;
 
                     for(int i = 0 ; i < 4 ; i ++) {
-                        if(x != corners[i][0] || y != corners[i][1]) {
-                            if(!rc.canSenseLocation(new MapLocation(tile.getMapLocation().x + (corners[i][0] - x), tile.getMapLocation().y + (corners[i][1] - y)))) {
-                                found = false;
-                                break;
-                            }
+                        if(!rc.canSenseLocation(new MapLocation(tile.getMapLocation().x + (corners[i][0]), tile.getMapLocation().y + (corners[i][1])))) {
+                            found = false;break;
                         }
                     }
                     if(found) {
-                        rc.setIndicatorString(found+"");
-                        MapLocation check = new MapLocation(tile.getMapLocation().x + (2 - x), tile.getMapLocation().y + (2 - y));
-                        if(rc.getLocation().distanceSquaredTo(check) < closest) {
-                            closest = rc.getLocation().distanceSquaredTo(check);
-                            center = check;
-                        }
+                        closest = tile.getMapLocation().distanceSquaredTo(tile.getMapLocation());
+                        center = new MapLocation(tile.getMapLocation().x, tile.getMapLocation().y);
                     }
                 }
             }
         }
 
-        MapLocation loc = null;
         if(center != null) {
             if(rc.canCompleteResourcePattern(center)) {
                 rc.completeResourcePattern(center);
             } else {
-                rc.setIndicatorString(center + "a");
                 MapLocation paintLoc = null;
-                for (int i = 5; --i >= 0; ) {
-                    for (int j = 5; --j >= 0; ) {
-                        loc = new MapLocation(center.x + i - 2, center.y + j - 2);
-                        PaintType paint = rc.senseMapInfo(loc).getPaint();
 
-                        if (rc.senseMapInfo(loc).hasRuin()) {
+                for(MapInfo tile : nearbyTiles) {
+                    int x = tile.getMapLocation().x;
+                    int y = tile.getMapLocation().y;
+
+                    if(x >= center.x -2 && x <= center.x + 2 && y >= center.y -2 && y <= center.y + 2) {
+
+                        if(tile.hasRuin()) {
                             return null;
                         }
-                        if (paint == PaintType.ALLY_SECONDARY) {
-                            if (!pattern[i][j]) {
+
+                        if(tile.getPaint() == PaintType.ENEMY_SECONDARY || tile.getPaint() == PaintType.ENEMY_PRIMARY) {
+                            return null;
+                        }
+                        if(tile.getPaint() == PaintType.ALLY_SECONDARY && !pattern[x-center.x+2][y-center.y+2]) {
+                            if(ruin) {
                                 return null;
+                            } else {
+                                paintLoc = tile.getMapLocation();
                             }
                         }
-                        if (paint == PaintType.ENEMY_PRIMARY || paint == PaintType.ENEMY_SECONDARY) {
-                            return null;
+                        if(tile.getPaint() == PaintType.EMPTY) {
+                            paintLoc = tile.getMapLocation();
                         }
-
-                        if (paint == PaintType.EMPTY || (paint == PaintType.ALLY_PRIMARY && pattern[i][j])) {
-                            paintLoc = loc;
+                        if(tile.getPaint() == PaintType.ALLY_PRIMARY && pattern[x-center.x+2][y-center.y+2]) {
+                            paintLoc = tile.getMapLocation();
                         }
                     }
                 }
-                if (rc.canMove(rc.getLocation().directionTo(center))) {
-                    rc.move(rc.getLocation().directionTo(center));
+                if(paintLoc != null) {
+                    if(rc.canMove(rc.getLocation().directionTo(center))) {
+                        rc.move(rc.getLocation().directionTo(center));
+                    }
                 }
-                rc.setIndicatorString(paintLoc + "c");
                 return paintLoc;
             }
         } else {

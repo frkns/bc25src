@@ -1,4 +1,4 @@
-package important;
+package vheurisitc;
 
 import battlecode.common.*;
 
@@ -35,19 +35,16 @@ public class Phase2 extends RobotPlayer{
 
         boolean attack = false;
 
-        if(!FillPattern.play(rc,UnitType.LEVEL_ONE_PAINT_TOWER)) {
+        if(!FillPattern.play(rc,UnitType.LEVEL_ONE_PAINT_TOWER,false)) {
             attack = true;
         }
 
         if(attack == true) {
-            if(rc.canAttack(rc.getLocation()) && rc.senseMapInfo(rc.getLocation()).getPaint() == PaintType.EMPTY) {
-                //rc.attack(rc.getLocation());
-                FillPattern.fillInPattern(rc,rc.getLocation());
+            MapLocation fill = FillPattern.locatePattern(rc);
+            if(fill != null) {
+                FillPattern.fillInPattern(rc,fill);
             } else {
-                MapLocation fill = FillPattern.locatePattern(rc);
-                if(fill != null) {
-                    FillPattern.fillInPattern(rc,fill);
-                }
+                FillPattern.fillInPattern(rc,rc.getLocation());
             }
         }
         //NORTH WEST, NORTH EAST, SOUTHWEST, SOUTHEAST

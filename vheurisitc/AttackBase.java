@@ -1,4 +1,4 @@
-package temp_test;
+package vheurisitc;
 
 import battlecode.common.*;
 import java.util.Arrays;

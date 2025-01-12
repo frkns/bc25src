@@ -1,4 +1,4 @@
-package important;
+package vheurisitc;
 
 import battlecode.common.*;
 

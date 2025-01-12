@@ -1,4 +1,4 @@
-package important;
+package gavin531_PM_MST;
 
 import battlecode.common.*;
 
@@ -26,7 +26,28 @@ public class Phase1 extends RobotPlayer{
                 }
             }
         }
-        FillPattern.play(rc,UnitType.LEVEL_ONE_MONEY_TOWER);
+        RobotInfo[] nearbyRobots = rc.senseNearbyRobots();
+        for(RobotInfo robot : nearbyRobots){
+            if(rc.canTransferPaint(robot.getLocation(),Math.max(-50, -1 * robot.getPaintAmount()))){
+                rc.transferPaint(robot.getLocation(),Math.max(-50, -1 * robot.getPaintAmount()));
+            }
+        }
+
+        boolean attack = false;
+
+        if(!FillPattern.play(rc,UnitType.LEVEL_ONE_MONEY_TOWER,false)) {
+            attack = true;
+        };
+
+
+        if(attack == true) {
+            MapLocation fill = FillPattern.locatePattern(rc);
+            if(fill != null) {
+                FillPattern.fillInPattern(rc,fill);
+            } else {
+                FillPattern.fillInPattern(rc,rc.getLocation());
+            }
+        }
 
         int r=0;
         int x=0;
@@ -60,6 +81,10 @@ public class Phase1 extends RobotPlayer{
 
         Direction dir = rc.getLocation().directionTo(target);
         if(rc.senseMapInfo(rc.getLocation()).getMark() == PaintType.ENEMY_PRIMARY || rc.senseMapInfo(rc.getLocation()).getMark() == PaintType.ENEMY_SECONDARY) {
+            // ^ this condition always eval to false? (we can't sense enemy marks)
+
+            assert(false);
+
             for(MapInfo tile : rc.senseNearbyMapInfos(target, 8)){
                 if(tile.getPaint().isAlly()){
                     dir=rc.getLocation().directionTo(tile.getMapLocation());
@@ -103,11 +128,6 @@ public class Phase1 extends RobotPlayer{
             }
         }
 
-        if (rc.senseMapInfo(rc.getLocation()).getPaint() == PaintType.EMPTY){
-            if(rc.canAttack(rc.getLocation())){
-                FillPattern.fillInPattern(rc,rc.getLocation());
-            }
-        }
     }
 
 }
