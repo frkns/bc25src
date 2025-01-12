@@ -15,7 +15,6 @@ public class _Template extends Action {
     public _Template(){
         rc = Robot.rc;
         name = "REPLACE WITH FUNC NAME";
-        type = null; // REMEMBER TO SET THE COOLDOWN REQUIREMENTS! No requirements = 0, Action = 1, Action + Move = 2
         debugAction = false;
         Debug.print(3, Debug.INIT + name, debugAction);
     }
@@ -31,14 +30,10 @@ public class _Template extends Action {
         Debug.print(3, Debug.CALCSCORE + name, debugAction);
         // 1. Calculate and assign score variable
         // 2. Store important variables
-        // 3. Set targetLoc
+        // 3. Set targetLoc (it is defined in Action.java)
     }
 
-    public int getScore(){
-        return score;
-    }
-
-    // TODO <-- Use TODO to make notes on potential future improvements
+    
     public void play() throws GameActionException {
         Debug.print(3, Debug.PLAY + name, debugAction);
         // Code here

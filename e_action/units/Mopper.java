@@ -2,15 +2,15 @@ package e_action.units;
 
 import e_action.Robot;
 import e_action.actions.unit.*;
+import e_action.interests.unit.*;
 
 import battlecode.common.*;
 
 
 public class Mopper extends Robot {
-    public Mopper(RobotController rc){
+    public Mopper(RobotController rc) throws GameActionException {
         super(rc);
 
-        actions.add(new Explore());
-        actions.add(new MopperAttack());
+        interests.add(new Explore());
     }
 }

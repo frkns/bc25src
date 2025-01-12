@@ -7,7 +7,7 @@ import battlecode.common.*;
 
 
 public class Tower extends Robot {
-    public Tower(RobotController rc) {
+    public Tower(RobotController rc) throws GameActionException {
         super(rc);
 
         actions.add(new SpawnUnits());

@@ -1,7 +1,16 @@
-    // -------------- Useful constants -------------- 
-    public static final Random rng = new Random(0);
+package e_action.knowledge;
+
+import battlecode.common.*;
+
+import java.util.Random;
+import e_action.Robot;
+import e_action.utils.*;
+
+public class _Info {
+    public static RobotController rc = Robot.rc;
+    // -------------- Useful constants --------------
+    public static final Random rng = new Random(rc.getID());
     public static final Direction[] directions = {
-            Direction.CENTER,
             Direction.NORTH,
             Direction.NORTHEAST,
             Direction.EAST,
@@ -10,6 +19,7 @@
             Direction.SOUTHWEST,
             Direction.WEST,
             Direction.NORTHWEST,
+            Direction.CENTER,
     };
 
     // -------------- Variables that vary by game --------------
@@ -20,6 +30,7 @@
     // -------------- Variables set during unit initialization ----------------
     public static MapLocation spawnTowerLocation;
     public static Direction spawnDirection;
+    public static UnitType unitType;
     public static int actionRadiusSquared;
 
     // -------------- Variables that vary by turn ----------------
@@ -41,16 +52,16 @@
 
 
 
-    // -------------- Variables that vary by game  ----------------
+
     public static void init() {
+        // -------------- Variables that vary by game  ----------------
         MAP_WIDTH = rc.getMapWidth();
         MAP_HEIGHT = rc.getMapHeight();
         MAP_AREA = MAP_WIDTH * MAP_HEIGHT;
-    }
+        // -------------- Variables set during unit initialization ----------------
+        unitType = rc.getType();
+        actionRadiusSquared = unitType.actionRadiusSquared;
 
-    // -------------- Variables set during unit initialization ----------------
-    public static void unitInit9() {
-        actionRadiusSquared = rc.getType().actionRadiusSquared;
     }
 
     // -------------- Variables that vary by turn ----------------
@@ -60,7 +71,7 @@
         chips = rc.getChips();
         chipsRate = ChipProductionRate.calculate();
         // ------------ Comms info ------------
-        
+
         // ----------- Internal info ------------
         robotLoc = rc.getLocation();
 
@@ -79,5 +90,5 @@
             }
         }
     }
+}
 
-    
