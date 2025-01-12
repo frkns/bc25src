@@ -28,9 +28,9 @@ public class _Template extends Action {
     // Included are: GatherInfo.nearbyAllies, GatherInfo.nearbyRuins...
     public void calcScore() throws GameActionException {
         Debug.print(3, Debug.CALCSCORE + name, debugAction);
-        // 1. Calculate and assign score variable
+        // 1. Calculate and set the score variable (defined in Action.java)
         // 2. Store important variables
-        // 3. Set targetLoc (it is defined in Action.java)
+        // 3. Set targetLoc (defined in Action.java)
     }
 
     

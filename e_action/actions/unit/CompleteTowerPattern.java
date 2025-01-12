@@ -215,5 +215,4 @@ public class CompleteTowerPattern extends Action {
             }
         }
     }
-
 }
