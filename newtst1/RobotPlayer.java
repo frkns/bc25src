@@ -1,4 +1,4 @@
-package vheurisitc;
+package newtst1;
 
 import battlecode.common.*;
 
