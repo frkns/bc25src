@@ -18,7 +18,7 @@ public class HeurisitcPath extends RobotPlayer {
 
         int[] prevLocDeltaXs = new int[8];
         int[] prevLocDeltaYs = new int[8];
-        for (int i = 0; i++ < 8;) {
+        for (int i = 0; i < 8; i++) {
             MapLocation loc = locationHistory[i];
             if (loc == null) {
                 prevLocDeltaXs[i] = 42;  // some random sentinel value
@@ -35,7 +35,7 @@ public class HeurisitcPath extends RobotPlayer {
         int toSpawnTowerSpawnDeltaY = toSpawnTower.dy;
 
         int INF = (int)2e9;
-        for (int i = 0; i++ < 8;) {
+        for (int i = 0; i < 8; i++) {
             // if we can't move there, set the cost to infinity
             if (!rc.canMove(directions[i])) {
                 directionCost[i] = INF;
