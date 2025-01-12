@@ -7,11 +7,14 @@ import battlecode.common.RobotController;
 import e_action.actions.Action;
 
 public class Debug {
-    public static boolean debug = false;
+    public static boolean debug = true;
+
     public static String INITUNIT = "Init unit ";
     public static String INIT = "Initializing ";
+    public static String UPDATE_DIR_SCORES = "Adding Move Scores for ";
     public static String CALCSCORE = "Calculating Score ";
     public static String PLAY = "Playing ";
+
 
     private static final String[] indents = {"", "\t", "\t\t", "\t\t\t", "\t\t\t\t", "\t\t\t\t\t", "\t\t\t\t\t"};
     private static int BYTECODE_PER_TURNS = GameConstants.ROBOT_BYTECODE_LIMIT;
@@ -39,7 +42,7 @@ public class Debug {
     }
 
     /**
-      * Prints the bytecode used to calculate score for each action and execute action
+      * Prints the bytecode used to calculate directionScores for each action and execute action
       * Example: https://discord.com/channels/1316447035242709032/1323051422819815486/1327037155956228146 
       */
     
@@ -86,16 +89,8 @@ public class Debug {
         }
     }
 
-    public static void setActionIndicatorString(Action actionAction, Action moveAction, int actionScore, int moveScore){
-        if (actionScore > 0 && moveScore > 0) {
-            rc.setIndicatorString(actionAction.name + " + " + moveAction.name + " - " + (actionScore + moveScore));
-        } else if (actionScore > 0) {
-            rc.setIndicatorString(actionAction.name + " + " + "noMove" + " - " + (actionScore));
-        } else {
-            rc.setIndicatorString("noAction" + " + " +  moveAction.name + " - " + (moveScore));
-        }
+    public static void setActionIndicatorString(Action action){
+        rc.setIndicatorString(action.name + " - " + (action.score));
     }
-    public static void setActionIndicatorString(Action comboAction, int comboScore){
-        rc.setIndicatorString(comboAction.name + " - " + comboScore);
-    }
+
 }

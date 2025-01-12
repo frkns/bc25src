@@ -2,11 +2,10 @@ package e_action.actions.unit;
 
 import e_action.Robot;
 import e_action.actions.Action;
-import e_action.utils.Constants;
-import e_action.utils.Debug;
+import e_action.utils.*;
+import e_action.knowledge._Info;
 
 import battlecode.common.*;
-import e_action.utils.SelectTower;
 
 public class CompleteTowerPattern extends Action {
     public RobotController rc;
@@ -22,6 +21,9 @@ public class CompleteTowerPattern extends Action {
 
     public boolean hasPaint = false;
 
+    public Boolean useSecondary = null;
+    public MapLocation paintLocation = null;
+
     public void initUnit(){
         Debug.print(1, Debug.INITUNIT + name, debugAction);
 
@@ -29,19 +31,17 @@ public class CompleteTowerPattern extends Action {
 
     public CompleteTowerPattern() {
         rc = Robot.rc;
-        name = "BUILD TOWER PATTERN";
-        Debug.print(3, Debug.INIT + name);
+        name = "COMPLETE TOWER PATTERN";
+        Debug.print(3, Debug.INIT + name, debugAction);
     }
 
     // Detects if towers can be constructed on nearby ruins (i.e. is there enemy paint?)
     public void calcScore() throws GameActionException {
+        Debug.print(3, Debug.CALCSCORE + name, debugAction);
 
-        ruinLoc = null;
 
         int distance = Integer.MAX_VALUE;
-
-        Debug.print(3, Debug.CALCSCORE + name);
-        for(MapLocation ruin : Robot.nearbyRuins) {
+        for(MapLocation ruin : _Info.nearbyRuins) {
             if(!rc.isLocationOccupied(ruin)) {
                 if(rc.getLocation().distanceSquaredTo(ruin) < distance) {
                     distance = rc.getLocation().distanceSquaredTo(ruin);
@@ -73,7 +73,6 @@ public class CompleteTowerPattern extends Action {
 
                     if(paint == PaintType.ENEMY_PRIMARY || paint == PaintType.ENEMY_SECONDARY) {
                         score = 0;
-                        cooldown_reqs = 0;
                         return;
                     }
                     if(paint == PaintType.ALLY_SECONDARY && !moneyPattern[x-ruinLoc.x+2][y-ruinLoc.y+2]) {
@@ -87,22 +86,11 @@ public class CompleteTowerPattern extends Action {
                     }
                 }
             }
-            score = Constants.BuildTower;
-            cooldown_reqs = 3;
         }
-    }
 
-    public int getScore(){
-        return score;
-    }
-    // If a pattern can be drawn on a nearby ruin, draw a tile and move towards that tile
-    // If the pattern is completed, move towards the ruin
-    public void play() throws GameActionException {
-
-        UnitType tower = SelectTower.getTower();
+        UnitType tower = selectTower();
 
         if(ruinLoc != null) {
-            Debug.print(3, Debug.PLAY + name);
             if(alwaysDraw) {
                 drawRuin(tower,ruinLoc);
             }
@@ -125,6 +113,18 @@ public class CompleteTowerPattern extends Action {
                 } else {
                     drawRuin(tower, ruinLoc);
                 }
+            }
+        }
+    }
+
+    // If a pattern can be drawn on a nearby ruin, draw a tile and move towards that tile
+    // If the pattern is completed, move towards the ruin
+    public void play() throws GameActionException {
+        Debug.print(3, Debug.PLAY + name, debugAction);
+        if(paintLocation != null) {
+            if(rc.canAttack(paintLocation)) {
+                rc.attack(paintLocation,useSecondary);
+                paintLocation = null;
             }
         }
     }
@@ -166,15 +166,49 @@ public class CompleteTowerPattern extends Action {
         }
 
         if (paintLoc != null) {
-            if (rc.canAttack(paintLoc)) {
-                rc.attack(paintLoc, paint);
+            paintLocation = paintLoc;
+            score = Constants.CompleteTowerPatternScore;
+            useSecondary = paint;
+            targetLoc = paintLoc;
+        } else {
+            score = Constants.CompleteTowerPatternScore;
+            targetLoc = ruinLoc;
+        }
+    }
+
+    // Select tower type to build based on chips and map size
+    public UnitType selectTower() {
+        int mapArea = _Info.MAP_AREA;
+        int chipsRate = _Info.chipsRate;
+        int round = rc.getRoundNum();
+
+        if(mapArea < 1000) {
+            if(_Info.chipsRate < 60 ) {
+                return UnitType.LEVEL_ONE_PAINT_TOWER;
+            } else {
+                return UnitType.LEVEL_ONE_MONEY_TOWER;
             }
-            if (rc.canMove(rc.getLocation().directionTo(paintLoc))) {
-                rc.move(rc.getLocation().directionTo(paintLoc));
+        } else if (mapArea < 2000) {
+            if(_Info.chipsRate < 100 ) {
+                return UnitType.LEVEL_ONE_PAINT_TOWER;
+            } else {
+                return UnitType.LEVEL_ONE_MONEY_TOWER;
+            }
+        } else if (mapArea < 3000) {
+            if(_Info.chipsRate < 100 ) {
+                return UnitType.LEVEL_ONE_PAINT_TOWER;
+            } else if(round < 300){
+                return UnitType.LEVEL_ONE_PAINT_TOWER;
+            } else {
+                return UnitType.LEVEL_ONE_DEFENSE_TOWER;
             }
         } else {
-            if (rc.canMove(rc.getLocation().directionTo(ruin))) {
-                rc.move(rc.getLocation().directionTo(ruin));
+            if(_Info.chipsRate < 160 ) {
+                return UnitType.LEVEL_ONE_PAINT_TOWER;
+            } else if (round < 300) {
+                return UnitType.LEVEL_ONE_MONEY_TOWER;
+            } else {
+                return UnitType.LEVEL_ONE_DEFENSE_TOWER;
             }
         }
     }

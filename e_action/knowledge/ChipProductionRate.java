@@ -1,4 +1,4 @@
-package e_action.utils;
+package e_action.knowledge;
 
 import battlecode.common.*;
 import e_action.Robot;
@@ -11,14 +11,14 @@ public class ChipProductionRate {
         RobotController rc = Robot.rc;
 
         if(prevChips == null || rc.getChips() == 0) {
-            prevChips= rc.getChips();
+            prevChips = rc.getChips();
             return -1;
         } else {
             if(rc.getChips() > prevChips && prevRate - (rc.getChips() - prevChips) <= 60) {
                 prevRate = rc.getChips() - prevChips;
-                prevChips = rc.getChips();
             }
         }
+        prevChips = rc.getChips();
         return prevRate;
     }
 }

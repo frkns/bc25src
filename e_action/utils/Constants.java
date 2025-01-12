@@ -9,15 +9,17 @@ public class Constants {
     public static final int LARGE_PHASE2 = 800;
     public static final int HUGE_PHASE1 = 500;
     public static final int HUGE_PHASE2 = 800;
-    // -------------- Action score related variables -------------
-    // "Score" suffix indicates a fixed score for an action
-    // No suffix indicates a variable used to help calculate the score of an action
+    // -------------- Action/Interest score related variables -------------
+    // NAME CONSTANTS AFTER THE FILE
+    // "Score" suffix indicates a fixed scores for an action
+    // No suffix indicates a variable used to help calculate the scores of an action
 
-    // Unit variables
-    public static final int _TemplateScore = 1;
-    public static final int BuildTower = 1;
-    public static final int BuildSRP = 1;
-
-    // Tower variables
+    // Unit Interest variables
+    public static final int ExploreScore = 2;
+    // Unit Action variables
+    public static final int CompleteTowerPatternScore = 1000;
+    public static final int CompleteSrpScore = 1000;
+    public static final int RefillPaintScore = 1000;
+    // Tower Action variables
     public static final int SpawnUnitsScore = 10;
 }

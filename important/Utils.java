@@ -18,16 +18,16 @@ public class Utils {
     static MapLocation SPAWN_LOCATION;
 
     // vertical symmetry
-    static MapLocation verticalMirror(MapLocation loc) {
+    public static MapLocation verticalMirror(MapLocation loc) {
         return new MapLocation(loc.x, MAP_HEIGHT - loc.y - 1);
     }
 
     // horizontal symmetry
-    static MapLocation horizontalMirror(MapLocation loc) {
+    public static MapLocation horizontalMirror(MapLocation loc) {
         return new MapLocation(MAP_WIDTH - loc.x - 1, loc.y);
     }
 
-    static MapLocation mirror(MapLocation loc) {  // rotational
+    public static MapLocation mirror(MapLocation loc) {  // rotational
         return new MapLocation(MAP_WIDTH - loc.x - 1, MAP_HEIGHT - loc.y - 1);
     }
 

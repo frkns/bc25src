@@ -6,12 +6,12 @@ import battlecode.common.PaintType;
 import battlecode.common.RobotController;
 import e_action.Robot;
 
-public class Painting {
+public class PaintSrpGrid {
 
     public static RobotController rc = Robot.rc;
 
-    //SOLDIER ONLY
-    //fills in the specified tile with a color such that the map gets tiled with resource patterns
+    // SOLDIER ONLY
+    // Fills in the specified tile with a color such that the map gets tiled with resource patterns
     public static void fillInPattern(MapLocation loc) throws GameActionException {
         boolean[][] pattern = rc.getResourcePattern();
 

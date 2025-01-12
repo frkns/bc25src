@@ -3,7 +3,7 @@ package e_action.utils;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import battlecode.common.UnitType;
-import e_action.Robot;
+import e_action.knowledge._Info;
 
 public class Utils{
     public static RobotController rc;
@@ -31,16 +31,16 @@ public class Utils{
     
     
     public static MapLocation mirror(MapLocation loc) {
-        return new MapLocation(Robot.MAP_WIDTH - loc.x - 1, Robot.MAP_HEIGHT - loc.y - 1);
+        return new MapLocation(_Info.MAP_WIDTH - loc.x - 1, _Info.MAP_HEIGHT - loc.y - 1);
     }
 
     public static MapLocation randomEnemyLocation(MapLocation spawnLoc) {
         MapLocation loc = mirror(spawnLoc);
         // add a small offset based on a % of HEIGHT and WIDTH
-        int offsetX = (int)(Robot.MAP_WIDTH * 0.1);
-        int offsetY = (int)(Robot.MAP_HEIGHT * 0.1);
-        loc = new MapLocation(loc.x + Robot.rng.nextInt(offsetX) - offsetX/2, loc.y + Robot.rng.nextInt(offsetY) - offsetY/2);
-        return new MapLocation(Math.min(Math.max(0, loc.x), Robot.MAP_WIDTH-1), Math.min(Math.max(0, loc.y), Robot.MAP_HEIGHT-1));
+        int offsetX = (int)(_Info.MAP_WIDTH * 0.1);
+        int offsetY = (int)(_Info.MAP_HEIGHT * 0.1);
+        loc = new MapLocation(loc.x + _Info.rng.nextInt(offsetX) - offsetX/2, loc.y + _Info.rng.nextInt(offsetY) - offsetY/2);
+        return new MapLocation(Math.min(Math.max(0, loc.x), _Info.MAP_WIDTH-1), Math.min(Math.max(0, loc.y), _Info.MAP_HEIGHT-1));
     }
 
 

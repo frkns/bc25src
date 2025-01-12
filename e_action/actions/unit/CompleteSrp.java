@@ -1,28 +1,23 @@
 package e_action.actions.unit;
 
+import e_action.knowledge._Info;
 import e_action.Robot;
 import e_action.actions.Action;
 import e_action.utils.*;
 
 import battlecode.common.*;
 
-public class CompleteSRP extends Action {
+public class CompleteSrp extends Action {
     public RobotController rc;
 
     public MapLocation center = null;
-    public MapInfo[] nearbyTiles;
     public MapLocation paintLoc = null;
 
-    public CompleteSRP(){
+    public CompleteSrp(){
         rc = Robot.rc;
-        name = "BUILD SRP";
-        debugAction = false;
+        name = "COMPLETE SRP";
         Debug.print(3, Debug.INIT + name, debugAction);
     }
-
-
-    // Initialize variables specific to the function here
-
 
     public void initUnit(){
         Debug.print(1, Debug.INITUNIT + name, debugAction);
@@ -31,10 +26,10 @@ public class CompleteSRP extends Action {
 
     // Check all nearby tiles for a visible 5x5 in which a SRP can be drawn
     public void calcScore() throws GameActionException {
-
         Debug.print(3, Debug.CALCSCORE + name, debugAction);
+
+
         center = null;
-        MapInfo[] nearbyTiles = rc.senseNearbyMapInfos();
 
         int[][] corners = {
                 {-2, -2},
@@ -46,7 +41,7 @@ public class CompleteSRP extends Action {
         boolean[][] pattern = rc.getResourcePattern();
         int closest = Integer.MAX_VALUE;
 
-        for(MapInfo tile : nearbyTiles) {
+        for(MapInfo tile : _Info.nearbyTiles) {
 
             int x = tile.getMapLocation().x;
             int y = tile.getMapLocation().y;
@@ -73,7 +68,7 @@ public class CompleteSRP extends Action {
             } else {
                 paintLoc = null;
 
-                for(MapInfo tile : nearbyTiles) {
+                for(MapInfo tile : _Info.nearbyTiles) {
                     int x = tile.getMapLocation().x;
                     int y = tile.getMapLocation().y;
 
@@ -81,19 +76,16 @@ public class CompleteSRP extends Action {
 
                         if(tile.hasRuin() || tile.isWall()) {
                             score = 0;
-                            cooldown_reqs = 0;
                             return;
                         }
 
                         if(tile.getPaint() == PaintType.ENEMY_SECONDARY || tile.getPaint() == PaintType.ENEMY_PRIMARY) {
                             score = 0;
-                            cooldown_reqs = 0;
                             return;
                         }
                         if(tile.getPaint() == PaintType.ALLY_SECONDARY && !pattern[x-center.x+2][y-center.y+2]) {
-                            if(Robot.nearbyRuins.length > 0) {
+                            if(_Info.nearbyRuins.length > 0) {
                                 score = 0;
-                                cooldown_reqs = 0;
                                 return;
                             } else {
                                 paintLoc = tile.getMapLocation();
@@ -107,34 +99,22 @@ public class CompleteSRP extends Action {
                         }
                     }
                 }
-                score = Constants.BuildSRP;
-                cooldown_reqs = 3;
+                score = Constants.CompleteSrpScore;
+                targetLoc = paintLoc;
                 return;
             }
         } else {
             score = 0;
-            cooldown_reqs = 0;
             return;
         }
         score = 0;
-        cooldown_reqs = 0;
-    }
-
-    public int getScore(){
-        return score;
     }
 
     //If there is a valid pattern, move towards and fill in the pattern
-
     public void play() throws GameActionException {
         Debug.print(3, Debug.PLAY + name, debugAction);
         if(paintLoc != null) {
-
-            Painting.fillInPattern(paintLoc);
-
-            if(rc.canMove(rc.getLocation().directionTo(center))) {
-                rc.move(rc.getLocation().directionTo(center));
-            }
+            PaintSrpGrid.fillInPattern(paintLoc);
         }
     }
 
