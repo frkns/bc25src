@@ -29,6 +29,10 @@ public class Phase3 extends RobotPlayer{
                 rc.upgradeTower(robot.getLocation());
             }
 
+            // if (rc.getTeam() != robot.getTeam() && robot.getType().isTowerType() && rc.canAttack(robot.getLocation())) {
+            //     rc.attack(robot.getLocation());
+            // }
+
             if (robot.getTeam() != rc.getTeam() && robot.getType() != UnitType.MOPPER && robot.getType() != UnitType.SOLDIER && robot.getType() != UnitType.SPLASHER) {
                 if(robot.getLocation().distanceSquaredTo(rc.getLocation()) < distance){
                     distance = robot.getLocation().distanceSquaredTo(rc.getLocation());
