@@ -64,14 +64,10 @@ public class RobotPlayer {
     static RobotController rc;
     static int roundNum;
 
-    static RobotInfo[] nearbyRobots;
-    static MapInfo[] nearbyTiles;
-
     public static void run(RobotController r) throws GameActionException {
         rc = r;
-        nearbyRobots = rc.senseNearbyRobots();
-        nearbyTiles = rc.senseNearbyMapInfos();
 
+        RobotInfo[] nearbyRobots = rc.senseNearbyRobots();
         for (RobotInfo robot : nearbyRobots) {
             if (robot.getTeam() == rc.getTeam()) {
                 if (robot.getType().isTowerType()) {
@@ -152,21 +148,7 @@ public class RobotPlayer {
      */
     public static void runTower(RobotController rc) throws GameActionException{
         Direction dir = directions[rng.nextInt(directions.length)];
-
-        if (rc.getRoundNum() == 1) {
-            dir = rc.getLocation().directionTo(CENTER).rotateLeft();
-        } else
-        if (rc.getRoundNum() == 2) {
-            dir = rc.getLocation().directionTo(CENTER).rotateRight();
-        }
-
         MapLocation nextLoc = rc.getLocation().add(dir);
-
-        // four main ones
-        if (dir == Direction.NORTH || dir == Direction.SOUTH || dir == Direction.EAST || dir == Direction.WEST) {
-            nextLoc = nextLoc.add(dir);  // one more tile
-        }
-
 
         // Pick a direction to build in.
         // if (rc.getRoundNum() <= 4) {
@@ -208,10 +190,9 @@ public class RobotPlayer {
                 if(r > 55) {
                     nextBot = 1;
                 } else if (r > 40){
-                    nextBot = 0;
-                    // nextBot = 2;
+                    // nextBot = 0;
+                    nextBot = 2;
                 } else {
-                    nextBot = 0;
                     nextBot = 2;
                 }
             }
@@ -286,7 +267,6 @@ public class RobotPlayer {
         //     return;
         // }
 
-        int r = rng.nextInt(100);
         if(rc.getRoundNum() < phase2) {
             Phase1.run(rc);
         } else if (rc.getRoundNum() < phase3) {

@@ -12,6 +12,8 @@ public class Splashers extends RobotPlayer{
         int height = rc.getMapHeight();
         int width = rc.getMapWidth();
 
+        RobotInfo[] nearbyRobots = rc.senseNearbyRobots();
+        MapInfo[] nearbyTiles = rc.senseNearbyMapInfos();
         // Search for a nearby ruin to complete.
         MapInfo curTile = null;
         int distance = 0;
