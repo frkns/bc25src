@@ -1,4 +1,4 @@
-package vheurisitc;
+package smallrewrite;
 
 import battlecode.common.*;
 
@@ -14,6 +14,8 @@ public class Phase3 extends RobotPlayer{
         int height = rc.getMapHeight();
         int width = rc.getMapWidth();
 
+        MapInfo[] nearbyTiles = rc.senseNearbyMapInfos(20);
+        RobotInfo[] nearbyRobots = rc.senseNearbyRobots(20);
 
         RobotInfo curTower = null;
 
@@ -77,9 +79,6 @@ public class Phase3 extends RobotPlayer{
                 FillPattern.fillInPattern(rc,rc.getLocation());
             }
         }
-
-        // HeurisitcPath.outOfBoundsPenalty = 0;
-        // HeurisitcPath.move();
 
         if (target == null) {
             target = new MapLocation(rng.nextInt(width-1),rng.nextInt(height-1));

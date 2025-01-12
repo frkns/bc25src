@@ -10,6 +10,7 @@ import battlecode.common.*;
 public class RobotPlayer {
     static RobotController rc;
     static Robot robot;
+    static int _round_num;
 
     // Can also be used to reset robot actions
     static void setRobotType() throws GameActionException {
@@ -31,6 +32,7 @@ public class RobotPlayer {
 
     public static void run(RobotController r) throws GameActionException {
         rc = r;  // Assign r to the public static field rc
+        _round_num = rc.getRoundNum();
 
         setRobotType();
         while (true) {
@@ -50,6 +52,9 @@ public class RobotPlayer {
                 System.out.println("Exception");
                 e.printStackTrace();
             } finally {
+                if (rc.getRoundNum() != _round_num) {
+                    System.out.println("Went over bytecode limit");
+                }
                 Clock.yield();
             }
         }

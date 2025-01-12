@@ -1,4 +1,4 @@
-package vheurisitc;
+package smallrewrite;
 
 import battlecode.common.*;
 
@@ -8,10 +8,12 @@ public class Splashers extends RobotPlayer{
     static MapLocation nearestPaintTower = null;
     public static MapLocation target;
 
-    public static void run (RobotController rc) throws GameActionException {
+    public static void run() throws GameActionException {
         int height = rc.getMapHeight();
         int width = rc.getMapWidth();
 
+        RobotInfo[] nearbyRobots = rc.senseNearbyRobots();
+        MapInfo[] nearbyTiles = rc.senseNearbyMapInfos();
         // Search for a nearby ruin to complete.
         MapInfo curTile = null;
         int distance = 0;

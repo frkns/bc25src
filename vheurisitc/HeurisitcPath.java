@@ -8,13 +8,13 @@ public class HeurisitcPath extends RobotPlayer {
     // plus some other costs for preferring to stay on my own paint, avoiding enemy paint etc
     // also try to move away from the our spawn tower
 
-    public static void move() throws GameActionException {
-        int[] directionCost = new int[8];
+    static int outOfBoundsPenalty = 300;
+    static int enemyPaintPenalty = 2000;
 
-        // boolean[] directionMovable = new boolean[8];
-        // for (int i = 0; i < 8; i++) {
-        //     directionMovable[i] = rc.canMove(directions[i]);
-        // }
+    public static void move() throws GameActionException {
+        MapLocation prevLoc = locationHistory[(rc.getRoundNum() - 1 + 8) % 8];  // mathematically consistent negative mod
+
+        int[] directionCost = new int[8];
 
         int[] prevLocDeltaXs = new int[8];
         int[] prevLocDeltaYs = new int[8];
@@ -67,18 +67,22 @@ public class HeurisitcPath extends RobotPlayer {
             MapInfo tileInfo = rc.senseMapInfo(newLoc);
             // add a cost if the tile is enemy paint
             if (tileInfo.getPaint().isEnemy()) {
-                directionCost[i] += 2000;
+                directionCost[i] += enemyPaintPenalty;
             }
             // add a cost if the tile is neutral paint
             else if (tileInfo.getPaint() == PaintType.EMPTY) {
                 directionCost[i] += 1000;
             }
 
-            // add a cost if the tile is out of exploration bounds
-            if (Utils.outOfExplorationBounds(newLoc)) {
+            // add a cost for moving back to previous location
+            if (newLoc.equals(prevLoc)) {
                 directionCost[i] += 1000;
             }
 
+            // add a cost if the tile is out of exploration bounds
+            if (Utils.outOfExplorationBounds(newLoc)) {
+                directionCost[i] += outOfBoundsPenalty;
+            }
         }
 
         // find the minimum cost Direction and move there
@@ -90,7 +94,11 @@ public class HeurisitcPath extends RobotPlayer {
                 minDir = directions[i];
             }
         }
-        rc.move(minDir);
+        if (minDir != null)
+            rc.move(minDir);
+        else {
+            rc.setIndicatorString("No valid direction to move in");
+        }
     }
 
 

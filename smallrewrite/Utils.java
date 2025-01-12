@@ -1,4 +1,4 @@
-package temp_test;
+package smallrewrite;
 
 import java.util.Random;
 import battlecode.common.*;

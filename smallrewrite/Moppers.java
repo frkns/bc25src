@@ -1,4 +1,4 @@
-package temp_test;
+package smallrewrite;
 
 import battlecode.common.*;
 
@@ -6,7 +6,8 @@ import battlecode.common.*;
 //spread out and build cash towers
 public class Moppers extends RobotPlayer{
     public static MapLocation target;
-    public static void run (RobotController rc) throws GameActionException {
+
+    public static void run() throws GameActionException {
         int height = rc.getMapHeight();
         int width = rc.getMapWidth();
 
@@ -58,14 +59,8 @@ public class Moppers extends RobotPlayer{
         }
 
 
-        // HeurisitcPath.outOfBoundsPenalty = 0;
-        if (target == null) {
-            target = new MapLocation(rng.nextInt(width-1),rng.nextInt(height-1));
-            // HeurisitcPath.move();
-        }
-        if(rc.getLocation() == target) {
-            target = new MapLocation(rng.nextInt(width-1),rng.nextInt(height-1));
-            // HeurisitcPath.move();
+        if (target == null || rc.getLocation() == target) {
+            HeurisitcPath.move();
         }
 
         Direction dir = rc.getLocation().directionTo(target);

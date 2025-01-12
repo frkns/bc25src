@@ -13,12 +13,11 @@ public class Phase2 extends RobotPlayer{
         int height = rc.getMapHeight();
         int width = rc.getMapWidth();
 
-        MapInfo[] nearbyTiles = rc.senseNearbyMapInfos();
         // Search for a nearby ruin to complete.
         MapInfo curRuin = null;
         int distance = Integer.MAX_VALUE;
 
-        for(RobotInfo robot : rc.senseNearbyRobots()) {
+        for(RobotInfo robot : nearbyRobots) {
             if(rc.canUpgradeTower(robot.getLocation())) {
                 rc.upgradeTower(robot.getLocation());
             }
@@ -48,96 +47,98 @@ public class Phase2 extends RobotPlayer{
             }
         }
         //NORTH WEST, NORTH EAST, SOUTHWEST, SOUTHEAST
-        int[] directionChance = {10,10,10,10};
-        for(RobotInfo robot : rc.senseNearbyRobots()) {
-            if(robot.getTeam().isPlayer()) {
-                switch (rc.getLocation().directionTo(robot.getLocation())) {
-                    case NORTH:
-                        directionChance[0]--;
-                        directionChance[1]--;
-                        break;
-                        case SOUTH:
-                            directionChance[2]--;
-                            directionChance[3]--;
-                            break;
-                            case EAST:
-                                directionChance[1]--;
-                                directionChance[3]--;
-                                break;
-                                case WEST:
-                                    directionChance[2]--;
-                                    directionChance[0]--;
-                                    break;
-                    case NORTHEAST:
-                        directionChance[1]--;
-                        break;
-                        case SOUTHEAST:
-                            directionChance[3]--;
-                            break;
-                            case SOUTHWEST:
-                                directionChance[2]--;
-                                break;
-                                case NORTHWEST:
-                                    directionChance[0]--;
-                                    break;
-                }
-            }
-        }
+        // int[] directionChance = {10,10,10,10};
+        // for(RobotInfo robot : rc.senseNearbyRobots()) {
+        //     if(robot.getTeam().isPlayer()) {
+        //         switch (rc.getLocation().directionTo(robot.getLocation())) {
+        //             case NORTH:
+        //                 directionChance[0]--;
+        //                 directionChance[1]--;
+        //                 break;
+        //                 case SOUTH:
+        //                     directionChance[2]--;
+        //                     directionChance[3]--;
+        //                     break;
+        //                     case EAST:
+        //                         directionChance[1]--;
+        //                         directionChance[3]--;
+        //                         break;
+        //                         case WEST:
+        //                             directionChance[2]--;
+        //                             directionChance[0]--;
+        //                             break;
+        //             case NORTHEAST:
+        //                 directionChance[1]--;
+        //                 break;
+        //                 case SOUTHEAST:
+        //                     directionChance[3]--;
+        //                     break;
+        //                     case SOUTHWEST:
+        //                         directionChance[2]--;
+        //                         break;
+        //                         case NORTHWEST:
+        //                             directionChance[0]--;
+        //                             break;
+        //         }
+        //     }
+        // }
 
-        int total = directionChance[0] + directionChance[1] + directionChance[2] + directionChance[3];
-        int cumulative = 0;
-        if(direction == null) {
-            for(int i = 0; i < directionChance.length; i++) {
-                cumulative += directionChance[i];
-                if(rng.nextInt(total) < cumulative) {
-                    switch (i) {
-                        case 0:
-                            direction = Direction.NORTHWEST;
-                            break;
-                            case 1:
-                                direction = Direction.NORTHEAST;
-                                break;
-                                case 2:
-                                    direction = Direction.SOUTHWEST;
-                                    break;
-                                    case 3:
-                                        direction = Direction.SOUTHEAST;
-                    }
-                    break;
-                }
-            }
-        }
+        // int total = directionChance[0] + directionChance[1] + directionChance[2] + directionChance[3];
+        // int cumulative = 0;
+        // if(direction == null) {
+        //     for(int i = 0; i < directionChance.length; i++) {
+        //         cumulative += directionChance[i];
+        //         if(rng.nextInt(total) < cumulative) {
+        //             switch (i) {
+        //                 case 0:
+        //                     direction = Direction.NORTHWEST;
+        //                     break;
+        //                     case 1:
+        //                         direction = Direction.NORTHEAST;
+        //                         break;
+        //                         case 2:
+        //                             direction = Direction.SOUTHWEST;
+        //                             break;
+        //                             case 3:
+        //                                 direction = Direction.SOUTHEAST;
+        //             }
+        //             break;
+        //         }
+        //     }
+        // }
 
-        int t = 0;
+        // int t = 0;
 
-        while((!rc.canMove(direction) && t < 15) || rc.senseMapInfo(rc.getLocation().add(direction)).getMark() == PaintType.ENEMY_SECONDARY || rc.senseMapInfo(rc.getLocation().add(direction)).getMark() == PaintType.ENEMY_PRIMARY){
-            total = directionChance[0] + directionChance[1] + directionChance[2] + directionChance[3];
-            cumulative = 0;
-            for(int i = 0; i < directionChance.length; i++) {
-                cumulative += directionChance[i];
-                if (rng.nextInt(total) < cumulative) {
-                    switch (i) {
-                        case 0:
-                            direction = Direction.NORTHWEST;
-                            break;
-                        case 1:
-                            direction = Direction.NORTHEAST;
-                            break;
-                        case 2:
-                            direction = Direction.SOUTHWEST;
-                            break;
-                        case 3:
-                            direction = Direction.SOUTHEAST;
-                    }
-                    break;
-                }
-                t++;
-            }
-        }
+        // while((!rc.canMove(direction) && t < 15) || rc.senseMapInfo(rc.getLocation().add(direction)).getMark() == PaintType.ENEMY_SECONDARY || rc.senseMapInfo(rc.getLocation().add(direction)).getMark() == PaintType.ENEMY_PRIMARY){
+        //     total = directionChance[0] + directionChance[1] + directionChance[2] + directionChance[3];
+        //     cumulative = 0;
+        //     for(int i = 0; i < directionChance.length; i++) {
+        //         cumulative += directionChance[i];
+        //         if (rng.nextInt(total) < cumulative) {
+        //             switch (i) {
+        //                 case 0:
+        //                     direction = Direction.NORTHWEST;
+        //                     break;
+        //                 case 1:
+        //                     direction = Direction.NORTHEAST;
+        //                     break;
+        //                 case 2:
+        //                     direction = Direction.SOUTHWEST;
+        //                     break;
+        //                 case 3:
+        //                     direction = Direction.SOUTHEAST;
+        //             }
+        //             break;
+        //         }
+        //         t++;
+        //     }
+        // }
 
-        if(rc.canMove(direction) && (rc.senseMapInfo(rc.getLocation().add(direction)).getMark() != PaintType.ENEMY_SECONDARY && rc.senseMapInfo(rc.getLocation().add(direction)).getMark() != PaintType.ENEMY_PRIMARY)) {
-            rc.move(direction);
-        }
+        // if(rc.canMove(direction) && (rc.senseMapInfo(rc.getLocation().add(direction)).getMark() != PaintType.ENEMY_SECONDARY && rc.senseMapInfo(rc.getLocation().add(direction)).getMark() != PaintType.ENEMY_PRIMARY)) {
+        //     rc.move(direction);
+        // }
+
+        HeurisitcPath.move();
 
         /*
         for(MapInfo tile : nearbyTiles) {

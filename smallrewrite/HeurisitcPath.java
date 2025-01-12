@@ -1,4 +1,4 @@
-package temp_test;
+package smallrewrite;
 
 import battlecode.common.*;
 
@@ -8,12 +8,7 @@ public class HeurisitcPath extends RobotPlayer {
     // plus some other costs for preferring to stay on my own paint, avoiding enemy paint etc
     // also try to move away from the our spawn tower
 
-    static int outOfBoundsPenalty = 300;
-    static int enemyPaintPenalty = 2000;
-
     public static void move() throws GameActionException {
-        MapLocation prevLoc = locationHistory[(rc.getRoundNum() - 1 + 8) % 8];  // mathematically consistent negative mod
-
         int[] directionCost = new int[8];
 
         int[] prevLocDeltaXs = new int[8];
@@ -33,7 +28,6 @@ public class HeurisitcPath extends RobotPlayer {
         Direction toSpawnTower = rc.getLocation().directionTo(spawnTowerLocation);
         int toSpawnTowerSpawnDeltaX = toSpawnTower.dx;
         int toSpawnTowerSpawnDeltaY = toSpawnTower.dy;
-
         int INF = (int)2e9;
         for (int i = 0; i < 8; i++) {
             // if we can't move there, set the cost to infinity
@@ -41,7 +35,6 @@ public class HeurisitcPath extends RobotPlayer {
                 directionCost[i] = INF;
                 continue;
             }
-
             // add a cost for moving in a direction that gets closer to the last 8 positions
             Direction dir = directions[i];
             for (int deltaX : prevLocDeltaXs) {
@@ -67,22 +60,18 @@ public class HeurisitcPath extends RobotPlayer {
             MapInfo tileInfo = rc.senseMapInfo(newLoc);
             // add a cost if the tile is enemy paint
             if (tileInfo.getPaint().isEnemy()) {
-                directionCost[i] += enemyPaintPenalty;
+                directionCost[i] += 2000;
             }
             // add a cost if the tile is neutral paint
             else if (tileInfo.getPaint() == PaintType.EMPTY) {
                 directionCost[i] += 1000;
             }
 
-            // add a cost for moving back to previous location
-            if (newLoc.equals(prevLoc)) {
+            // add a cost if the tile is out of exploration bounds
+            if (Utils.outOfExplorationBounds(newLoc)) {
                 directionCost[i] += 1000;
             }
 
-            // add a cost if the tile is out of exploration bounds
-            if (Utils.outOfExplorationBounds(newLoc)) {
-                directionCost[i] += outOfBoundsPenalty;
-            }
         }
 
         // find the minimum cost Direction and move there
@@ -96,9 +85,6 @@ public class HeurisitcPath extends RobotPlayer {
         }
         if (minDir != null)
             rc.move(minDir);
-        else {
-            rc.setIndicatorString("No valid direction to move in");
-        }
     }
 
 

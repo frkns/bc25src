@@ -10,11 +10,11 @@ public class Phase1 extends RobotPlayer{
 
     public static MapLocation target;
 
+
     public static void run (RobotController rc) throws GameActionException {
         int height = rc.getMapHeight();
         int width = rc.getMapWidth();
 
-        MapInfo[] nearbyTiles = rc.senseNearbyMapInfos();
         // Search for a nearby ruin to complete.
         MapInfo curRuin = null;
         int distance = Integer.MAX_VALUE;
@@ -26,8 +26,10 @@ public class Phase1 extends RobotPlayer{
                 }
             }
         }
-        RobotInfo[] nearbyRobots = rc.senseNearbyRobots();
         for(RobotInfo robot : nearbyRobots){
+            // if (rc.canAttack(robot.getLocation())){
+            //     rc.attack(robot.getLocation());
+            // }
             if(rc.canTransferPaint(robot.getLocation(),Math.max(-50, -1 * robot.getPaintAmount()))){
                 rc.transferPaint(robot.getLocation(),Math.max(-50, -1 * robot.getPaintAmount()));
             }

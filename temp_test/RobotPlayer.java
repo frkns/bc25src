@@ -62,11 +62,16 @@ public class RobotPlayer {
     static UnitType spawnTowerType;
 
     static RobotController rc;
+    static int roundNum;
+
+    static RobotInfo[] nearbyRobots;
+    static MapInfo[] nearbyTiles;
 
     public static void run(RobotController r) throws GameActionException {
         rc = r;
+        nearbyRobots = rc.senseNearbyRobots();
+        nearbyTiles = rc.senseNearbyMapInfos();
 
-        RobotInfo[] nearbyRobots = rc.senseNearbyRobots();
         for (RobotInfo robot : nearbyRobots) {
             if (robot.getTeam() == rc.getTeam()) {
                 if (robot.getType().isTowerType()) {
@@ -77,8 +82,10 @@ public class RobotPlayer {
                 }
             }
         }
-        phase2 = (int)((((rc.getMapHeight()+rc.getMapWidth())/2) * 4.5) + 30);
-        phase3 = (int)((((rc.getMapHeight()+rc.getMapWidth())/2) * 5.775) + 60.5);
+        phase2 = (int)((((rc.getMapHeight()+rc.getMapWidth())/2) * 2));
+        phase3 = (int)((((rc.getMapHeight()+rc.getMapWidth())/2) * 5.775));
+        System.out.println("Phase 2: " + phase2);
+        System.out.println("Phase 3: " + phase3);
 
         Utils.init(rc);
         AttackBase.init(rc);
@@ -87,6 +94,7 @@ public class RobotPlayer {
         CENTER = new MapLocation(rc.getMapWidth()/2, rc.getMapHeight()/2);
 
         while (true) {
+            roundNum = rc.getRoundNum();
             // This code runs during the entire lifespan of the robot, which is why it is in an infinite
             // loop. If we ever leave this loop and return from run(), the robot dies! At the end of the
             // loop, we call Clock.yield(), signifying that we've done everything we want to do.
@@ -126,6 +134,8 @@ public class RobotPlayer {
                 e.printStackTrace();
 
             } finally {
+                if (roundNum != rc.getRoundNum())
+                    System.out.println("~~~ Went over bytecode limit!! ~~~");
                 // Signify we've done everything we want to do, thereby ending our turn.
                 // This will make our code wait until the next turn, and then perform this loop again.
                 Clock.yield();
@@ -142,7 +152,21 @@ public class RobotPlayer {
      */
     public static void runTower(RobotController rc) throws GameActionException{
         Direction dir = directions[rng.nextInt(directions.length)];
+
+        if (rc.getRoundNum() == 1) {
+            dir = rc.getLocation().directionTo(CENTER).rotateLeft();
+        } else
+        if (rc.getRoundNum() == 2) {
+            dir = rc.getLocation().directionTo(CENTER).rotateRight();
+        }
+
         MapLocation nextLoc = rc.getLocation().add(dir);
+
+        // four main ones
+        if (dir == Direction.NORTH || dir == Direction.SOUTH || dir == Direction.EAST || dir == Direction.WEST) {
+            nextLoc = nextLoc.add(dir);  // one more tile
+        }
+
 
         // Pick a direction to build in.
         // if (rc.getRoundNum() <= 4) {
@@ -181,12 +205,13 @@ public class RobotPlayer {
                     nextBot = 0;
                 }
             } else {
-                if(r > 55) {
+                if(r > 50) {
                     nextBot = 1;
                 } else if (r > 40){
-                    // nextBot = 0;
+                    nextBot = 0;
                     nextBot = 2;
                 } else {
+                    nextBot = 0;
                     nextBot = 2;
                 }
             }
@@ -261,6 +286,7 @@ public class RobotPlayer {
         //     return;
         // }
 
+        int r = rng.nextInt(100);
         if(rc.getRoundNum() < phase2) {
             Phase1.run(rc);
         } else if (rc.getRoundNum() < phase3) {
