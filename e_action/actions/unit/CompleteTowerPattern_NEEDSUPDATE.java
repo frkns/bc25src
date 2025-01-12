@@ -211,5 +211,4 @@ public class CompleteTowerPattern_NEEDSUPDATE extends Action {
             }
         }
     }
-
 }
