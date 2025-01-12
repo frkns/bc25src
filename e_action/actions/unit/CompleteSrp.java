@@ -11,13 +11,11 @@ public class CompleteSrp extends Action {
     public RobotController rc;
 
     public MapLocation center = null;
-    public MapInfo[] nearbyTiles;
     public MapLocation paintLoc = null;
 
     public CompleteSrp(){
         rc = Robot.rc;
         name = "COMPLETE SRP";
-        debugAction = false;
         Debug.print(3, Debug.INIT + name, debugAction);
     }
 
@@ -28,10 +26,10 @@ public class CompleteSrp extends Action {
 
     // Check all nearby tiles for a visible 5x5 in which a SRP can be drawn
     public void calcScore() throws GameActionException {
-
         Debug.print(3, Debug.CALCSCORE + name, debugAction);
+
+
         center = null;
-        MapInfo[] nearbyTiles = rc.senseNearbyMapInfos();
 
         int[][] corners = {
                 {-2, -2},
@@ -43,7 +41,7 @@ public class CompleteSrp extends Action {
         boolean[][] pattern = rc.getResourcePattern();
         int closest = Integer.MAX_VALUE;
 
-        for(MapInfo tile : nearbyTiles) {
+        for(MapInfo tile : _Info.nearbyTiles) {
 
             int x = tile.getMapLocation().x;
             int y = tile.getMapLocation().y;
@@ -70,7 +68,7 @@ public class CompleteSrp extends Action {
             } else {
                 paintLoc = null;
 
-                for(MapInfo tile : nearbyTiles) {
+                for(MapInfo tile : _Info.nearbyTiles) {
                     int x = tile.getMapLocation().x;
                     int y = tile.getMapLocation().y;
 

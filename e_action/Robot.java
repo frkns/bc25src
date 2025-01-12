@@ -23,13 +23,14 @@ public abstract class Robot {
         Debug.print(0, "Create unit => " + rc.getType() + " at " + rc.getLocation());
         _Info.init();
         Pathfinder.init(rc);
+        Communication.init(rc);
+
         for (Interest interest : interests) {
             interest.initUnit();
         }
         for (Action action : actions) {
             action.initUnit();
         }
-
     }
 
 
@@ -38,7 +39,8 @@ public abstract class Robot {
         Debug.print(0, "Start turn => " + rc.getType() + " at " + _Info.robotLoc);
         Interest.resetDirectionScores();
         _Info.update();
-        // Comms.read();
+        Communication.initTurn();
+        Communication.readMessages();
     }
 
     public void playTurn() throws GameActionException {
@@ -56,6 +58,7 @@ public abstract class Robot {
         Debug.print(1, "Calculate actions.");
         Action bestAction = null;
         int bestTotalScore = 0;
+
         // ======================= Bunnies =======================
         // TODO Fix calculation for scoreWithDir to account for action + move
         if (_Info.unitType.isRobotType()) {
@@ -63,7 +66,7 @@ public abstract class Robot {
             for (Action action : actions) {
                 Debug.print(2, action.name + " ...", action.debugAction);
                 action.calcScore();
-                if (action.score > 0) {
+                if (action.score > 0 && action.targetLoc != null) {
                     action.setPossibleDirs(action.targetLoc);
                     scoreWithDir = action.calcScoreWithDir(Interest.directionScores);
                     if (scoreWithDir > bestTotalScore) {
@@ -78,6 +81,7 @@ public abstract class Robot {
                 Debug.setActionIndicatorString(bestAction);
                 Direction dir = Interest.calcBestDir(bestAction);
                 if (bestAction.possibleDirs[8]) { // If the robot can play the action before moving, play it first
+                    bestAction.play();
                     if (dir != null) {
                         rc.move(dir);
                     }
@@ -89,6 +93,8 @@ public abstract class Robot {
                 }
             } else {
                 Debug.print(1, "No action to play");
+                rc.setIndicatorString("No action.");
+
                 Direction dir = Interest.calcBestDir(null);
                 if (dir != null) {
                     rc.move(dir);

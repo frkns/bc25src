@@ -26,24 +26,19 @@ public class CompleteTowerPattern extends Action {
 
     public void initUnit(){
         Debug.print(1, Debug.INITUNIT + name, debugAction);
-
     }
 
     public CompleteTowerPattern() {
         rc = Robot.rc;
         name = "COMPLETE TOWER PATTERN";
-        debugAction = false;
-        Debug.print(3, Debug.INIT + name);
+        Debug.print(3, Debug.INIT + name, debugAction);
     }
 
     // Detects if towers can be constructed on nearby ruins (i.e. is there enemy paint?)
     public void calcScore() throws GameActionException {
-
-        ruinLoc = null;
+        Debug.print(3, Debug.CALCSCORE + name, debugAction);
 
         int distance = Integer.MAX_VALUE;
-
-        Debug.print(3, Debug.CALCSCORE + name);
         for(MapLocation ruin : _Info.nearbyRuins) {
             if(!rc.isLocationOccupied(ruin)) {
                 if(rc.getLocation().distanceSquaredTo(ruin) < distance) {
@@ -59,33 +54,34 @@ public class CompleteTowerPattern extends Action {
             boolean[][] defensePattern = rc.getTowerPattern(UnitType.LEVEL_ONE_DEFENSE_TOWER);
 
 
-            MapInfo[] NearbyTiles = rc.senseNearbyMapInfos(); //I could not find a variable for this in the Robot class. Please replace if there is one
-
-            for(MapInfo tile : NearbyTiles) {
+            for(MapInfo tile : _Info.nearbyTiles) {
                 MapLocation loc = tile.getMapLocation();
                 int x = tile.getMapLocation().x;
                 int y = tile.getMapLocation().y;
 
                 //System.out.println(loc);
                 if(x >= ruinLoc.x -2 && x <= ruinLoc.x + 2 && y >= ruinLoc.y -2 && y <= ruinLoc.y + 2 && !tile.hasRuin()) {
-                    PaintType paint = rc.senseMapInfo(loc).getPaint();
+                    if(rc.canSenseLocation(loc)){
+                        PaintType paint = rc.senseMapInfo(loc).getPaint();
 
-                    if(paint!=null) {
-                        hasPaint = true;
-                    }
+                        if(paint != PaintType.EMPTY) {
+                            hasPaint = true;
+                        }
 
-                    if(paint == PaintType.ENEMY_PRIMARY || paint == PaintType.ENEMY_SECONDARY) {
-                        score = 0;
-                        return;
-                    }
-                    if(paint == PaintType.ALLY_SECONDARY && !moneyPattern[x-ruinLoc.x+2][y-ruinLoc.y+2]) {
-                        isMoney = false;
-                    }
-                    if(paint == PaintType.ALLY_SECONDARY && !paintPattern[x-ruinLoc.x+2][y-ruinLoc.y+2]) {
-                        isPaint = false;
-                    }
-                    if(paint == PaintType.ALLY_SECONDARY && !defensePattern[x-ruinLoc.x+2][y-ruinLoc.y+2]) {
-                        isDefense = false;
+                        if(paint.isEnemy()) {
+                            score = 0;
+                            return;
+                        }
+                        if(paint == PaintType.ALLY_SECONDARY && !moneyPattern[x-ruinLoc.x+2][y-ruinLoc.y+2]) {
+                            isMoney = false;
+                        }
+                        if(paint == PaintType.ALLY_SECONDARY && !paintPattern[x-ruinLoc.x+2][y-ruinLoc.y+2]) {
+                            isPaint = false;
+                        }
+                        if(paint == PaintType.ALLY_SECONDARY && !defensePattern[x-ruinLoc.x+2][y-ruinLoc.y+2]) {
+                            isDefense = false;
+                        }
+                        // TODO can be optimized with binary mask
                     }
                 }
             }
@@ -94,7 +90,6 @@ public class CompleteTowerPattern extends Action {
         UnitType tower = selectTower();
 
         if(ruinLoc != null) {
-            Debug.print(3, Debug.PLAY + name);
             if(alwaysDraw) {
                 drawRuin(tower,ruinLoc);
             }
@@ -124,6 +119,7 @@ public class CompleteTowerPattern extends Action {
     // If a pattern can be drawn on a nearby ruin, draw a tile and move towards that tile
     // If the pattern is completed, move towards the ruin
     public void play() throws GameActionException {
+        Debug.print(3, Debug.PLAY + name, debugAction);
         if(paintLocation != null) {
             if(rc.canAttack(paintLocation)) {
                 rc.attack(paintLocation,useSecondary);

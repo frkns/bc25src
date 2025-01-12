@@ -11,7 +11,7 @@ public abstract class Action {
     public int score = 0; 
     public MapLocation targetLoc;
     public boolean[] possibleDirs = new boolean[9];
-    public boolean debugAction = false;
+    public boolean debugAction = true;
 
     public Action(){
         rc = Robot.rc;
@@ -20,35 +20,20 @@ public abstract class Action {
     public abstract void initUnit() throws GameActionException;
     public abstract void calcScore() throws GameActionException;
     public abstract void play() throws GameActionException;
+
     // Possible dirs include every move that keeps the robot in range of their action's target location.
+
     public void setPossibleDirs(MapLocation targetLoc) {
-        if (_Info.actionRadiusSquared >= _Info.robotLoc.distanceSquaredTo(targetLoc)) {
-            possibleDirs[Direction.CENTER.ordinal()] = true;
-        }
-        if (_Info.actionRadiusSquared >= _Info.robotLoc.add(Direction.NORTH).distanceSquaredTo(targetLoc)) {
-            possibleDirs[Direction.NORTH.ordinal()] = true;
-        }
-        if (_Info.actionRadiusSquared >= _Info.robotLoc.add(Direction.NORTHEAST).distanceSquaredTo(targetLoc)) {
-            possibleDirs[Direction.NORTHEAST.ordinal()] = true;
-        }
-        if (_Info.actionRadiusSquared >= _Info.robotLoc.add(Direction.EAST).distanceSquaredTo(targetLoc)) {
-            possibleDirs[Direction.EAST.ordinal()] = true;
-        }
-        if (_Info.actionRadiusSquared >= _Info.robotLoc.add(Direction.SOUTHEAST).distanceSquaredTo(targetLoc)) {
-            possibleDirs[Direction.SOUTHEAST.ordinal()] = true;
-        }
-        if (_Info.actionRadiusSquared >= _Info.robotLoc.add(Direction.SOUTH).distanceSquaredTo(targetLoc)) {
-            possibleDirs[Direction.SOUTH.ordinal()] = true;
-        }
-        if (_Info.actionRadiusSquared >= _Info.robotLoc.add(Direction.SOUTHWEST).distanceSquaredTo(targetLoc)) {
-            possibleDirs[Direction.SOUTHWEST.ordinal()] = true;
-        }
-        if (_Info.actionRadiusSquared >= _Info.robotLoc.add(Direction.WEST).distanceSquaredTo(targetLoc)) {
-            possibleDirs[Direction.WEST.ordinal()] = true;
-        }
-        if (_Info.actionRadiusSquared >= _Info.robotLoc.add(Direction.NORTHWEST).distanceSquaredTo(targetLoc)) {
-            possibleDirs[Direction.NORTHWEST.ordinal()] = true;
-        }
+        // possibleDirs[direction] = true if target is still reachable after moving in this direction
+
+        possibleDirs[Direction.NORTH.ordinal()] = _Info.actionRadiusSquared >= _Info.robotLoc.add(Direction.NORTH).distanceSquaredTo(targetLoc);
+        possibleDirs[Direction.NORTHEAST.ordinal()] = _Info.actionRadiusSquared >= _Info.robotLoc.add(Direction.NORTHEAST).distanceSquaredTo(targetLoc);
+        possibleDirs[Direction.EAST.ordinal()] = _Info.actionRadiusSquared >= _Info.robotLoc.add(Direction.EAST).distanceSquaredTo(targetLoc);
+        possibleDirs[Direction.SOUTHEAST.ordinal()] = _Info.actionRadiusSquared >= _Info.robotLoc.add(Direction.SOUTHEAST).distanceSquaredTo(targetLoc);
+        possibleDirs[Direction.SOUTH.ordinal()] = _Info.actionRadiusSquared >= _Info.robotLoc.add(Direction.SOUTH).distanceSquaredTo(targetLoc);
+        possibleDirs[Direction.SOUTHWEST.ordinal()] = _Info.actionRadiusSquared >= _Info.robotLoc.add(Direction.SOUTHWEST).distanceSquaredTo(targetLoc);
+        possibleDirs[Direction.WEST.ordinal()] = _Info.actionRadiusSquared >= _Info.robotLoc.add(Direction.WEST).distanceSquaredTo(targetLoc);
+        possibleDirs[Direction.NORTHWEST.ordinal()] = _Info.actionRadiusSquared >= _Info.robotLoc.add(Direction.NORTHWEST).distanceSquaredTo(targetLoc);
     }
     // Calculate the best move direction where the action can still be played
     public int calcScoreWithDir(int[] directionScores) {
