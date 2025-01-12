@@ -3,7 +3,7 @@ package e_action.actions.tower;
 import e_action.Robot;
 import e_action.actions.Action;
 import e_action.utils.*;
-
+import e_action.knowledge._Info;
 import battlecode.common.*;
 
 public class SpawnUnits extends Action {
@@ -12,7 +12,6 @@ public class SpawnUnits extends Action {
     public SpawnUnits(){
         rc = Robot.rc;
         name = "SPAWN UNITS";
-        type = 2;
         debugAction = false;
         Debug.print(3, Debug.INIT + name, debugAction);
     }
@@ -32,7 +31,7 @@ public class SpawnUnits extends Action {
     public void calcScore() throws GameActionException {
         Debug.print(3, Debug.CALCSCORE + name, debugAction);
 
-        Direction dir = Robot.directions[Robot.rng.nextInt(Robot.directions.length)];
+        Direction dir = _Info.directions[_Info.rng.nextInt(_Info.directions.length)];
         if (dir.getDeltaX() != 0 && dir.getDeltaY() != 0) {
             spawnLoc = rc.getLocation().add(dir); // If diagonal we can only spawn 1 tile away
         } else {
@@ -61,9 +60,9 @@ public class SpawnUnits extends Action {
 
     //helper function that determines when units should be spawned
     public boolean shouldSpawn() {
-        int mapArea = Robot.MAP_AREA;
-        int chips = Robot.chips;
-        int chipRate = Robot.chipsRate;
+        int mapArea = _Info.MAP_AREA;
+        int chips = _Info.chips;
+        int chipRate = _Info.chipsRate;
 
         //spawns 3 soldiers at the start
         if(rc.getRoundNum() < 6) {

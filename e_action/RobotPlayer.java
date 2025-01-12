@@ -12,7 +12,7 @@ public class RobotPlayer {
     static Robot robot;
 
     // Can also be used to reset robot actions
-    static void setRobotType(){
+    static void setRobotType() throws GameActionException {
         switch (rc.getType()){
             case SOLDIER:
                 robot = new Soldier(rc);

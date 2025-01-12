@@ -1,22 +1,22 @@
 package e_action.actions.unit;
 
+import e_action.knowledge._Info;
 import e_action.Robot;
 import e_action.actions.Action;
 import e_action.utils.*;
 
 import battlecode.common.*;
 
-public class CompleteSRP extends Action {
+public class CompleteSrp_NEEDSUPDATE extends Action {
     public RobotController rc;
 
     public MapLocation center = null;
     public MapInfo[] nearbyTiles;
     public MapLocation paintLoc = null;
 
-    public CompleteSRP(){
+    public CompleteSrp_NEEDSUPDATE(){
         rc = Robot.rc;
-        name = "BUILD SRP";
-        type = 2;
+        name = "COMPLETE SRP";
         debugAction = false;
         Debug.print(3, Debug.INIT + name, debugAction);
     }
@@ -86,7 +86,7 @@ public class CompleteSRP extends Action {
                             return;
                         }
                         if(tile.getPaint() == PaintType.ALLY_SECONDARY && !pattern[x-center.x+2][y-center.y+2]) {
-                            if(Info.nearbyRuins.length > 0) {
+                            if(_Info.nearbyRuins.length > 0) {
                                 score = 0;
                                 return;
                             } else {
@@ -101,7 +101,7 @@ public class CompleteSRP extends Action {
                         }
                     }
                 }
-                score = Constants.CompleteSRPScore;
+                score = Constants.CompleteSrpScore;
                 return;
             }
         } else {
@@ -111,17 +111,12 @@ public class CompleteSRP extends Action {
         score = 0;
     }
 
-    public int getScore(){
-        return score;
-    }
-
     //If there is a valid pattern, move towards and fill in the pattern
-
     public void play() throws GameActionException {
         Debug.print(3, Debug.PLAY + name, debugAction);
         if(paintLoc != null) {
 
-            Painting.fillInPattern(paintLoc);
+            PaintSrpGrid.fillInPattern(paintLoc);
 
             if(rc.canMove(rc.getLocation().directionTo(center))) {
                 rc.move(rc.getLocation().directionTo(center));

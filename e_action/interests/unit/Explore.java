@@ -7,8 +7,7 @@ import battlecode.common.RobotController;
 import e_action.Robot;
 import e_action.interests.Interest;
 import e_action.utils.*;
-
-import java.util.Objects;
+import e_action.knowledge._Info;
 
 public class Explore extends Interest {
     public RobotController rc;
@@ -28,7 +27,7 @@ public class Explore extends Interest {
         Debug.print(1, Debug.INITUNIT + name, debugInterest);
     }
 
-    //TODO Make based on rounds, painted tiles, or even have tower send message to robot
+    //TODO Follow empty tiles without stepping on them
     public void updateDirectionScores() throws GameActionException {
         Debug.print(3, Debug.UPDATE_DIR_SCORES + name, debugInterest);
         if (target == null || rc.getLocation().distanceSquaredTo(target) < 3 || outOfExplorationBounds(rc.getLocation())) {
@@ -40,17 +39,15 @@ public class Explore extends Interest {
         }
      }
 
-
-
     public static boolean outOfExplorationBounds(MapLocation loc) {
         return loc.x - explorationBoundary < 0 || loc.y - explorationBoundary < 0
-            || loc.x + explorationBoundary >= Robot.MAP_WIDTH || loc.y + explorationBoundary >= Robot.MAP_HEIGHT;
+            || loc.x + explorationBoundary >= _Info.MAP_WIDTH || loc.y + explorationBoundary >= _Info.MAP_HEIGHT;
     }
 
     public static MapLocation getRandomInBoundLocation() {
-        // should be within [explorationBoundary+1, Robot.MAP_WIDTH-explorationBoundary-1]
-        return new MapLocation(Robot.rng.nextInt(Robot.MAP_WIDTH - 2*explorationBoundary - 1) + explorationBoundary + 1,
-                               Robot.rng.nextInt(Robot.MAP_HEIGHT - 2*explorationBoundary - 1) + explorationBoundary + 1);
+        // should be within [explorationBoundary+1, Info.MAP_WIDTH-explorationBoundary-1]
+        return new MapLocation(_Info.rng.nextInt(_Info.MAP_WIDTH - 2*explorationBoundary - 1) + explorationBoundary + 1,
+                               _Info.rng.nextInt(_Info.MAP_HEIGHT - 2*explorationBoundary - 1) + explorationBoundary + 1);
 
     }
 }
