@@ -51,8 +51,6 @@ public class _Info {
     public static MapInfo[] nearbyTiles;
 
 
-
-
     public static void init() {
         // -------------- Variables that vary by game  ----------------
         MAP_WIDTH = rc.getMapWidth();
