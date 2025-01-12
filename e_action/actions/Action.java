@@ -25,7 +25,7 @@ public abstract class Action {
 
     public void setPossibleDirs(MapLocation targetLoc) {
         // possibleDirs[direction] = true if target is still reachable after moving in this direction
-        possibleDirs[Direction.CENTER.ordinal()] = _Info.actionRadiusSquared >= _Info.robotLoc.distanceSquaredTo(targetLoc);
+
         possibleDirs[Direction.NORTH.ordinal()] = _Info.actionRadiusSquared >= _Info.robotLoc.add(Direction.NORTH).distanceSquaredTo(targetLoc);
         possibleDirs[Direction.NORTHEAST.ordinal()] = _Info.actionRadiusSquared >= _Info.robotLoc.add(Direction.NORTHEAST).distanceSquaredTo(targetLoc);
         possibleDirs[Direction.EAST.ordinal()] = _Info.actionRadiusSquared >= _Info.robotLoc.add(Direction.EAST).distanceSquaredTo(targetLoc);

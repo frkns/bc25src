@@ -1,0 +1,74 @@
+@startuml
+package "templateBot" {
+package "units" {
+  class Mopper
+  class Soldier
+  class Splasher
+  class Tower
+}
+
+package "utils" {
+  class DebugUnit {
+    + getInstance(): DebugUnit
+    + print(level: int, text: String)
+  }
+  class MessageUnit {
+    + sendMessage(text: String)
+    + receiveMessage(): String
+  }
+}
+
+
+  class Robot {
+    + end()
+    + init()
+    + initTurn()
+    + play()
+    - messageUnit: MessageUnit
+  }
+  class RobotPlayer {
+    # resetRobot()
+    + run(rc: RobotController)
+    - robot: Robot
+  }
+
+
+package "Interests" {
+  abstract class Interest {
+    + name: String [0..1]
+    + getScore(loc: MapLocation): int
+  }
+  class InterestExplore {
+    + exploreArea()
+  }
+  InterestExplore --|> Interest
+}
+
+package "Actions" {
+  abstract class Action {
+    + name: String [0..1]
+    + play()
+  }
+  class ActionAttackTower {
+    + attackTower()
+  }
+  class ActionDefend {
+    + defendBase()
+  }
+  class ActionPaint {
+    + paintTarget()
+  }
+  ActionAttackTower --|> Action
+  ActionDefend --|> Action
+  ActionPaint --|> Action
+}
+}
+
+Robot --> Mopper
+Robot --> Soldier
+Robot --> Splasher
+Robot --> Tower
+
+DebugUnit --o Robot : Singleton
+
+@enduml

@@ -62,7 +62,7 @@ public abstract class Robot {
             for (Action action : actions) {
                 Debug.print(2, action.name + " ...", action.debugAction);
                 action.calcScore();
-                if (action.score > 0) {
+                if (action.score > 0 && action.targetLoc != null) {
                     action.setPossibleDirs(action.targetLoc);
                     scoreWithDir = action.calcScoreWithDir(Interest.directionScores);
                     if (scoreWithDir > bestTotalScore) {
