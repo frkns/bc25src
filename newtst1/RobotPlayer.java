@@ -161,6 +161,11 @@ public class RobotPlayer {
 
         // rc.setIndicatorDot(nextLoc, 255, 0, 0);
 
+        // four main dirs
+        if (dir == Direction.NORTH || dir == Direction.SOUTH || dir == Direction.EAST || dir == Direction.WEST) {
+            nextLoc = nextLoc.add(dir);
+        }
+
         RobotInfo[] robots = rc.senseNearbyRobots();
 
 

@@ -13,11 +13,12 @@ public class Phase2 extends RobotPlayer{
         int height = rc.getMapHeight();
         int width = rc.getMapWidth();
 
+        MapInfo[] nearbyTiles = rc.senseNearbyMapInfos();
         // Search for a nearby ruin to complete.
         MapInfo curRuin = null;
         int distance = Integer.MAX_VALUE;
 
-        for(RobotInfo robot : nearbyRobots) {
+        for(RobotInfo robot : rc.senseNearbyRobots()) {
             if(rc.canUpgradeTower(robot.getLocation())) {
                 rc.upgradeTower(robot.getLocation());
             }

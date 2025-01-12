@@ -58,14 +58,11 @@ public class Moppers extends RobotPlayer{
         }
 
 
-        // HeurisitcPath.outOfBoundsPenalty = 0;
         if (target == null) {
             target = new MapLocation(rng.nextInt(width-1),rng.nextInt(height-1));
-            // HeurisitcPath.move();
         }
         if(rc.getLocation() == target) {
             target = new MapLocation(rng.nextInt(width-1),rng.nextInt(height-1));
-            // HeurisitcPath.move();
         }
 
         Direction dir = rc.getLocation().directionTo(target);
