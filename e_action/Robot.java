@@ -24,7 +24,10 @@ public abstract class Robot {
         _Info.init();
         Pathfinder.init(rc);
         Communication.init(rc);
+    }
 
+    // This runs after the Robot's interests and actions are added
+    public static void initUnit() throws GameActionException {
         for (Interest interest : interests) {
             interest.initUnit();
         }
@@ -32,7 +35,6 @@ public abstract class Robot {
             action.initUnit();
         }
     }
-
 
     public void initTurn() throws GameActionException {
         Debug.reset(rc.getRoundNum()); // Reset clock to benchmark
@@ -121,7 +123,6 @@ public abstract class Robot {
             }
         }
     }
-
 
     public void endTurn(){
         // Comms.write();
