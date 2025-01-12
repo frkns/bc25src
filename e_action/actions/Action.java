@@ -11,7 +11,7 @@ public abstract class Action {
     public int score = 0; 
     public MapLocation targetLoc;
     public boolean[] possibleDirs = new boolean[9];
-    public boolean debugAction = false;
+    public boolean debugAction = true;
 
     public Action(){
         rc = Robot.rc;
@@ -20,6 +20,9 @@ public abstract class Action {
     public abstract void initUnit() throws GameActionException;
     public abstract void calcScore() throws GameActionException;
     public abstract void play() throws GameActionException;
+    public void resetPossibleDirs(){
+        possibleDirs = new boolean[9];
+    }
     // Possible dirs include every move that keeps the robot in range of their action's target location.
     public void setPossibleDirs(MapLocation targetLoc) {
         if (_Info.actionRadiusSquared >= _Info.robotLoc.distanceSquaredTo(targetLoc)) {

@@ -11,7 +11,7 @@ public class ChipProductionRate {
         RobotController rc = Robot.rc;
 
         if(prevChips == null || rc.getChips() == 0) {
-            prevChips= rc.getChips();
+            prevChips = rc.getChips();
             return -1;
         } else {
             if(rc.getChips() > prevChips && prevRate - (rc.getChips() - prevChips) <= 60) {

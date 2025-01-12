@@ -11,7 +11,7 @@ public class Debug {
 
     public static String INITUNIT = "Init unit ";
     public static String INIT = "Initializing ";
-    public static String UPDATE_DIR_SCORES = "Adding Move Scores ";
+    public static String UPDATE_DIR_SCORES = "Adding Move Scores for ";
     public static String CALCSCORE = "Calculating Score ";
     public static String PLAY = "Playing ";
 

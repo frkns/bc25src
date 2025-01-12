@@ -64,6 +64,7 @@ public abstract class Robot {
                 Debug.print(2, action.name + " ...", action.debugAction);
                 action.calcScore();
                 if (action.score > 0) {
+                    action.resetPossibleDirs();
                     action.setPossibleDirs(action.targetLoc);
                     scoreWithDir = action.calcScoreWithDir(Interest.directionScores);
                     if (scoreWithDir > bestTotalScore) {
@@ -78,6 +79,7 @@ public abstract class Robot {
                 Debug.setActionIndicatorString(bestAction);
                 Direction dir = Interest.calcBestDir(bestAction);
                 if (bestAction.possibleDirs[8]) { // If the robot can play the action before moving, play it first
+                    bestAction.play();
                     if (dir != null) {
                         rc.move(dir);
                     }

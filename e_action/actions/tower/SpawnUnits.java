@@ -12,7 +12,6 @@ public class SpawnUnits extends Action {
     public SpawnUnits(){
         rc = Robot.rc;
         name = "SPAWN UNITS";
-        debugAction = false;
         Debug.print(3, Debug.INIT + name, debugAction);
     }
 

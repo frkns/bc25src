@@ -32,18 +32,15 @@ public class CompleteTowerPattern extends Action {
     public CompleteTowerPattern() {
         rc = Robot.rc;
         name = "COMPLETE TOWER PATTERN";
-        debugAction = false;
-        Debug.print(3, Debug.INIT + name);
+        Debug.print(3, Debug.INIT + name, debugAction);
     }
 
     // Detects if towers can be constructed on nearby ruins (i.e. is there enemy paint?)
     public void calcScore() throws GameActionException {
+        Debug.print(3, Debug.CALCSCORE + name, debugAction);
 
-        ruinLoc = null;
 
         int distance = Integer.MAX_VALUE;
-
-        Debug.print(3, Debug.CALCSCORE + name);
         for(MapLocation ruin : _Info.nearbyRuins) {
             if(!rc.isLocationOccupied(ruin)) {
                 if(rc.getLocation().distanceSquaredTo(ruin) < distance) {
@@ -94,7 +91,6 @@ public class CompleteTowerPattern extends Action {
         UnitType tower = selectTower();
 
         if(ruinLoc != null) {
-            Debug.print(3, Debug.PLAY + name);
             if(alwaysDraw) {
                 drawRuin(tower,ruinLoc);
             }
@@ -124,6 +120,7 @@ public class CompleteTowerPattern extends Action {
     // If a pattern can be drawn on a nearby ruin, draw a tile and move towards that tile
     // If the pattern is completed, move towards the ruin
     public void play() throws GameActionException {
+        Debug.print(3, Debug.PLAY + name, debugAction);
         if(paintLocation != null) {
             if(rc.canAttack(paintLocation)) {
                 rc.attack(paintLocation,useSecondary);

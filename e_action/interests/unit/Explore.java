@@ -1,13 +1,11 @@
 package e_action.interests.unit;
 
-import battlecode.common.Direction;
-import battlecode.common.GameActionException;
-import battlecode.common.MapLocation;
-import battlecode.common.RobotController;
 import e_action.Robot;
 import e_action.interests.Interest;
 import e_action.utils.*;
 import e_action.knowledge._Info;
+
+import battlecode.common.*;
 
 public class Explore extends Interest {
     public RobotController rc;
@@ -15,7 +13,6 @@ public class Explore extends Interest {
     public Explore(){
         rc = Robot.rc;
         name = "EXPLORE";
-        debugInterest = false;
         Debug.print(3, Debug.INIT + name, debugInterest);
     }
 
@@ -29,13 +26,15 @@ public class Explore extends Interest {
 
     //TODO Follow empty tiles without stepping on them
     public void updateDirectionScores() throws GameActionException {
-        Debug.print(3, Debug.UPDATE_DIR_SCORES + name, debugInterest);
+        Debug.print(2, Debug.UPDATE_DIR_SCORES + name, debugInterest);
         if (target == null || rc.getLocation().distanceSquaredTo(target) < 3 || outOfExplorationBounds(rc.getLocation())) {
             target = getRandomInBoundLocation();
         }
         Direction dir = Pathfinder.getMoveDir(target);
         if (dir != null) {
-            addDirectionScore(dir, Constants.ExploreScore);
+            adjustDirectionScore(dir.rotateLeft(), Constants.ExploreScore - 1); // Add some flexibility to pathfinding. Only works well on open maps.
+            adjustDirectionScore(dir, Constants.ExploreScore);
+            adjustDirectionScore(dir.rotateRight(), Constants.ExploreScore - 1);
         }
      }
 

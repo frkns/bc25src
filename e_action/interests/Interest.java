@@ -3,7 +3,6 @@ package e_action.interests;
 import e_action.Robot;
 import e_action.actions.Action;
 import e_action.knowledge._Info;
-import e_action.utils.Constants;
 
 import battlecode.common.*;
 
@@ -11,7 +10,7 @@ import battlecode.common.*;
 public abstract class Interest {
     public RobotController rc;
     public String name = "ABSTRACT Int.";
-    public boolean debugInterest = false;
+    public boolean debugInterest = true;
 
     public static int [] directionScores = new int[9]; // TODO use cheap hash map instead
 
@@ -22,17 +21,9 @@ public abstract class Interest {
     public abstract void initUnit() throws GameActionException;
     public abstract void updateDirectionScores() throws GameActionException;
     public static void resetDirectionScores() throws GameActionException {
-        directionScores[0] = 0;
-        directionScores[1] = 0;
-        directionScores[2] = 0;
-        directionScores[3] = 0;
-        directionScores[4] = 0;
-        directionScores[5] = 0;
-        directionScores[6] = 0;
-        directionScores[7] = 0;
-        directionScores[8] = 0;
+        directionScores = new int[9];
     }
-    public static void addDirectionScore(Direction dir, int score){
+    public static void adjustDirectionScore(Direction dir, int score){
         directionScores[dir.ordinal()] += score;
     }
     public static void maskIllegalMoves(){
