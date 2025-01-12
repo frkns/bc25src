@@ -162,7 +162,7 @@ public class RobotPlayer {
         // rc.setIndicatorDot(nextLoc, 255, 0, 0);
 
         // four main dirs
-        if (dir == directions.NORTH || dir == directions.SOUTH || dir == directions.EAST || dir == directions.WEST) {
+        if (dir == Direction.NORTH || dir == Direction.SOUTH || dir == Direction.EAST || dir == Direction.WEST) {
             nextLoc = nextLoc.add(dir);
         }
 
