@@ -28,7 +28,6 @@ public class CompleteSrp extends Action {
     public void calcScore() throws GameActionException {
         Debug.print(3, Debug.CALCSCORE + name, debugAction);
 
-
         center = null;
 
         int[][] corners = {
@@ -43,9 +42,7 @@ public class CompleteSrp extends Action {
 
         for(MapInfo tile : _Info.nearbyTiles) {
 
-            int x = tile.getMapLocation().x;
-            int y = tile.getMapLocation().y;
-            if(y%3 == 2 &&  (x+((y-1)/3))%4 == 2) {
+            if(tile.getMapLocation().y%3 == 2 &&  (tile.getMapLocation().x+((tile.getMapLocation().y-1)/3))%4 == 2) {
                 if(rc.getLocation().distanceSquaredTo(tile.getMapLocation()) < closest) {
                     boolean found = true;
 
@@ -69,10 +66,8 @@ public class CompleteSrp extends Action {
                 paintLoc = null;
 
                 for(MapInfo tile : _Info.nearbyTiles) {
-                    int x = tile.getMapLocation().x;
-                    int y = tile.getMapLocation().y;
 
-                    if(x >= center.x -2 && x <= center.x + 2 && y >= center.y -2 && y <= center.y + 2) {
+                    if(tile.getMapLocation().x >= center.x -2 && tile.getMapLocation().x <= center.x + 2 && tile.getMapLocation().y >= center.y -2 && tile.getMapLocation().y <= center.y + 2) {
 
                         if(tile.hasRuin() || tile.isWall()) {
                             score = 0;
@@ -83,7 +78,7 @@ public class CompleteSrp extends Action {
                             score = 0;
                             return;
                         }
-                        if(tile.getPaint() == PaintType.ALLY_SECONDARY && !pattern[x-center.x+2][y-center.y+2]) {
+                        if(tile.getPaint() == PaintType.ALLY_SECONDARY && !pattern[tile.getMapLocation().x-center.x+2][tile.getMapLocation().y-center.y+2]) {
                             if(_Info.nearbyRuins.length > 0) {
                                 score = 0;
                                 return;
@@ -94,7 +89,7 @@ public class CompleteSrp extends Action {
                         if(tile.getPaint() == PaintType.EMPTY) {
                             paintLoc = tile.getMapLocation();
                         }
-                        if(tile.getPaint() == PaintType.ALLY_PRIMARY && pattern[x-center.x+2][y-center.y+2]) {
+                        if(tile.getPaint() == PaintType.ALLY_PRIMARY && pattern[tile.getMapLocation().x-center.x+2][tile.getMapLocation().y-center.y+2]) {
                             paintLoc = tile.getMapLocation();
                         }
                     }
