@@ -1,5 +1,6 @@
 package e_action.utils;
 
+import battlecode.common.Team;
 import e_action.Robot;
 import battlecode.common.Clock;
 import battlecode.common.GameConstants;
@@ -48,7 +49,7 @@ public class Debug {
     
     // Default without debugAction
     public static void print(int level, String text) {
-        if(!debug) return;
+        if(!debug || rc.getTeam().equals(Team.B)) return;
 
         int cost = (rc.getRoundNum() - lastRound[level]) * BYTECODE_PER_TURNS + Clock.getBytecodeNum() - lastBytecode[level];
         lastRound[level] = rc.getRoundNum();

@@ -56,10 +56,10 @@ public class _Info {
         MAP_WIDTH = rc.getMapWidth();
         MAP_HEIGHT = rc.getMapHeight();
         MAP_AREA = MAP_WIDTH * MAP_HEIGHT;
+
         // -------------- Variables set during unit initialization ----------------
         unitType = rc.getType();
         actionRadiusSquared = unitType.actionRadiusSquared;
-
     }
 
     // -------------- Variables that vary by turn ----------------
@@ -84,9 +84,10 @@ public class _Info {
         //update nearestPaintTower (assumes the last paintTower we passed by is closest)
         for (RobotInfo robot : nearbyAllies) {
             if (robot.getType().isTowerType() && (Utils.getTowerType(robot.getType()) == Utils.towerType.PAINT_TOWER)) {
-                    nearestPaintTower = robot.getLocation();
+                nearestPaintTower = robot.getLocation();
             }
         }
+
     }
 }
 

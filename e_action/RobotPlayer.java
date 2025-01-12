@@ -35,8 +35,6 @@ public class RobotPlayer {
         setRobotType();
         while (true) {
             try {
-                int round = rc.getRoundNum();
-                int ID = rc.getID();
                 robot.initTurn();
                 robot.playTurn();
                 robot.endTurn();
