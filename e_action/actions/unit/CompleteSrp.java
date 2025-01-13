@@ -72,6 +72,8 @@ public class CompleteSrp extends Action {
         if (center != null) {
             if (rc.canCompleteResourcePattern(center)) {
                 rc.completeResourcePattern(center);
+                score=0;
+                return;
             } else {
                 for (MapInfo tile : _Info.nearbyTiles) {
                     MapLocation tileLoc = tile.getMapLocation();
