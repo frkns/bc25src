@@ -40,67 +40,75 @@ public class CompleteSrp extends Action {
         boolean[][] pattern = rc.getResourcePattern();
         int closest = Integer.MAX_VALUE;
 
-        for(MapInfo tile : _Info.nearbyTiles) {
+        for (MapInfo tile : _Info.nearbyTiles) {
+            MapLocation tileLoc = tile.getMapLocation();
 
-            if(tile.getMapLocation().y%3 == 2 &&  (tile.getMapLocation().x+((tile.getMapLocation().y-1)/3))%4 == 2) {
-                if(rc.getLocation().distanceSquaredTo(tile.getMapLocation()) < closest) {
+            if (tileLoc.y % 3 == 2 && (tileLoc.x + ((tileLoc.y - 1) / 3)) % 4 == 2) {
+                int dist = rc.getLocation().distanceSquaredTo(tileLoc);
+                if (dist < closest) {
                     boolean found = true;
 
-                    for(int i = 0 ; i < 4 ; i ++) {
-                        if(!rc.canSenseLocation(new MapLocation(tile.getMapLocation().x + (corners[i][0]), tile.getMapLocation().y + (corners[i][1])))) {
-                            found = false;break;
-                        }
+                    // Unrolled version of the inner loop (corners)
+                    MapLocation adjacentLoc0 = new MapLocation(tileLoc.x + corners[0][0], tileLoc.y + corners[0][1]);
+                    MapLocation adjacentLoc1 = new MapLocation(tileLoc.x + corners[1][0], tileLoc.y + corners[1][1]);
+                    MapLocation adjacentLoc2 = new MapLocation(tileLoc.x + corners[2][0], tileLoc.y + corners[2][1]);
+                    MapLocation adjacentLoc3 = new MapLocation(tileLoc.x + corners[3][0], tileLoc.y + corners[3][1]);
+
+                    if (!rc.canSenseLocation(adjacentLoc0) ||
+                            !rc.canSenseLocation(adjacentLoc1) ||
+                            !rc.canSenseLocation(adjacentLoc2) ||
+                            !rc.canSenseLocation(adjacentLoc3)) {
+                        found = false;
                     }
-                    if(found) {
-                        closest = tile.getMapLocation().distanceSquaredTo(tile.getMapLocation());
-                        center = new MapLocation(tile.getMapLocation().x, tile.getMapLocation().y);
+
+                    if (found) {
+                        closest = dist;
+                        center = tileLoc;
                     }
                 }
             }
         }
 
-        if(center != null) {
-            if(rc.canCompleteResourcePattern(center)) {
+        if (center != null) {
+            if (rc.canCompleteResourcePattern(center)) {
                 rc.completeResourcePattern(center);
             } else {
-                paintLoc = null;
+                for (MapInfo tile : _Info.nearbyTiles) {
+                    MapLocation tileLoc = tile.getMapLocation();
 
-                for(MapInfo tile : _Info.nearbyTiles) {
+                    if (tileLoc.x >= center.x - 2 && tileLoc.x <= center.x + 2 &&
+                            tileLoc.y >= center.y - 2 && tileLoc.y <= center.y + 2) {
 
-                    if(tile.getMapLocation().x >= center.x -2 && tile.getMapLocation().x <= center.x + 2 && tile.getMapLocation().y >= center.y -2 && tile.getMapLocation().y <= center.y + 2) {
-
-                        if(tile.hasRuin() || tile.isWall()) {
+                        if (tile.hasRuin() || tile.isWall() ||
+                                tile.getPaint() == PaintType.ENEMY_SECONDARY ||
+                                tile.getPaint() == PaintType.ENEMY_PRIMARY) {
                             score = 0;
                             return;
                         }
 
-                        if(tile.getPaint() == PaintType.ENEMY_SECONDARY || tile.getPaint() == PaintType.ENEMY_PRIMARY) {
-                            score = 0;
-                            return;
-                        }
-                        if(tile.getPaint() == PaintType.ALLY_SECONDARY && !pattern[tile.getMapLocation().x-center.x+2][tile.getMapLocation().y-center.y+2]) {
-                            if(_Info.nearbyRuins.length > 0) {
+                        if (tile.getPaint() == PaintType.ALLY_SECONDARY &&
+                                !pattern[tileLoc.x - center.x + 2][tileLoc.y - center.y + 2]) {
+                            if (_Info.nearbyRuins.length > 0) {
                                 score = 0;
                                 return;
                             } else {
-                                paintLoc = tile.getMapLocation();
+                                paintLoc = tileLoc;
                             }
                         }
-                        if(tile.getPaint() == PaintType.EMPTY) {
-                            paintLoc = tile.getMapLocation();
-                        }
-                        if(tile.getPaint() == PaintType.ALLY_PRIMARY && pattern[tile.getMapLocation().x-center.x+2][tile.getMapLocation().y-center.y+2]) {
-                            paintLoc = tile.getMapLocation();
+                        if (tile.getPaint() == PaintType.EMPTY ||
+                                (tile.getPaint() == PaintType.ALLY_PRIMARY &&
+                                        pattern[tileLoc.x - center.x + 2][tileLoc.y - center.y + 2])) {
+                            paintLoc = tileLoc;
                         }
                     }
                 }
-                score = Constants.CompleteSrpScore;
-                targetLoc = paintLoc;
-                return;
+
+                if (paintLoc != null) {
+                    score = Constants.CompleteSrpScore;
+                    targetLoc = paintLoc;
+                    return;
+                }
             }
-        } else {
-            score = 0;
-            return;
         }
         score = 0;
     }
@@ -110,6 +118,7 @@ public class CompleteSrp extends Action {
         Debug.print(3, Debug.PLAY + name, debugAction);
         if(paintLoc != null) {
             PaintSrpGrid.fillInPattern(paintLoc);
+            paintLoc = null;
         }
     }
 
