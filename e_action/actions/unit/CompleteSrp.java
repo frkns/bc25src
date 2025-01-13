@@ -43,12 +43,13 @@ public class CompleteSrp extends Action {
         for (MapInfo tile : _Info.nearbyTiles) {
             MapLocation tileLoc = tile.getMapLocation();
 
+            // Gets the center of a potential SRP
             if (tileLoc.y % 3 == 2 && (tileLoc.x + ((tileLoc.y - 1) / 3)) % 4 == 2) {
                 int dist = rc.getLocation().distanceSquaredTo(tileLoc);
                 if (dist < closest) {
                     boolean found = true;
 
-                    // Unrolled version of the inner loop (corners)
+                    // Checks if all corners of the SRP are within sensing range
                     MapLocation adjacentLoc0 = new MapLocation(tileLoc.x + corners[0][0], tileLoc.y + corners[0][1]);
                     MapLocation adjacentLoc1 = new MapLocation(tileLoc.x + corners[1][0], tileLoc.y + corners[1][1]);
                     MapLocation adjacentLoc2 = new MapLocation(tileLoc.x + corners[2][0], tileLoc.y + corners[2][1]);
@@ -69,6 +70,7 @@ public class CompleteSrp extends Action {
             }
         }
 
+        // If found a SRP
         if (center != null) {
             if (rc.canCompleteResourcePattern(center)) {
                 rc.completeResourcePattern(center);
@@ -78,6 +80,7 @@ public class CompleteSrp extends Action {
                 for (MapInfo tile : _Info.nearbyTiles) {
                     MapLocation tileLoc = tile.getMapLocation();
 
+                    // If tile is a part of the SRP
                     if (tileLoc.x >= center.x - 2 && tileLoc.x <= center.x + 2 &&
                             tileLoc.y >= center.y - 2 && tileLoc.y <= center.y + 2) {
 

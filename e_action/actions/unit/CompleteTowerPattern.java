@@ -24,6 +24,7 @@ public class CompleteTowerPattern extends Action {
     public PaintType[][] paintPattern = new PaintType[5][5];
     public PaintType[][] defensePattern = new PaintType[5][5];
 
+    //uses the getTowerPattern methods to generate a grid of PaintTypes for each pattern
     public void initUnit() throws GameActionException {
         Debug.print(1, Debug.INITUNIT + name, debugAction);
         for(int i = 0; i < 5; i++){
@@ -60,6 +61,7 @@ public class CompleteTowerPattern extends Action {
         ruinLoc = null;
         int distance = Integer.MAX_VALUE;
 
+        // Finds the closest ruin
         Debug.print(3, Debug.CALCSCORE + name);
         for(MapLocation ruin : _Info.nearbyRuins) {
             if(!rc.isLocationOccupied(ruin)) {
@@ -70,7 +72,9 @@ public class CompleteTowerPattern extends Action {
                 }
             }
         }
+
         if(ruinLoc != null) {
+            // Ignores the tile if there is enemy paint
             for(MapInfo tile : _Info.nearbyTiles) {
                 MapLocation tileLoc = tile.getMapLocation();
 
