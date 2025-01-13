@@ -107,7 +107,7 @@ public class CompleteTowerPattern extends Action {
 
                 if (isWithinRange(tile.getMapLocation(),ruinLoc)) {
                     //rc.setIndicatorString(towerPaintPattern[0][0]+"a");
-                    if (tile.getPaint() != towerPaintPattern[tile.getMapLocation().x - ruinLoc.x + 2][tile.getMapLocation().y - ruinLoc.y + 2]) {
+                    if (!tile.hasRuin() && tile.getPaint() != towerPaintPattern[tile.getMapLocation().x - ruinLoc.x + 2][tile.getMapLocation().y - ruinLoc.y + 2]) {
                         paint = towerPattern[tile.getMapLocation().x - ruinLoc.x + 2][tile.getMapLocation().y - ruinLoc.y + 2];
                         paintLoc = tile.getMapLocation();
                         break;
