@@ -20,7 +20,7 @@ public class PaintSrpGrid {
             //rc.setIndicatorString(loc+"+"+useSecondary);
             if(!((rc.senseMapInfo(loc).getPaint() == PaintType.ALLY_SECONDARY && useSecondary) || (rc.senseMapInfo(loc).getPaint() == PaintType.ALLY_PRIMARY && !useSecondary))) {
                 rc.attack(loc, useSecondary);
-                rc.setIndicatorString(loc+"e");
+                //rc.setIndicatorString(loc+"e");
             }
         }
     }

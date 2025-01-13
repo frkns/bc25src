@@ -124,6 +124,8 @@ public class CompleteTowerPattern extends Action {
                 score = Constants.CompleteTowerPatternScore;
                 targetLoc = ruinLoc;
             }
+        } else {
+            score = 0;
         }
 
     }
