@@ -32,18 +32,11 @@ public class RobotPlayer {
 
     public static void run(RobotController r) throws GameActionException {
         rc = r;  // Assign r to the public static field rc
-        _round_num = rc.getRoundNum();
 
         setRobotType();
         while (true) {
+            _round_num = rc.getRoundNum();
             try {
-                /*
-                if(rc.getRoundNum() > 200){
-                    rc.resign();
-                }
-
-                 */
-
                 robot.initTurn();
                 robot.playTurn();
                 robot.endTurn();

@@ -8,7 +8,7 @@ import e_action.knowledge._Info;
 import templateBot.Robot;
 
 public class Communication {
-    // ---------- Attributs ----------
+    // ---------- Attributes ----------
     static RobotController rc;
     static char[] reverseID;
     static int height;
