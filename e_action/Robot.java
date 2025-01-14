@@ -36,6 +36,10 @@ public abstract class Robot {
         }
     }
 
+    private static void extracted(Action bestAction) throws GameActionException {
+        bestAction.play();
+    }
+
     public void initTurn() throws GameActionException {
         Debug.reset(rc.getRoundNum()); // Reset clock to benchmark
         Debug.print(0, "Start turn => " + rc.getType() + " at " + _Info.robotLoc);
@@ -78,6 +82,10 @@ public abstract class Robot {
                     }
                 }
             }
+            if (bestAction != null){
+                Interest.calcBestDirWithAction(bestAction);
+            }
+
             // ---------- Play best action and move ----------
             if (Interest.bestDirScore >= bestTotalScore) { // It is better to move and skip the action.
                 Debug.print(1, "Action skipped or no legal actions");

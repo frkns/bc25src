@@ -43,6 +43,8 @@ public class _Info {
 
     // Internal info
     public static MapLocation robotLoc;
+    public static boolean isActionReady;
+    public static boolean isMovementReady;
 
     // External info
     public static RobotInfo[] nearbyAllies;
@@ -51,10 +53,13 @@ public class _Info {
     public static MapLocation nearestPaintTower = null;
     public static MapInfo[] nearbyTiles;
 
+    // Interest + Action specific info (shared between interests and actions that work closely together)
+    public static MapLocation srpCenter;
+    public static FastLocSet invalidSrpCenters = new FastLocSet();
     public static FastLocSet completedPatterns = new FastLocSet(); // Add to completed patterns when pattern is complete but cannot build tower.
     // When tower completed, check for the ruin location in the set. If exists, pop the set
     public static FastLocSet avoidRuins = new FastLocSet(); // If enemy paint, add to this set.
-    public static FastLocSet illegalOrCompletedCenters = new FastLocSet();
+
 
 
     public static void init() {
@@ -80,6 +85,8 @@ public class _Info {
 
         // ----------- Internal info ------------
         robotLoc = rc.getLocation();
+        isActionReady = rc.isActionReady();
+        isMovementReady = rc.isMovementReady();
 
         // ----------- External info ------------
         nearbyAllies = rc.senseNearbyRobots(-1, rc.getTeam());

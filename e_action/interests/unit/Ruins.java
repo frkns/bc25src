@@ -7,7 +7,6 @@ import e_action.interests.Interest;
 import e_action.knowledge._Info;
 import e_action.utils.Constants;
 import e_action.utils.Debug;
-import e_action.utils.fast.FastLocSet;
 
 public class Ruins extends Interest {
     public RobotController rc;

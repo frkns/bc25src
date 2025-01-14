@@ -7,8 +7,6 @@ import e_action.knowledge._Info;
 
 import battlecode.common.*;
 
-import java.awt.*;
-
 public class CompleteTowerPattern extends Action {
     public RobotController rc;
 

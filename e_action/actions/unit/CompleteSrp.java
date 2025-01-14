@@ -6,17 +6,20 @@ import e_action.actions.Action;
 import e_action.utils.*;
 
 import battlecode.common.*;
-import e_action.utils.fast.FastLocSet;
 
+
+// The robot will only build if it can see all 4 corners of the SRP to verify there is no enemy paint blocking it
+// This function is dependent on the FindSrpCenter Interest to prevent it from wandering way from the srpCenter of the SRP being built
 public class CompleteSrp extends Action {
     public RobotController rc;
 
-    public MapLocation center = null;
-    public MapLocation cursor; // Keeps track of the last painted tile and keeps shifting until it finds another tile it can paint
+
+    public MapInfo [] srpTiles = null;
+    public MapLocation cursor = null; // Keeps track of the last painted tile and keeps shifting until it finds another tile it can paint
     public int cursorVerticalDirection; // Keeps track of the direction the cursor is moving in. 1 = NORTH, -1 = SOUTH
     public int cursorHorizontalDirection; // Keeps track of the direction the cursor is moving in. 1 = EAST, -1 = WEST
     public boolean[][] pattern;
-    
+    public boolean useSecondary;
 
 
     public CompleteSrp(){
@@ -34,27 +37,30 @@ public class CompleteSrp extends Action {
     public void calcScore() throws GameActionException {
         Debug.print(3, Debug.CALCSCORE + name, debugAction);
 
-        if (center == null){
-            center = SRP.findUnvalidatedCenter();
-        }
-        if (center != null) {
-            if (rc.canCompleteResourcePattern(center)) {
-                rc.completeResourcePattern(center);
-                _Info.illegalOrCompletedCenters.add(center);
-                center = null;
-                score = 0;
-                rc.setTimelineMarker("Completed SRP",0,225,0);
-            } else if (_Info.robotLoc.isWithinDistanceSquared(center, 4)) { // Robot can see all 4 corners of potential SRP
-                if (SRP.centerIsValid(center)){
-                    spawnCursor();
-                    targetLoc = cursor;
-                    score = Constants.CompleteSrpScore;
+        if (_Info.srpCenter != null) {
+            if (rc.canCompleteResourcePattern(_Info.srpCenter)) {
+                rc.completeResourcePattern(_Info.srpCenter);
+                markInvalid();
+            } else if (_Info.robotLoc.isWithinDistanceSquared(_Info.srpCenter, 4)) { // Robot can see all 4 corners of potential SRP
+                if (srpTiles == null) {
+                    srpTiles = rc.senseNearbyMapInfos(_Info.srpCenter, 8);
+                }
+                if (centerIsValid()){
+                    if (cursor == null) {
+                        spawnCursor();
+                    }
+                    while (cursor.isWithinDistanceSquared(_Info.srpCenter, 8)){
+                        useSecondary = pattern[(cursor.x+(cursor.y/3))%4][4-(cursor.y%3)];
+                        if(!((rc.senseMapInfo(cursor).getPaint() == PaintType.ALLY_SECONDARY && useSecondary) || (rc.senseMapInfo(cursor).getPaint() == PaintType.ALLY_PRIMARY && !useSecondary))) {
+                            targetLoc = cursor;
+                            score = Constants.CompleteSrpScore;
+                            break;
+                        } else {moveCursor();}
+                    }
                 } else {
-                    _Info.illegalOrCompletedCenters.add(center);
-                    center = null;
-                    score = 0;
+                    markInvalid();
                 };
-            } else{
+            } else { // We have a target center but we are not close enough to verify if there is enemy paint, walls, or ruins blocking us
                 score = 0;
             }
         }
@@ -64,41 +70,38 @@ public class CompleteSrp extends Action {
     public void play() throws GameActionException {
         Debug.print(3, Debug.PLAY + name, debugAction);
 
-        while (cursor.isWithinDistanceSquared(center, 8)){
-            boolean useSecondary = pattern[(cursor.x+(cursor.y/3))%4][4-(cursor.y%3)];
-            if(!((rc.senseMapInfo(cursor).getPaint() == PaintType.ALLY_SECONDARY && useSecondary) || (rc.senseMapInfo(cursor).getPaint() == PaintType.ALLY_PRIMARY && !useSecondary))) {
-                if(rc.canAttack(cursor)) {
-                    rc.attack(cursor, useSecondary);
-                }
-                break;
-            } else {moveCursor();}
+        if (rc.canAttack(targetLoc)){
+            rc.attack(targetLoc, useSecondary);
         }
     }
     
     public void spawnCursor() throws GameActionException{
-        int robotDist1 = _Info.robotLoc.distanceSquaredTo(new MapLocation(center.x - 2, center.y + 2));
-        int robotDist2 = _Info.robotLoc.distanceSquaredTo(new MapLocation(center.x + 2, center.y - 2));
-        int robotDist3 = _Info.robotLoc.distanceSquaredTo(new MapLocation(center.x + 2, center.y + 2));
-        int robotDist4 = _Info.robotLoc.distanceSquaredTo(new MapLocation(center.x - 2, center.y - 2));
-
-        // Find closest corner
-        if (robotDist1 <= robotDist2 && robotDist1 <= robotDist3 && robotDist1 <= robotDist4) {
-            cursor = new MapLocation(center.x - 2, center.y + 2); // Top left
-            cursorVerticalDirection = -1;
-            cursorHorizontalDirection = 1;
-        } else if (robotDist2 <= robotDist1 && robotDist2 <= robotDist4) {
-            cursor = new MapLocation(center.x + 2, center.y - 2);  // Bottom right
-            cursorVerticalDirection = 1;
-            cursorHorizontalDirection = -1;
-        } else if (robotDist3 <= robotDist4) {
-            cursor = new MapLocation(center.x + 2, center.y + 2);  // Top right
-            cursorVerticalDirection = -1;
-            cursorHorizontalDirection = -1;
-        } else {
-            cursor = new MapLocation(center.x - 2, center.y - 2); // Bottom left
-            cursorVerticalDirection = 1;
-            cursorHorizontalDirection = 1;
-        }
+        cursor = new MapLocation(_Info.srpCenter.x - 2, _Info.srpCenter.y + 2); // Top left
+        cursorVerticalDirection = -1;
+        cursorHorizontalDirection = 1;
+//        // Find closest corner. Removed for bytecode efficiency
+//        int robotDist1 = _Info.robotLoc.distanceSquaredTo(new MapLocation(_Info.srpCenter.x - 2, _Info.srpCenter.y + 2));
+//        int robotDist2 = _Info.robotLoc.distanceSquaredTo(new MapLocation(_Info.srpCenter.x + 2, _Info.srpCenter.y - 2));
+//        int robotDist3 = _Info.robotLoc.distanceSquaredTo(new MapLocation(_Info.srpCenter.x + 2, _Info.srpCenter.y + 2));
+//        int robotDist4 = _Info.robotLoc.distanceSquaredTo(new MapLocation(_Info.srpCenter.x - 2, _Info.srpCenter.y - 2));
+//
+//        if (robotDist1 <= robotDist2 && robotDist1 <= robotDist3 && robotDist1 <= robotDist4) {
+//            cursor = new MapLocation(_Info.srpCenter.x - 2, _Info.srpCenter.y + 2); // Top left
+//            cursorVerticalDirection = -1;
+//            cursorHorizontalDirection = 1;
+//        } else if (robotDist2 <= robotDist1 && robotDist2 <= robotDist4) {
+//            cursor = new MapLocation(_Info.srpCenter.x + 2, _Info.srpCenter.y - 2);  // Bottom right
+//            cursorVerticalDirection = 1;
+//            cursorHorizontalDirection = -1;
+//        } else if (robotDist3 <= robotDist4) {
+//            cursor = new MapLocation(_Info.srpCenter.x + 2, _Info.srpCenter.y + 2);  // Top right
+//            cursorVerticalDirection = -1;
+//            cursorHorizontalDirection = -1;
+//        } else {
+//            cursor = new MapLocation(_Info.srpCenter.x - 2, _Info.srpCenter.y - 2); // Bottom left
+//            cursorVerticalDirection = 1;
+//            cursorHorizontalDirection = 1;
+//        }
     }
     /**
      * The cursor moves vertically within a band of 5 tiles,
@@ -112,11 +115,35 @@ public class CompleteSrp extends Action {
 
         MapLocation nextLoc = cursor.translate(0, cursorVerticalDirection);
         // If the vertical shift would move the cursor out of bounds, shift horizontally instead and reverse the vertical direction
-        if (!nextLoc.isWithinDistanceSquared(center, 8)) {
-            cursor = cursor.translate(cursorHorizontalDirection, 0);
+        if (!nextLoc.isWithinDistanceSquared(_Info.srpCenter, 8)) {
+            cursor = cursor.translate(1, 0);
             cursorVerticalDirection *= -1;
         } else {
             cursor = nextLoc;
         }
     }
+
+    public boolean centerIsValid() throws GameActionException {
+        for (MapLocation ruin : _Info.nearbyRuins){
+            if (_Info.srpCenter.isWithinDistanceSquared(ruin, 8)){
+                return false;
+            }
+        }
+        for (MapInfo tile : srpTiles) {
+            if (tile.isWall() ||
+                    tile.getPaint().isEnemy()) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    public void markInvalid() throws GameActionException {
+        _Info.invalidSrpCenters.add(_Info.srpCenter);
+        _Info.srpCenter = null;
+        srpTiles = null;
+        score = 0;
+    }
+
+
 }

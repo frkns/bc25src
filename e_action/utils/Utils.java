@@ -3,7 +3,6 @@ package e_action.utils;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import battlecode.common.UnitType;
-import e_action.knowledge._Info;
 
 public class Utils{
     public static RobotController rc;
