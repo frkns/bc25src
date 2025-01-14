@@ -11,7 +11,6 @@ import e_action.utils.fast.FastLocSet;
 public class CompleteSrp extends Action {
     public RobotController rc;
 
-    public FastLocSet illegalOrCompletedCenters = new FastLocSet();
     public MapLocation center = null;
     public MapLocation cursor; // Keeps track of the last painted tile and keeps shifting until it finds another tile it can paint
     public int cursorVerticalDirection; // Keeps track of the direction the cursor is moving in. 1 = NORTH, -1 = SOUTH
@@ -36,19 +35,22 @@ public class CompleteSrp extends Action {
         Debug.print(3, Debug.CALCSCORE + name, debugAction);
 
         if (center == null){
-            center = findUnvalidatedCenter();
+            center = SRP.findUnvalidatedCenter();
         }
         if (center != null) {
             if (rc.canCompleteResourcePattern(center)) {
                 rc.completeResourcePattern(center);
-                illegalOrCompletedCenters.add(center);
+                _Info.illegalOrCompletedCenters.add(center);
+                center = null;
+                score = 0;
+                rc.setTimelineMarker("Completed SRP",0,225,0);
             } else if (_Info.robotLoc.isWithinDistanceSquared(center, 4)) { // Robot can see all 4 corners of potential SRP
-                if (centerIsValid(center)){
+                if (SRP.centerIsValid(center)){
                     spawnCursor();
                     targetLoc = cursor;
                     score = Constants.CompleteSrpScore;
                 } else {
-                    illegalOrCompletedCenters.add(center);
+                    _Info.illegalOrCompletedCenters.add(center);
                     center = null;
                     score = 0;
                 };
@@ -65,7 +67,9 @@ public class CompleteSrp extends Action {
         while (cursor.isWithinDistanceSquared(center, 8)){
             boolean useSecondary = pattern[(cursor.x+(cursor.y/3))%4][4-(cursor.y%3)];
             if(!((rc.senseMapInfo(cursor).getPaint() == PaintType.ALLY_SECONDARY && useSecondary) || (rc.senseMapInfo(cursor).getPaint() == PaintType.ALLY_PRIMARY && !useSecondary))) {
-                rc.attack(cursor, useSecondary);
+                if(rc.canAttack(cursor)) {
+                    rc.attack(cursor, useSecondary);
+                }
                 break;
             } else {moveCursor();}
         }
@@ -115,51 +119,4 @@ public class CompleteSrp extends Action {
             cursor = nextLoc;
         }
     }
-
-    // Returns the first unvalidated center it sees
-    public MapLocation findUnvalidatedCenter() throws GameActionException{
-        // Calculate the vertical offset needed to reach the next valid y-coordinate (y % 3 == 2)
-        int dy = (2 - _Info.robotLoc.y % 3) % 3;
-        // Calculate the shifted x-coordinate based on y position
-        int x = _Info.robotLoc.x + ((_Info.robotLoc.y + dy) / 3);
-        // Calculate the horizontal offset needed to reach the next valid x-coordinate ((x + y/3) % 4 == 2)
-        int dx = (2 - x % 4) % 4;
-
-        // Generate four potential center locations by applying offsets in all combinations
-        MapLocation center1 = new MapLocation(_Info.robotLoc.x + dx, _Info.robotLoc.y + dy);
-        MapLocation center2 = new MapLocation(_Info.robotLoc.x + dx, _Info.robotLoc.y - dy);
-        MapLocation center3 = new MapLocation(_Info.robotLoc.x - dx, _Info.robotLoc.y + dy);
-        MapLocation center4 = new MapLocation(_Info.robotLoc.x - dx, _Info.robotLoc.y - dy);
-
-        // Calculate distances to each center, setting to MAX_VALUE if center is illegal or completed
-        int d1 = illegalOrCompletedCenters.contains(center1) ? Integer.MAX_VALUE : _Info.robotLoc.distanceSquaredTo(center1);
-        int d2 = illegalOrCompletedCenters.contains(center2) ? Integer.MAX_VALUE : _Info.robotLoc.distanceSquaredTo(center2);
-        int d3 = illegalOrCompletedCenters.contains(center3) ? Integer.MAX_VALUE : _Info.robotLoc.distanceSquaredTo(center3);
-        int d4 = illegalOrCompletedCenters.contains(center4) ? Integer.MAX_VALUE : _Info.robotLoc.distanceSquaredTo(center4);
-
-        // Return the closest valid center, or null if none are valid
-        if (d1 <= d2 && d1 <= d3 && d1 <= d4 && d1 != Integer.MAX_VALUE) return center1;
-        if (d2 <= d3 && d2 <= d4 && d2 != Integer.MAX_VALUE) return center2;
-        if (d3 <= d4 && d3 != Integer.MAX_VALUE) return center3;
-        if (d4 != Integer.MAX_VALUE) return center4;
-        return null;
-    }
-
-    public boolean centerIsValid(MapLocation center) throws GameActionException {
-        for (MapInfo tile : _Info.nearbyTiles) {
-            MapLocation tileLoc = tile.getMapLocation();
-            // If tile is a part of the SRP
-            if (tileLoc.x >= center.x - 2 && tileLoc.x <= center.x + 2 &&
-                    tileLoc.y >= center.y - 2 && tileLoc.y <= center.y + 2) {
-                if (tile.hasRuin() || tile.isWall() ||
-                        tile.getPaint() == PaintType.ENEMY_SECONDARY ||
-                        tile.getPaint() == PaintType.ENEMY_PRIMARY) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-
 }

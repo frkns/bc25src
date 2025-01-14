@@ -54,6 +54,7 @@ public class _Info {
     public static FastLocSet completedPatterns = new FastLocSet(); // Add to completed patterns when pattern is complete but cannot build tower.
     // When tower completed, check for the ruin location in the set. If exists, pop the set
     public static FastLocSet avoidRuins = new FastLocSet(); // If enemy paint, add to this set.
+    public static FastLocSet illegalOrCompletedCenters = new FastLocSet();
 
 
     public static void init() {
