@@ -1,8 +1,8 @@
 // Adapted from https://github.com/chenyx512/battlecode24/blob/main/src/bot1/PathFinder.java
-package temp_test;
+package heuristic_test;
 
 import battlecode.common.*;
-import temp_test.fast.*;
+import heuristic_test.fast.*;
 
 class Pathfinder extends RobotPlayer{
     static RobotController rc;

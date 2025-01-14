@@ -1,4 +1,4 @@
-package temp_test;
+package heuristic_test;
 
 import battlecode.common.*;
 
@@ -14,6 +14,8 @@ public class Phase3 extends RobotPlayer{
         int height = rc.getMapHeight();
         int width = rc.getMapWidth();
 
+        MapInfo[] nearbyTiles = rc.senseNearbyMapInfos(20);
+        RobotInfo[] nearbyRobots = rc.senseNearbyRobots(20);
 
         RobotInfo curTower = null;
 
@@ -26,6 +28,10 @@ public class Phase3 extends RobotPlayer{
             if(rc.canUpgradeTower(robot.getLocation())) {
                 rc.upgradeTower(robot.getLocation());
             }
+
+            // if (rc.getTeam() != robot.getTeam() && robot.getType().isTowerType() && rc.canAttack(robot.getLocation())) {
+            //     rc.attack(robot.getLocation());
+            // }
 
             if (robot.getTeam() != rc.getTeam() && robot.getType() != UnitType.MOPPER && robot.getType() != UnitType.SOLDIER && robot.getType() != UnitType.SPLASHER) {
                 if(robot.getLocation().distanceSquaredTo(rc.getLocation()) < distance){
@@ -52,6 +58,9 @@ public class Phase3 extends RobotPlayer{
         distance = Integer.MAX_VALUE;
 
         for (MapInfo tile : nearbyTiles){
+            // if (tile.getMapLocation().equals(target)){
+            //     target = null;
+            // }
             // for some reason throws an exception
             if (tile.hasRuin() && /*!rc.isLocationOccupied(tile.getMapLocation())*/
                 !rc.canSenseRobotAtLocation(tile.getMapLocation())) {
@@ -78,13 +87,10 @@ public class Phase3 extends RobotPlayer{
             }
         }
 
-        // HeurisitcPath.outOfBoundsPenalty = 0;
-        // HeurisitcPath.move();
-
         if (target == null) {
             target = new MapLocation(rng.nextInt(width-1),rng.nextInt(height-1));
         }
-        if(rc.getLocation() == target) {
+        if(rc.getLocation().equals(target)) {
             target = new MapLocation(rng.nextInt(width-1),rng.nextInt(height-1));
         }
 
@@ -96,9 +102,11 @@ public class Phase3 extends RobotPlayer{
             target = new MapLocation(rng.nextInt(width-1),rng.nextInt(height-1));
             dir = rc.getLocation().directionTo(target);
         }
-        if(rc.canMove(dir) && !(rc.senseMapInfo(rc.getLocation().add(dir)).getPaint().equals(PaintType.ENEMY_PRIMARY)) && !(rc.senseMapInfo(rc.getLocation().add(dir)).getPaint().equals(PaintType.ENEMY_SECONDARY))) {
+        if(rc.canMove(dir)) {
             rc.move(dir);
         }
+
+        // HeurisitcPath.move(target);
 
         for(MapInfo tile : nearbyTiles) {
             if(rc.canCompleteResourcePattern(tile.getMapLocation())) {

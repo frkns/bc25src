@@ -1,4 +1,4 @@
-package temp_test;
+package heuristic_test;
 
 import battlecode.common.*;
 
@@ -10,11 +10,11 @@ public class Phase1 extends RobotPlayer{
 
     public static MapLocation target;
 
-
     public static void run (RobotController rc) throws GameActionException {
         int height = rc.getMapHeight();
         int width = rc.getMapWidth();
 
+        MapInfo[] nearbyTiles = rc.senseNearbyMapInfos();
         // Search for a nearby ruin to complete.
         MapInfo curRuin = null;
         int distance = Integer.MAX_VALUE;
@@ -25,11 +25,12 @@ public class Phase1 extends RobotPlayer{
                     curRuin = tile;
                 }
             }
+            if (tile.getMapLocation().equals(target)){
+                target = null;
+            }
         }
+        RobotInfo[] nearbyRobots = rc.senseNearbyRobots();
         for(RobotInfo robot : nearbyRobots){
-            // if (rc.canAttack(robot.getLocation())){
-            //     rc.attack(robot.getLocation());
-            // }
             if(rc.canTransferPaint(robot.getLocation(),Math.max(-50, -1 * robot.getPaintAmount()))){
                 rc.transferPaint(robot.getLocation(),Math.max(-50, -1 * robot.getPaintAmount()));
             }
@@ -56,36 +57,38 @@ public class Phase1 extends RobotPlayer{
             }
         }
 
-        // int r=0;
-        // int x=0;
-        // int y=0;
-        // int last = 0;
+        int r=0;
+        int x=0;
+        int y=0;
+        int last = 0;
 
 
-        if (target == null || rc.getLocation() == target) {
-            HeurisitcPath.move();
-            // r = rng.nextInt(4);
-            // last = r;
-            // switch (r){
-            //     case 3:
-            //         y=0;
-            //         x=rng.nextInt(width);
-            //         break;
-            //     case 2:
-            //         y = rc.getMapHeight()-1;
-            //         x=rng.nextInt(width);
-            //         break;
-            //     case 1:
-            //         x = 0;
-            //         y=rc.getMapHeight()-1;
-            //         break;
-            //     case 0:
-            //         x = rc.getMapWidth()-1;
-            //         y=rng.nextInt(height);
-            //         break;
-            // }
-            // target = new MapLocation(x,y);
+        if (target == null) {
+            // HeurisitcPath.move();
+            r = rng.nextInt(4);
+            last = r;
+            switch (r){
+                case 3:
+                    y=0;
+                    x=rng.nextInt(width);
+                    break;
+                case 2:
+                    y = rc.getMapHeight()-1;
+                    x=rng.nextInt(width);
+                    break;
+                case 1:
+                    x = 0;
+                    y=rc.getMapHeight()-1;
+                    break;
+                case 0:
+                    x = rc.getMapWidth()-1;
+                    y=rng.nextInt(height);
+                    break;
+            }
+            target = new MapLocation(x,y);
         }
+
+        HeurisitcPath.move(target);
 
         // Direction dir = rc.getLocation().directionTo(target);
         // if(rc.senseMapInfo(rc.getLocation()).getMark() == PaintType.ENEMY_PRIMARY || rc.senseMapInfo(rc.getLocation()).getMark() == PaintType.ENEMY_SECONDARY) {

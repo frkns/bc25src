@@ -1,5 +1,5 @@
 // https://github.com/chenyx512/battlecode24/blob/main/src/bot1/fast/FastLocSet.java
-package temp_test.fast;
+package slim_v1.fast;
 
 import battlecode.common.*;
 
