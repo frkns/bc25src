@@ -12,7 +12,7 @@ public abstract class Interest {
     public String name = "ABSTRACT Int.";
     public boolean debugInterest = true;
 
-    public static int [] directionScores = new int[] {500, 500, 500, 500, 500, 500, 500, 500, 500}; // TODO use cheap hash map instead
+    public static int [] directionScores = new int[9]; // TODO use cheap hash map instead
     public static int bestDirScore;
     public static Direction bestDir = null;
 

@@ -1,9 +1,6 @@
 package e_action.utils;
 
-import battlecode.common.GameActionException;
-import battlecode.common.MapLocation;
-import battlecode.common.Message;
-import battlecode.common.RobotController;
+import battlecode.common.*;
 import e_action.knowledge._Info;
 
 
@@ -35,7 +32,6 @@ public class Communication {
     // ---------- Instantiates and utils ----------
     public static void init(RobotController r){
         rc = r;
-
         reverseID = "\0".repeat(20000).toCharArray();
     }
 

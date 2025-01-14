@@ -11,7 +11,6 @@ import battlecode.common.*;
 public class RobotPlayer {
     static RobotController rc;
     static Robot robot;
-    static int _round_num;
 
     // Can also be used to reset robot actions
     static void setRobotType() throws GameActionException {
@@ -33,7 +32,6 @@ public class RobotPlayer {
 
     public static void run(RobotController r) throws GameActionException {
         rc = r;  // Assign r to the public static field rc
-
         setRobotType();
         while (true) {
             try {
@@ -43,7 +41,7 @@ public class RobotPlayer {
             }
             catch (GameActionException e) {
                 System.out.println("GameActionException");
-                e.printStackTrace();
+                 e.printStackTrace();
 //                rc.resign();
             } catch (Exception e) {
                 System.out.println("Exception");

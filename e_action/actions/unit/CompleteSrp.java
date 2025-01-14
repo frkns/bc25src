@@ -31,7 +31,7 @@ public class CompleteSrp extends Action {
         pattern = rc.getResourcePattern();
     }
 
-
+    // The robot will only build if it can see all 4 corners of the SRP to verify there is no enemy paint blocking it
     public void calcScore() throws GameActionException {
         Debug.print(3, Debug.CALCSCORE + name, debugAction);
 
@@ -47,11 +47,13 @@ public class CompleteSrp extends Action {
                     spawnCursor();
                     targetLoc = cursor;
                     score = Constants.CompleteSrpScore;
-                } else{
+                } else {
                     illegalOrCompletedCenters.add(center);
                     center = null;
                     score = 0;
                 };
+            } else{
+                score = 0;
             }
         }
     }
@@ -59,9 +61,8 @@ public class CompleteSrp extends Action {
     //If there is a valid pattern, move towards and fill in the pattern
     public void play() throws GameActionException {
         Debug.print(3, Debug.PLAY + name, debugAction);
-        
-        // If we're still within the pattern bounds
-        while (cursor.x <= center.x + 2){
+
+        while (cursor.isWithinDistanceSquared(center, 8)){
             boolean useSecondary = pattern[(cursor.x+(cursor.y/3))%4][4-(cursor.y%3)];
             if(!((rc.senseMapInfo(cursor).getPaint() == PaintType.ALLY_SECONDARY && useSecondary) || (rc.senseMapInfo(cursor).getPaint() == PaintType.ALLY_PRIMARY && !useSecondary))) {
                 rc.attack(cursor, useSecondary);
@@ -71,27 +72,28 @@ public class CompleteSrp extends Action {
     }
     
     public void spawnCursor() throws GameActionException{
-        cursor = new MapLocation(center.x - 2, center.y - 2); // Start at bottom left corner
-        cursorVerticalDirection = 1;
-        cursorHorizontalDirection = 1;
-        int robotDist1 = _Info.robotLoc.distanceSquaredTo(new MapLocation(center.x - 2, center.y - 2));
-        int robotDist2 = _Info.robotLoc.distanceSquaredTo(new MapLocation(center.x - 2, center.y + 2));
-        int robotDist3 = _Info.robotLoc.distanceSquaredTo(new MapLocation(center.x + 2, center.y - 2));
-        int robotDist4 = _Info.robotLoc.distanceSquaredTo(new MapLocation(center.x + 2, center.y + 2));
+        int robotDist1 = _Info.robotLoc.distanceSquaredTo(new MapLocation(center.x - 2, center.y + 2));
+        int robotDist2 = _Info.robotLoc.distanceSquaredTo(new MapLocation(center.x + 2, center.y - 2));
+        int robotDist3 = _Info.robotLoc.distanceSquaredTo(new MapLocation(center.x + 2, center.y + 2));
+        int robotDist4 = _Info.robotLoc.distanceSquaredTo(new MapLocation(center.x - 2, center.y - 2));
 
         // Find closest corner
-        if (robotDist2 <= robotDist1 && robotDist2 <= robotDist3 && robotDist2 <= robotDist4) {
-            cursor = new MapLocation(center.x - 2, center.y + 2);
+        if (robotDist1 <= robotDist2 && robotDist1 <= robotDist3 && robotDist1 <= robotDist4) {
+            cursor = new MapLocation(center.x - 2, center.y + 2); // Top left
             cursorVerticalDirection = -1;
             cursorHorizontalDirection = 1;
-        } else if (robotDist3 <= robotDist1 && robotDist3 <= robotDist4) {
-            cursor = new MapLocation(center.x + 2, center.y - 2);
+        } else if (robotDist2 <= robotDist1 && robotDist2 <= robotDist4) {
+            cursor = new MapLocation(center.x + 2, center.y - 2);  // Bottom right
             cursorVerticalDirection = 1;
             cursorHorizontalDirection = -1;
-        } else if (robotDist4 <= robotDist1) {
-            cursor = new MapLocation(center.x + 2, center.y + 2);
+        } else if (robotDist3 <= robotDist4) {
+            cursor = new MapLocation(center.x + 2, center.y + 2);  // Top right
             cursorVerticalDirection = -1;
             cursorHorizontalDirection = -1;
+        } else {
+            cursor = new MapLocation(center.x - 2, center.y - 2); // Bottom left
+            cursorVerticalDirection = 1;
+            cursorHorizontalDirection = 1;
         }
     }
     /**
@@ -105,7 +107,8 @@ public class CompleteSrp extends Action {
         if (cursor == null) return;
 
         MapLocation nextLoc = cursor.translate(0, cursorVerticalDirection);
-        if (nextLoc.y > center.y + 2 || nextLoc.y < center.y - 2) {
+        // If the vertical shift would move the cursor out of bounds, shift horizontally instead and reverse the vertical direction
+        if (!nextLoc.isWithinDistanceSquared(center, 8)) {
             cursor = cursor.translate(cursorHorizontalDirection, 0);
             cursorVerticalDirection *= -1;
         } else {
@@ -129,10 +132,10 @@ public class CompleteSrp extends Action {
         MapLocation center4 = new MapLocation(_Info.robotLoc.x - dx, _Info.robotLoc.y - dy);
 
         // Calculate distances to each center, setting to MAX_VALUE if center is illegal or completed
-        int d1 = _Info.robotLoc.isWithinDistanceSquared(center1, Integer.MAX_VALUE) && !illegalOrCompletedCenters.contains(center1) ? _Info.robotLoc.distanceSquaredTo(center1) : Integer.MAX_VALUE;
-        int d2 = _Info.robotLoc.isWithinDistanceSquared(center2, Integer.MAX_VALUE) && !illegalOrCompletedCenters.contains(center2) ? _Info.robotLoc.distanceSquaredTo(center2) : Integer.MAX_VALUE;
-        int d3 = _Info.robotLoc.isWithinDistanceSquared(center3, Integer.MAX_VALUE) && !illegalOrCompletedCenters.contains(center3) ? _Info.robotLoc.distanceSquaredTo(center3) : Integer.MAX_VALUE;
-        int d4 = _Info.robotLoc.isWithinDistanceSquared(center4, Integer.MAX_VALUE) && !illegalOrCompletedCenters.contains(center4) ? _Info.robotLoc.distanceSquaredTo(center4) : Integer.MAX_VALUE;
+        int d1 = illegalOrCompletedCenters.contains(center1) ? Integer.MAX_VALUE : _Info.robotLoc.distanceSquaredTo(center1);
+        int d2 = illegalOrCompletedCenters.contains(center2) ? Integer.MAX_VALUE : _Info.robotLoc.distanceSquaredTo(center2);
+        int d3 = illegalOrCompletedCenters.contains(center3) ? Integer.MAX_VALUE : _Info.robotLoc.distanceSquaredTo(center3);
+        int d4 = illegalOrCompletedCenters.contains(center4) ? Integer.MAX_VALUE : _Info.robotLoc.distanceSquaredTo(center4);
 
         // Return the closest valid center, or null if none are valid
         if (d1 <= d2 && d1 <= d3 && d1 <= d4 && d1 != Integer.MAX_VALUE) return center1;
