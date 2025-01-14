@@ -16,9 +16,10 @@ public class Constants {
 
     // Unit Interest variables
     public static final int ExploreScore = 2;
+    public static final int RuinScore = 1000;
     // Unit Action variables
     public static final int CompleteTowerPatternScore = 1000;
-    public static final int CompleteSrpScore = 1000;
+    public static final int CompleteSrpScore = 300;
     public static final int RefillPaintScore = 1000;
     // Tower Action variables
     public static final int SpawnUnitsScore = 10;

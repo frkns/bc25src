@@ -6,6 +6,8 @@ import e_action.utils.*;
 import e_action.knowledge._Info;
 
 import battlecode.common.*;
+
+import battlecode.common.*;
 public class _Template extends Interest {
     public RobotController rc;
 

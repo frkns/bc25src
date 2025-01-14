@@ -5,6 +5,7 @@ import battlecode.common.*;
 import java.util.Random;
 import e_action.Robot;
 import e_action.utils.*;
+import e_action.utils.fast.FastLocSet;
 
 public class _Info {
     public static RobotController rc = Robot.rc;
@@ -49,6 +50,10 @@ public class _Info {
     public static MapLocation[] nearbyRuins;
     public static MapLocation nearestPaintTower = null;
     public static MapInfo[] nearbyTiles;
+
+    public static FastLocSet completedPatterns = new FastLocSet(); // Add to completed patterns when pattern is complete but cannot build tower.
+    // When tower completed, check for the ruin location in the set. If exists, pop the set
+    public static FastLocSet avoidRuins = new FastLocSet(); // If enemy paint, add to this set.
 
 
     public static void init() {
