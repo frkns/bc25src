@@ -42,7 +42,7 @@ public class CompleteSrp extends Action {
             if (_Info.robotLoc.isWithinDistanceSquared(nearestCenter, 4)) {
                 center = nearestCenter;
             }
-        } else { // Found SRP
+        if (center != null) {
             if (rc.canCompleteResourcePattern(center)) {
                 rc.completeResourcePattern(center);
                 center = null;
