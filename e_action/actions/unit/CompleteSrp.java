@@ -84,7 +84,7 @@ public class CompleteSrp extends Action {
 
                 if (paintLoc != null) {
                     score = Constants.CompleteSrpScore;
-                    targetLoc = paintLoc;
+                    targetLoc = center;
                     return;
                 }
             }
