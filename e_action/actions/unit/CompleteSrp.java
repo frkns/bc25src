@@ -13,6 +13,7 @@ public class CompleteSrp extends Action {
     public MapLocation center = null;
     public MapLocation paintLoc = null;
 
+
     public CompleteSrp(){
         rc = Robot.rc;
         name = "COMPLETE SRP";
@@ -24,56 +25,27 @@ public class CompleteSrp extends Action {
         // Initialize any variable needed when a unit first spawns in
     }
 
-    // Check all nearby tiles for a visible 5x5 in which a SRP can be drawn
     public void calcScore() throws GameActionException {
         Debug.print(3, Debug.CALCSCORE + name, debugAction);
-
-        center = null;
-
-        int[][] corners = {
-                {-2, -2},
-                {2, 2},
-                {-2, 2},
-                {2, -2}
-        };
-
+        // 2 conditions to check if a tile is the center of potential SRP, assuming we start tiling from the bottom left.
+        // y % 3 == 2
+        // (x + (y/3)) % 4 == 2       (The x coordinate is shifted by to the left by 1 for every 3 tiles up)
         boolean[][] pattern = rc.getResourcePattern();
-        int closest = Integer.MAX_VALUE;
-
-        for (MapInfo tile : _Info.nearbyTiles) {
-            MapLocation tileLoc = tile.getMapLocation();
-
-            // Gets the center of a potential SRP
-            if (tileLoc.y % 3 == 2 && (tileLoc.x + ((tileLoc.y - 1) / 3)) % 4 == 2) {
-                int dist = rc.getLocation().distanceSquaredTo(tileLoc);
-                if (dist < closest) {
-                    boolean found = true;
-
-                    // Checks if all corners of the SRP are within sensing range
-                    MapLocation adjacentLoc0 = new MapLocation(tileLoc.x + corners[0][0], tileLoc.y + corners[0][1]);
-                    MapLocation adjacentLoc1 = new MapLocation(tileLoc.x + corners[1][0], tileLoc.y + corners[1][1]);
-                    MapLocation adjacentLoc2 = new MapLocation(tileLoc.x + corners[2][0], tileLoc.y + corners[2][1]);
-                    MapLocation adjacentLoc3 = new MapLocation(tileLoc.x + corners[3][0], tileLoc.y + corners[3][1]);
-
-                    if (!rc.canSenseLocation(adjacentLoc0) ||
-                            !rc.canSenseLocation(adjacentLoc1) ||
-                            !rc.canSenseLocation(adjacentLoc2) ||
-                            !rc.canSenseLocation(adjacentLoc3)) {
-                        found = false;
-                    }
-
-                    if (found) {
-                        closest = dist;
-                        center = tileLoc;
-                    }
-                }
+        if (center == null){
+            int dy = (2 - _Info.robotLoc.y % 3) % 3; // Distance downwards to the nearest center
+            int x = _Info.robotLoc.x + ((_Info.robotLoc.y + dy) / 3);
+            int dx = (2 - x % 4 + 4) % 4; // Distance leftwards to the nearest
+            MapLocation nearestCenter = new MapLocation(
+                _Info.robotLoc.x + dx,
+                _Info.robotLoc.y + dy
+            );
+            if (_Info.robotLoc.isWithinDistanceSquared(nearestCenter, 4)) {
+                center = nearestCenter;
             }
-        }
-
-        // If found a SRP
-        if (center != null) {
+        } else { // Found SRP
             if (rc.canCompleteResourcePattern(center)) {
                 rc.completeResourcePattern(center);
+                center = null;
                 score=0;
                 return;
             } else {
@@ -87,6 +59,7 @@ public class CompleteSrp extends Action {
                         if (tile.hasRuin() || tile.isWall() ||
                                 tile.getPaint() == PaintType.ENEMY_SECONDARY ||
                                 tile.getPaint() == PaintType.ENEMY_PRIMARY) {
+                            center = null;
                             score = 0;
                             return;
                         }
@@ -95,6 +68,7 @@ public class CompleteSrp extends Action {
                                 !pattern[tileLoc.x - center.x + 2][tileLoc.y - center.y + 2]) {
                             if (_Info.nearbyRuins.length > 0) {
                                 score = 0;
+                                center = null;
                                 return;
                             } else {
                                 paintLoc = tileLoc;
@@ -116,6 +90,7 @@ public class CompleteSrp extends Action {
             }
         }
         score = 0;
+        center = null;
     }
 
     //If there is a valid pattern, move towards and fill in the pattern

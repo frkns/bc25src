@@ -54,7 +54,7 @@ public class SpawnUnits extends Action {
 
         rc.buildRobot(Unit, spawnLoc);
 
-        // Exemple
+        // Example
         int id = rc.senseRobotAtLocation(spawnLoc).getID();
         Debug.print(0, "### Test ### Send message to " + id);
         /*

@@ -14,7 +14,7 @@ public class Soldier extends Robot {
 
         interests.add(new Explore());
         actions.add(new CompleteSrp());
-        actions.add(new CompleteTowerPattern());
+//        actions.add(new CompleteTowerPattern());
 
         Robot.initUnit();
     }

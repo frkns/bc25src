@@ -2,6 +2,7 @@ package e_action.actions;
 
 import e_action.Robot;
 import e_action.knowledge._Info;
+import e_action.interests.Interest;
 
 import battlecode.common.*;
 
@@ -34,45 +35,47 @@ public abstract class Action {
         possibleDirs[Direction.SOUTHWEST.ordinal()] = _Info.actionRadiusSquared >= _Info.robotLoc.add(Direction.SOUTHWEST).distanceSquaredTo(targetLoc);
         possibleDirs[Direction.WEST.ordinal()] = _Info.actionRadiusSquared >= _Info.robotLoc.add(Direction.WEST).distanceSquaredTo(targetLoc);
         possibleDirs[Direction.NORTHWEST.ordinal()] = _Info.actionRadiusSquared >= _Info.robotLoc.add(Direction.NORTHWEST).distanceSquaredTo(targetLoc);
+        possibleDirs[Direction.CENTER.ordinal()] = _Info.actionRadiusSquared >= _Info.robotLoc.distanceSquaredTo(targetLoc);
     }
     // Calculate the best move direction where the action can still be played
     public int calcScoreWithDir(int[] directionScores) {
         int bestScore = 0;
+        if (possibleDirs[8]) { // If action can be played without moving
+            int totalScore = Interest.bestDirScore + score;
+            if (totalScore > bestScore) bestScore  = totalScore;
+            return bestScore;
+        }
         if (possibleDirs[0]) {
             int totalScore = directionScores[0] + score;
-            if (totalScore > bestScore) bestScore = score;
+            if (totalScore > bestScore) bestScore  = totalScore;
         }
         if (possibleDirs[1]) {
             int totalScore = directionScores[1] + score;
-            if (totalScore > bestScore) bestScore = score;
+            if (totalScore > bestScore) bestScore  = totalScore;
         }
         if (possibleDirs[2]) {
             int totalScore = directionScores[2] + score;
-            if (totalScore > bestScore) bestScore = score;
+            if (totalScore > bestScore) bestScore  = totalScore;
         }
         if (possibleDirs[3]) {
             int totalScore = directionScores[3] + score;
-            if (totalScore > bestScore) bestScore = score;
+            if (totalScore > bestScore) bestScore  = totalScore;
         }
         if (possibleDirs[4]) {
             int totalScore = directionScores[4] + score;
-            if (totalScore > bestScore) bestScore = score;
+            if (totalScore > bestScore) bestScore  = totalScore;
         }
         if (possibleDirs[5]) {
             int totalScore = directionScores[5] + score;
-            if (totalScore > bestScore) bestScore = score;
+            if (totalScore > bestScore) bestScore  = totalScore;
         }
         if (possibleDirs[6]) {
             int totalScore = directionScores[6] + score;
-            if (totalScore > bestScore) bestScore = score;
+            if (totalScore > bestScore) bestScore  = totalScore;
         }
         if (possibleDirs[7]) {
             int totalScore = directionScores[7] + score;
-            if (totalScore > bestScore) bestScore = score;
-        }
-        if (possibleDirs[8]) {
-            int totalScore = directionScores[8] + score;
-            if (totalScore > bestScore) bestScore = score;
+            if (totalScore > bestScore) bestScore  = totalScore;
         }
         return bestScore;
     }

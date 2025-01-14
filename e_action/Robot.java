@@ -54,6 +54,7 @@ public abstract class Robot {
             interest.updateDirectionScores();
         }
         Interest.maskIllegalMoves();
+        Interest.calcBestDirAndScore();
 
         // ----------------- Calculate actions -----------------
         Debug.print(1, "");
@@ -68,7 +69,7 @@ public abstract class Robot {
             for (Action action : actions) {
                 Debug.print(2, action.name + " ...", action.debugAction);
                 action.calcScore();
-                if (action.score > 0 && action.targetLoc != null) {
+                if (action.score > 0) {
                     action.setPossibleDirs(action.targetLoc);
                     scoreWithDir = action.calcScoreWithDir(Interest.directionScores);
                     if (scoreWithDir > bestTotalScore) {
@@ -78,30 +79,31 @@ public abstract class Robot {
                 }
             }
             // ---------- Play best action and move ----------
-            if (bestAction != null) {
+            if (Interest.bestDirScore > bestTotalScore) { // It is better to move and skip the action.
+                Debug.print(1, "Action skipped or no legal actions");
+                rc.setIndicatorString("No action.");
+                if (Interest.bestDir != null) {
+                    rc.move(Interest.bestDir);
+                }
+            } else {
                 Debug.print(1, "Playing action: " + bestAction.name);
                 Debug.setActionIndicatorString(bestAction);
-                Direction dir = Interest.calcBestDir(bestAction);
                 if (bestAction.possibleDirs[8]) { // If the robot can play the action before moving, play it first
                     bestAction.play();
-                    if (dir != null) {
-                        rc.move(dir);
+                    if (Interest.bestDir != null) {
+                        rc.move(Interest.bestDir);
                     }
                 } else {
-                    if (dir != null) {
-                        rc.move(dir);
+                    if (Interest.bestDir != null) {
+                        rc.move(Interest.bestDir);
                         bestAction.play(); // In case our action was dependent on movement
                     }
                 }
-            } else {
-                Debug.print(1, "No action to play");
-                rc.setIndicatorString("No action.");
-
-                Direction dir = Interest.calcBestDir(null);
-                if (dir != null) {
-                    rc.move(dir);
-                }
             }
+
+//              
+                
+//                } 
         // ==================== Towers ======================
         } else {
             for (Action action : actions) {

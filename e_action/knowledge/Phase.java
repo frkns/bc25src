@@ -1,4 +1,6 @@
-package e_action.utils;
+package e_action.knowledge;
+
+import e_action.utils.Constants;
 
 // LEGACY CODE
 // Use Chips/turn rate for unit spawn behaviour and tower selection

@@ -4,6 +4,7 @@ import e_action.units.Mopper;
 import e_action.units.Soldier;
 import e_action.units.Splasher;
 import e_action.units.Tower;
+import e_action.knowledge._Info;
 
 import battlecode.common.*;
 
@@ -35,7 +36,6 @@ public class RobotPlayer {
 
         setRobotType();
         while (true) {
-            _round_num = rc.getRoundNum();
             try {
                 robot.initTurn();
                 robot.playTurn();
@@ -44,11 +44,13 @@ public class RobotPlayer {
             catch (GameActionException e) {
                 System.out.println("GameActionException");
                 e.printStackTrace();
+                rc.resign();
             } catch (Exception e) {
                 System.out.println("Exception");
                 e.printStackTrace();
+                rc.resign();
             } finally {
-                if (rc.getRoundNum() != _round_num) {
+                if (rc.getRoundNum() != _Info.round) {
                     System.out.println("Went over bytecode limit");
                 }
                 Clock.yield();

@@ -91,7 +91,11 @@ public class Debug {
     }
 
     public static void setActionIndicatorString(Action action){
-        rc.setIndicatorString(action.name + " - " + (action.score));
+        if (action.targetLoc != null) {
+            rc.setIndicatorString(action.name + " - " + action.targetLoc.toString());
+        } else {
+            rc.setIndicatorString(action.name);
+        }
     }
 
 }

@@ -12,7 +12,9 @@ public abstract class Interest {
     public String name = "ABSTRACT Int.";
     public boolean debugInterest = true;
 
-    public static int [] directionScores = new int[9]; // TODO use cheap hash map instead
+    public static int [] directionScores = new int[] {500, 500, 500, 500, 500, 500, 500, 500, 500}; // TODO use cheap hash map instead
+    public static int bestDirScore;
+    public static Direction bestDir = null;
 
     public Interest(){
         rc = Robot.rc;
@@ -21,7 +23,7 @@ public abstract class Interest {
     public abstract void initUnit() throws GameActionException;
     public abstract void updateDirectionScores() throws GameActionException;
     public static void resetDirectionScores() throws GameActionException {
-        directionScores = new int[9];
+        directionScores = new int[]{500, 500, 500, 500, 500, 500, 500, 500, 500};
     }
     public static void adjustDirectionScore(Direction dir, int score){
         directionScores[dir.ordinal()] += score;
@@ -37,8 +39,17 @@ public abstract class Interest {
         if (!Robot.rc.canMove(_Info.directions[7])) directionScores[7] = 0;
         if (!Robot.rc.canMove(_Info.directions[8])) directionScores[8] = 0;
     }
-
-    public static Direction calcBestDir (Action action){
+    public static void calcBestDirAndScore(){
+        bestDirScore = 0;
+        bestDir = null;
+        for (int i = 0; i < 9; i++) {
+            if (directionScores[i] > bestDirScore) {
+                bestDirScore = directionScores[i];
+                bestDir = _Info.directions[i];
+            }
+        }
+    }
+    public static Direction calcBestDirWithAction(Action action){
         int score;
         int bestScore = 0;
         Direction bestDir = null;

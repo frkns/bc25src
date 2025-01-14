@@ -28,13 +28,13 @@ public class _Info {
     public static int MAP_AREA;
 
     // -------------- Variables set during unit initialization ----------------
-    public static MapLocation spawnTowerLocation;
-    public static Direction spawnDirection;
+    public static int id;
     public static UnitType unitType;
     public static int actionRadiusSquared;
 
     // -------------- Variables that vary by turn ----------------
     // Game state info
+    public static int round;
     public static int phase;
     public static int chips;
     public static int chipsRate;
@@ -58,6 +58,7 @@ public class _Info {
         MAP_AREA = MAP_WIDTH * MAP_HEIGHT;
 
         // -------------- Variables set during unit initialization ----------------
+        id = rc.getID();
         unitType = rc.getType();
         actionRadiusSquared = unitType.actionRadiusSquared;
     }
@@ -65,6 +66,7 @@ public class _Info {
     // -------------- Variables that vary by turn ----------------
     public static void update() throws GameActionException {
         // ---------- Game state info ------------
+        round = rc.getRoundNum();
         phase = Phase.getPhase(rc.getRoundNum(), MAP_AREA);
         chips = rc.getChips();
         chipsRate = ChipProductionRate.calculate();
