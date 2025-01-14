@@ -70,6 +70,7 @@ public class CompleteSrp extends Action {
             }
         }
 
+
         // If found a SRP
         if (center != null) {
             if (rc.canCompleteResourcePattern(center)) {

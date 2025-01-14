@@ -1,4 +1,4 @@
-package newtst1;
+package slim_v1;
 
 import battlecode.common.*;
 

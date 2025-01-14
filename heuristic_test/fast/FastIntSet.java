@@ -1,5 +1,5 @@
 // https://github.com/chenyx512/battlecode24/blob/main/src/bot1/fast/FastIntSet.java
-package temp_test.fast;
+package heuristic_test.fast;
 
 public class FastIntSet {
     public StringBuilder keys;

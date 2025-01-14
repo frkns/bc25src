@@ -1,4 +1,4 @@
-package temp_test;
+package slim_v1;
 
 import battlecode.common.*;
 import org.apache.lucene.index.Payload;

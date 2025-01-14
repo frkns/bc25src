@@ -67,7 +67,7 @@ public class RobotPlayer {
     public static void run(RobotController r) throws GameActionException {
         rc = r;
 
-        RobotInfo[] nearbyRobots = rc.senseNearbyRobots();
+        RobotInfo[] nearbyRobots = rc.senseNearbyRobots(-1);
         for (RobotInfo robot : nearbyRobots) {
             if (robot.getTeam() == rc.getTeam()) {
                 if (robot.getType().isTowerType()) {
@@ -78,6 +78,8 @@ public class RobotPlayer {
                 }
             }
         }
+        if (!rc.getType().isTowerType())
+            assert(spawnTowerLocation != null);
         phase2 = (int)((((rc.getMapHeight()+rc.getMapWidth())/2) * 2));
         phase3 = (int)((((rc.getMapHeight()+rc.getMapWidth())/2) * 5.775));
         System.out.println("Phase 2: " + phase2);
@@ -91,6 +93,8 @@ public class RobotPlayer {
 
         while (true) {
             roundNum = rc.getRoundNum();
+            // if (roundNum > 500)
+            //     rc.resign();
             // This code runs during the entire lifespan of the robot, which is why it is in an infinite
             // loop. If we ever leave this loop and return from run(), the robot dies! At the end of the
             // loop, we call Clock.yield(), signifying that we've done everything we want to do.
@@ -99,11 +103,11 @@ public class RobotPlayer {
 
             // Try/catch blocks stop unhandled exceptions, which cause your robot to explode.
             try {
-                // if (birthRound <= 4 && rc.getType() == UnitType.SOLDIER) {
-                //     rusher = true;
-                //     assert(!rc.getType().isTowerType());
-                //     AttackBase.run();
-                // } else
+                if (birthRound <= 4 && rc.getType() == UnitType.SOLDIER && spawnTowerType == UnitType.LEVEL_ONE_PAINT_TOWER) {
+                    rusher = true;
+                    assert(!rc.getType().isTowerType());
+                    AttackBase.run();
+                } else
                 switch (rc.getType()) {
                     case SOLDIER: runSoldier(rc); break;
                     case MOPPER: runMopper(rc); break;
@@ -195,9 +199,10 @@ public class RobotPlayer {
                 if(r > 55) {
                     nextBot = 1;
                 } else if (r > 40){
-                    // nextBot = 0;
-                    nextBot = 2;
+                    nextBot = 0;
+                    // nextBot = 2;
                 } else {
+                    nextBot = 0;
                     nextBot = 2;
                 }
             }

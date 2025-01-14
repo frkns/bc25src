@@ -1,5 +1,5 @@
 // https://github.com/awesomelemonade/Battlecode2023/blob/master/src/finalBot/util/LambdaUtil.java
-package temp_test.fast;
+package heuristic_test.fast;
 
 import java.util.Comparator;
 import java.util.Optional;

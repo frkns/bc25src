@@ -1,5 +1,5 @@
 // https://github.com/chenyx512/battlecode24/blob/main/src/bot1/fast/FastMath.java
-package temp_test.fast;
+package heuristic_test.fast;
 
 import battlecode.common.*;
 

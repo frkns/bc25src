@@ -8,7 +8,15 @@ public class HeurisitcPath extends RobotPlayer {
     // plus some other costs for preferring to stay on my own paint, avoiding enemy paint etc
     // also try to move away from the our spawn tower
 
+    static int enemyPaintPenalty = 3000;
+    static int neutralPaintPenalty = 2000;
+    static int targetIncentive = 300;
+
     public static void move() throws GameActionException {
+        move(null);
+    }
+
+    public static void move(MapLocation targetLoc) throws GameActionException {
         int[] directionCost = new int[8];
 
         // boolean[] directionMovable = new boolean[8];
@@ -67,16 +75,27 @@ public class HeurisitcPath extends RobotPlayer {
             MapInfo tileInfo = rc.senseMapInfo(newLoc);
             // add a cost if the tile is enemy paint
             if (tileInfo.getPaint().isEnemy()) {
-                directionCost[i] += 2000;
+                directionCost[i] += enemyPaintPenalty;
             }
             // add a cost if the tile is neutral paint
             else if (tileInfo.getPaint() == PaintType.EMPTY) {
-                directionCost[i] += 1000;
+                directionCost[i] += neutralPaintPenalty;
             }
 
             // add a cost if the tile is out of exploration bounds
-            if (Utils.outOfExplorationBounds(newLoc)) {
-                directionCost[i] += 1000;
+            // if (Utils.outOfExplorationBounds(newLoc)) {
+            //     directionCost[i] += 1000;
+            // }
+
+            if (targetLoc != null) {
+                // remove cost for moving in a direction that gets closer to the target
+                Direction toTarget = rc.getLocation().directionTo(targetLoc);
+                if (dir.dx == toTarget.dx) {
+                    directionCost[i] -= targetIncentive;
+                }
+                if (dir.dy == toTarget.dy) {
+                    directionCost[i] -= targetIncentive;
+                }
             }
 
         }
@@ -90,7 +109,8 @@ public class HeurisitcPath extends RobotPlayer {
                 minDir = directions[i];
             }
         }
-        rc.move(minDir);
+        if (minDir != null)
+            rc.move(minDir);
     }
 
 
