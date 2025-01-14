@@ -82,7 +82,6 @@ public class Pathfinder{
                 resetPathfinding();
             }
 
-
             prevTarget = target;
             if (visitedLocs.contains(rc.getLocation())) {
                 stuckCnt++;

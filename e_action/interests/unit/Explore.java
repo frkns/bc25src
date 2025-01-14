@@ -18,7 +18,7 @@ public class Explore extends Interest {
 
 
     public static MapLocation target = null;
-    public static int explorationBoundary = 5;
+    public static int explorationBoundary = 0;
 
     public void initUnit()  throws GameActionException {
         Debug.print(1, Debug.INITUNIT + name, debugInterest);

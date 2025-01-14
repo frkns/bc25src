@@ -63,7 +63,7 @@ public abstract class Robot {
         int bestTotalScore = 0;
 
         // ======================= Bunnies =======================
-        // TODO Fix calculation for scoreWithDir to account for action + move
+
         if (_Info.unitType.isRobotType()) {
             int scoreWithDir;
             for (Action action : actions) {
@@ -79,10 +79,10 @@ public abstract class Robot {
                 }
             }
             // ---------- Play best action and move ----------
-            if (Interest.bestDirScore > bestTotalScore) { // It is better to move and skip the action.
+            if (Interest.bestDirScore >= bestTotalScore) { // It is better to move and skip the action.
                 Debug.print(1, "Action skipped or no legal actions");
                 rc.setIndicatorString("No action.");
-                if (Interest.bestDir != null) {
+                if (Interest.bestDir != Direction.CENTER) {
                     rc.move(Interest.bestDir);
                 }
             } else {
@@ -90,20 +90,18 @@ public abstract class Robot {
                 Debug.setActionIndicatorString(bestAction);
                 if (bestAction.possibleDirs[8]) { // If the robot can play the action before moving, play it first
                     bestAction.play();
-                    if (Interest.bestDir != null) {
+                    if (Interest.bestDir != Direction.CENTER) {
                         rc.move(Interest.bestDir);
                     }
                 } else {
-                    if (Interest.bestDir != null) {
+                    if (Interest.bestDir != Direction.CENTER) {
                         rc.move(Interest.bestDir);
                         bestAction.play(); // In case our action was dependent on movement
                     }
                 }
             }
 
-//              
-                
-//                } 
+
         // ==================== Towers ======================
         } else {
             for (Action action : actions) {
