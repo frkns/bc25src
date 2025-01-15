@@ -58,6 +58,7 @@ public class CompleteSrp extends Action {
                         }
                         moveCursor();
                     }
+                    spawnCursor(); // Reached end of pattern
                 } else {
                     markInvalid();
                 };
