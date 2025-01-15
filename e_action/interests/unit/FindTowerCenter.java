@@ -69,4 +69,5 @@ public class FindTowerCenter extends Interest {
         }
         return closestRuin;
     }
+
 }
