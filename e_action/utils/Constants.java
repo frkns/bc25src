@@ -17,12 +17,17 @@ public class Constants {
     // Unit Interest variables
     public static final int ExploreScore = 2;
     // Unit Action variables
+    // ALL
+    public static final int RefillPaintScore = 10;
+
+    // SOLDIER
     public static final int CompleteTowerPatternScore = 20;
     public static final int CompleteSrpScore = 10;
-    public static final int RefillPaintScore = 10;
-    public static final int FindRuinScore = 10;
+
+    //
     public static final int FindEnemyPaint = 10;
     public static final int MopEnemyPaint = 5;
+    public static final int MopPaintScore = 5;
     public static final int AvoidEnemyPaint = 2;
     // Tower Action variables
     public static final int SpawnUnitsScore = 10;

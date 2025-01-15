@@ -16,7 +16,7 @@ public class Soldier extends Robot {
         interests.add(new FindTowerCenter());
         actions.add(new CompleteSrp());
         actions.add(new CompleteTowerPattern());
-        interests.add(new StayOnAllyPaint());
+        // interests.add(new StayOnAllyPaint());
 
         initUnit();
     }
