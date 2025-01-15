@@ -34,7 +34,7 @@ public class StayOnAllyPaint extends Interest {
                 return;
             }
             if(tile.getPaint().isAlly()) {
-                adjustDirectionScore(direction,-1 * Constants.AvoidEnemyPaint);
+                adjustDirectionScore(direction,Constants.AvoidEnemyPaint);
             }
         }
         int x = rc.getLocation().x;
