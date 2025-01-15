@@ -31,54 +31,11 @@ public class StayOnAllyPaint extends Interest {
             Direction direction = tile.getMapLocation().directionTo(tile.getMapLocation());
             if(tile.getPaint().isEnemy()){
                 adjustDirectionScore(direction,-1 * Constants.AvoidEnemyPaint);
-                break;
+                continue;
             }
             if(tile.getPaint().isAlly()) {
                 adjustDirectionScore(direction,Constants.AvoidEnemyPaint);
             }
         }
-        int x = rc.getLocation().x;
-        int y = rc.getLocation().y;
-
-        if(rc.senseMapInfo(new MapLocation(x,y+4)).getPaint() == PaintType.EMPTY)  {
-            adjustDirectionScore(Direction.NORTH, Constants.AvoidEnemyPaint);
-        }
-        if(rc.senseMapInfo(new MapLocation(x+3,y+3)).getPaint() == PaintType.EMPTY)  {
-            adjustDirectionScore(Direction.NORTHEAST, Constants.AvoidEnemyPaint);
-        }
-
-        if (rc.senseMapInfo(new MapLocation(x, y + 4)).getPaint() == PaintType.EMPTY) {
-            adjustDirectionScore(Direction.NORTH, Constants.AvoidEnemyPaint);
-        }
-
-        if (rc.senseMapInfo(new MapLocation(x + 3, y + 3)).getPaint() == PaintType.EMPTY) {
-            adjustDirectionScore(Direction.NORTHEAST, Constants.AvoidEnemyPaint);
-        }
-
-        if (rc.senseMapInfo(new MapLocation(x + 4, y)).getPaint() == PaintType.EMPTY) {
-            adjustDirectionScore(Direction.EAST, Constants.AvoidEnemyPaint);
-        }
-
-        if (rc.senseMapInfo(new MapLocation(x + 3, y - 3)).getPaint() == PaintType.EMPTY) {
-            adjustDirectionScore(Direction.SOUTHEAST, Constants.AvoidEnemyPaint);
-        }
-
-        if (rc.senseMapInfo(new MapLocation(x, y - 4)).getPaint() == PaintType.EMPTY) {
-            adjustDirectionScore(Direction.SOUTH, Constants.AvoidEnemyPaint);
-        }
-
-        if (rc.senseMapInfo(new MapLocation(x - 3, y - 3)).getPaint() == PaintType.EMPTY) {
-            adjustDirectionScore(Direction.SOUTHWEST, Constants.AvoidEnemyPaint);
-        }
-
-        if (rc.senseMapInfo(new MapLocation(x - 4, y)).getPaint() == PaintType.EMPTY) {
-            adjustDirectionScore(Direction.WEST, Constants.AvoidEnemyPaint);
-        }
-
-        if (rc.senseMapInfo(new MapLocation(x - 3, y + 3)).getPaint() == PaintType.EMPTY) {
-            adjustDirectionScore(Direction.NORTHWEST, Constants.AvoidEnemyPaint);
-        }
-
-
     }
 }
