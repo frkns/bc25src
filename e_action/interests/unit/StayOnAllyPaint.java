@@ -27,16 +27,6 @@ public class StayOnAllyPaint extends Interest {
         Debug.print(3, Debug.UPDATE_DIR_SCORES + name, debugInterest);
         int distance = 0;
 
-        for(MapInfo tile : rc.senseNearbyMapInfos(2)) {
-            Direction direction = tile.getMapLocation().directionTo(tile.getMapLocation());
-            if(tile.getPaint().isEnemy()){
-                adjustDirectionScore(direction,-1 * Constants.AvoidEnemyPaint);
-                return;
-            }
-            if(tile.getPaint().isAlly()) {
-                adjustDirectionScore(direction,Constants.AvoidEnemyPaint);
-            }
-        }
         int x = rc.getLocation().x;
         int y = rc.getLocation().y;
 
