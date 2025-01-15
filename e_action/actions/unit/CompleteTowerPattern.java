@@ -180,13 +180,11 @@ public class CompleteTowerPattern extends Action {
     }
 
     public boolean[][] getTowerPattern(UnitType tower) {
-        if(tower == UnitType.LEVEL_ONE_MONEY_TOWER) {
-            return moneyPattern;
-        } else if (tower == UnitType.LEVEL_ONE_PAINT_TOWER) {
-            return paintPattern;
-        } else {
-            return defensePattern;
-        }
+        return switch(tower){
+            case UnitType.LEVEL_ONE_MONEY_TOWER -> moneyPattern;
+            case UnitType.LEVEL_ONE_PAINT_TOWER -> paintPattern;
+            default ->defensePattern;
+        };
     }
 
 }

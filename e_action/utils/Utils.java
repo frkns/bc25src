@@ -107,9 +107,9 @@ public class Utils{
         }
 
         return switch(type){
-            case 00 -> neighborsInMap[ORD_NORTHWEST];
-            case 01 -> neighborsInMap[ORD_NORTH];
-            case 02 -> neighborsInMap[ORD_NORTHEAST];
+            case 0 -> neighborsInMap[ORD_NORTHWEST];
+            case 1 -> neighborsInMap[ORD_NORTH];
+            case 2 -> neighborsInMap[ORD_NORTHEAST];
 
             case 10 -> neighborsInMap[ORD_WEST];
             case 11 -> neighborsInMap[ORD_CENTER];
@@ -122,4 +122,62 @@ public class Utils{
             default -> neighborsInMap[ORD_NONE];
         };
     }
+
+    public static String locToString(MapLocation loc){
+        return "" + loc.x + loc.y;
+    }
+
+    public static boolean isLocationInRangeOfMopper(MapLocation mopperLoc, MapLocation targetLocation){
+        int hash = (targetLocation.x - mopperLoc.x) * 1000 + (targetLocation.y - mopperLoc.y);
+        // dx * 1000 + dy to avoid collision beetween x and y.
+        // For exemple colision is possible with dx*100 + dy for (1, -50) and (0, -50)
+        // generate by script/mopperRange.py
+
+        switch(hash){
+            case 1:
+            case 2:
+            case 3:
+            case -1003:
+            case -1002:
+            case -1001:
+            case -1000:
+            case -999:
+            case -998:
+            case -997:
+            case -2002:
+            case -2001:
+            case -2000:
+            case -1999:
+            case -1998:
+            case -1997:
+            case 2999:
+            case 3000:
+            case 3001:
+            case 3002:
+            case -3002:
+            case -3001:
+            case -3000:
+            case -2999:
+            case 1997:
+            case 1998:
+            case 1999:
+            case 2000:
+            case 2001:
+            case 2002:
+            case 997:
+            case 998:
+            case 999:
+            case 1000:
+            case 1001:
+            case 1002:
+            case 1003:
+            case -1:
+            case -3:
+            case -2:
+                return true;
+            default: return false;
+        }
+    }
+
+
 }
