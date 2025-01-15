@@ -31,7 +31,7 @@ public class RefillPaint extends Action {
         for(RobotInfo robot : _Info.nearbyAllies) {
             if(robot.getType().isTowerType()) {
                 if(rc.getPaint() < 100) {
-                    if(rc.canTransferPaint(robot.getLocation(),-1)) {
+                    if(rc.canTransferPaint(robot.getLocation(), -1)) {
                         score = Constants.RefillPaintScore;
                         take = true;
                         return;
@@ -39,7 +39,7 @@ public class RefillPaint extends Action {
                 }
             } else {
                 if(rc.getPaint() > 60) {
-                    if(rc.canTransferPaint(robot.getLocation(),1) ) {
+                    if(rc.canTransferPaint(robot.getLocation(), 1) ) {
                         score = Constants.RefillPaintScore;
                         take = false;
                         return;
