@@ -58,7 +58,7 @@ public class Pathfinder{
         static int currentTurnDir = 0;
         static int stackDepthCutoff = 8;
         static final int MAX_DEPTH = 20;
-        static final int BYTECODE_CUTOFF = 6000;
+        static final int BYTECODE_CUTOFF = 500;
         static int lastMoveRound = -1;
 
         static Direction turn(Direction dir) {
@@ -81,7 +81,6 @@ public class Pathfinder{
             if (prevTarget == null || target.distanceSquaredTo(prevTarget) > 2) {
                 resetPathfinding();
             }
-
 
             prevTarget = target;
             if (visitedLocs.contains(rc.getLocation())) {

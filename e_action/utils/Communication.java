@@ -1,22 +1,17 @@
 package e_action.utils;
 
-import battlecode.common.GameActionException;
-import battlecode.common.MapLocation;
-import battlecode.common.Message;
-import battlecode.common.RobotController;
+import battlecode.common.*;
 import e_action.knowledge._Info;
-import templateBot.Robot;
+
 
 public class Communication {
     // ---------- Attributes ----------
     static RobotController rc;
     static char[] reverseID;
-    static int height;
-    static int width;
 
     static final int HEADER_MASK = 0b1111 << 28; // Coded on 4 upper bits
     static final int HEADER_CLASS = 1 << 28;
-    static final int MEADER_LOCATION = 2 << 28;
+    static final int HEADER_LOCATION = 2 << 28;
 
     /** Message Class :
      *   4 bits for encoding header
@@ -37,18 +32,15 @@ public class Communication {
     // ---------- Instantiates and utils ----------
     public static void init(RobotController r){
         rc = r;
-        height = rc.getMapHeight();
-        width = rc.getMapWidth();
-
         reverseID = "\0".repeat(20000).toCharArray();
     }
 
     public static MapLocation intToLoc(int i){
-        return new MapLocation(i % width, i / width);
+        return new MapLocation(i % _Info.MAP_WIDTH, i / _Info.MAP_WIDTH);
     }
 
     public static int locToInt(MapLocation loc){
-        return loc.x + loc.y * width;
+        return loc.x + loc.y * _Info.MAP_WIDTH;
     }
 
     public static MapLocation getLocation(int unitID){
@@ -84,7 +76,7 @@ public class Communication {
     public static void sendLocationMessage(int unitID, int info, MapLocation target) throws GameActionException{
         MapLocation loc = getLocation(unitID);
         if(loc != null && rc.canSendMessage(loc)){
-            rc.sendMessage(loc, MEADER_LOCATION + (info << 12) + locToInt(target));
+            rc.sendMessage(loc, HEADER_LOCATION + (info << 12) + locToInt(target));
         }else{
             Debug.print(0, "Can't send location message. Did we have a path of paint between sender and receiver ?");
         }
@@ -92,13 +84,13 @@ public class Communication {
 
     public static void readMessages(){
         // todo read message from actual turn in addition to last turn
-        for (Message mes : rc.readMessages(rc.getRoundNum() - 1)) {
+        for (Message mes : rc.readMessages(_Info.round - 1)) {
             int header = mes.getBytes() & HEADER_MASK;
             switch(header){
                 case HEADER_CLASS:
                     readMessageClass(mes);
                     break;
-                case MEADER_LOCATION:
+                case HEADER_LOCATION:
                     readMessageLocation(mes);
                     break;
                 default:

@@ -3,9 +3,9 @@ package e_action.interests.unit;
 import e_action.Robot;
 import e_action.interests.Interest;
 import e_action.utils.*;
-import e_action.knowledge._Info;
 
 import battlecode.common.*;
+
 public class _Template extends Interest {
     public RobotController rc;
 

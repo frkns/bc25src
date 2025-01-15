@@ -25,8 +25,7 @@ public class RefillPaint extends Action {
         // Initialize any variable needed when a unit first spawns in
     }
 
-    // Use GatherInfo.varname to access the variables
-    // Included are: GatherInfo.nearbyAllies, GatherInfo.nearbyRuins...
+
     public void calcScore() throws GameActionException {
         Debug.print(3, Debug.CALCSCORE + name, debugAction);
         for(RobotInfo robot : _Info.nearbyAllies) {

@@ -2,6 +2,7 @@ package e_action.actions;
 
 import e_action.Robot;
 import e_action.knowledge._Info;
+import e_action.interests.Interest;
 
 import battlecode.common.*;
 
@@ -25,7 +26,8 @@ public abstract class Action {
 
     public void setPossibleDirs(MapLocation targetLoc) {
         // possibleDirs[direction] = true if target is still reachable after moving in this direction
-
+        // TODO Check center first. If center is in range, we will play the action first so no need to consider other directions
+        // TODO Heuristics to minimize the number of checks (if we check 4 locations, can we guarantee the others are by default reachable?)
         possibleDirs[Direction.NORTH.ordinal()] = _Info.actionRadiusSquared >= _Info.robotLoc.add(Direction.NORTH).distanceSquaredTo(targetLoc);
         possibleDirs[Direction.NORTHEAST.ordinal()] = _Info.actionRadiusSquared >= _Info.robotLoc.add(Direction.NORTHEAST).distanceSquaredTo(targetLoc);
         possibleDirs[Direction.EAST.ordinal()] = _Info.actionRadiusSquared >= _Info.robotLoc.add(Direction.EAST).distanceSquaredTo(targetLoc);
@@ -34,45 +36,48 @@ public abstract class Action {
         possibleDirs[Direction.SOUTHWEST.ordinal()] = _Info.actionRadiusSquared >= _Info.robotLoc.add(Direction.SOUTHWEST).distanceSquaredTo(targetLoc);
         possibleDirs[Direction.WEST.ordinal()] = _Info.actionRadiusSquared >= _Info.robotLoc.add(Direction.WEST).distanceSquaredTo(targetLoc);
         possibleDirs[Direction.NORTHWEST.ordinal()] = _Info.actionRadiusSquared >= _Info.robotLoc.add(Direction.NORTHWEST).distanceSquaredTo(targetLoc);
+        possibleDirs[Direction.CENTER.ordinal()] = _Info.actionRadiusSquared >= _Info.robotLoc.distanceSquaredTo(targetLoc);
     }
-    // Calculate the best move direction where the action can still be played
+
+    // TODO Replace with a hash map
     public int calcScoreWithDir(int[] directionScores) {
         int bestScore = 0;
+        if (possibleDirs[8]) { // If action can be played without moving
+            int totalScore = Interest.bestDirScore + score;
+            if (totalScore > bestScore) bestScore  = totalScore;
+            return bestScore;
+        }
         if (possibleDirs[0]) {
             int totalScore = directionScores[0] + score;
-            if (totalScore > bestScore) bestScore = score;
+            if (totalScore > bestScore) bestScore  = totalScore;
         }
         if (possibleDirs[1]) {
             int totalScore = directionScores[1] + score;
-            if (totalScore > bestScore) bestScore = score;
+            if (totalScore > bestScore) bestScore  = totalScore;
         }
         if (possibleDirs[2]) {
             int totalScore = directionScores[2] + score;
-            if (totalScore > bestScore) bestScore = score;
+            if (totalScore > bestScore) bestScore  = totalScore;
         }
         if (possibleDirs[3]) {
             int totalScore = directionScores[3] + score;
-            if (totalScore > bestScore) bestScore = score;
+            if (totalScore > bestScore) bestScore  = totalScore;
         }
         if (possibleDirs[4]) {
             int totalScore = directionScores[4] + score;
-            if (totalScore > bestScore) bestScore = score;
+            if (totalScore > bestScore) bestScore  = totalScore;
         }
         if (possibleDirs[5]) {
             int totalScore = directionScores[5] + score;
-            if (totalScore > bestScore) bestScore = score;
+            if (totalScore > bestScore) bestScore  = totalScore;
         }
         if (possibleDirs[6]) {
             int totalScore = directionScores[6] + score;
-            if (totalScore > bestScore) bestScore = score;
+            if (totalScore > bestScore) bestScore  = totalScore;
         }
         if (possibleDirs[7]) {
             int totalScore = directionScores[7] + score;
-            if (totalScore > bestScore) bestScore = score;
-        }
-        if (possibleDirs[8]) {
-            int totalScore = directionScores[8] + score;
-            if (totalScore > bestScore) bestScore = score;
+            if (totalScore > bestScore) bestScore  = totalScore;
         }
         return bestScore;
     }

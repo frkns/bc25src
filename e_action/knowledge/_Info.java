@@ -5,6 +5,7 @@ import battlecode.common.*;
 import java.util.Random;
 import e_action.Robot;
 import e_action.utils.*;
+import e_action.utils.fast.FastLocSet;
 
 public class _Info {
     public static RobotController rc = Robot.rc;
@@ -28,13 +29,13 @@ public class _Info {
     public static int MAP_AREA;
 
     // -------------- Variables set during unit initialization ----------------
-    public static MapLocation spawnTowerLocation;
-    public static Direction spawnDirection;
+    public static int id;
     public static UnitType unitType;
     public static int actionRadiusSquared;
 
     // -------------- Variables that vary by turn ----------------
     // Game state info
+    public static int round;
     public static int phase;
     public static int chips;
     public static int chipsRate;
@@ -42,6 +43,8 @@ public class _Info {
 
     // Internal info
     public static MapLocation robotLoc;
+    public static boolean isActionReady;
+    public static boolean isMovementReady;
 
     // External info
     public static RobotInfo[] nearbyAllies;
@@ -49,6 +52,17 @@ public class _Info {
     public static MapLocation[] nearbyRuins;
     public static MapLocation nearestPaintTower = null;
     public static MapInfo[] nearbyTiles;
+
+    // Interest + Action specific info (shared between interests and actions that work closely together)
+    public static MapLocation srpCenter;
+    public static MapLocation towerCenter;
+    public static FastLocSet invalidSrpCenters = new FastLocSet(); // Includes completed SRP centers
+    public static FastLocSet invalidTowerCenters = new FastLocSet(); // Includes completed tower centers & enemy paint blocking
+    // Add to completed patterns when pattern is complete but cannot build tower.
+    // When tower completed, check for the ruin location in the set. If exists, pop the set
+    // public static FastLocSet completedPatterns = new FastLocSet(); 
+
+
 
 
     public static void init() {
@@ -58,6 +72,7 @@ public class _Info {
         MAP_AREA = MAP_WIDTH * MAP_HEIGHT;
 
         // -------------- Variables set during unit initialization ----------------
+        id = rc.getID();
         unitType = rc.getType();
         actionRadiusSquared = unitType.actionRadiusSquared;
     }
@@ -65,6 +80,7 @@ public class _Info {
     // -------------- Variables that vary by turn ----------------
     public static void update() throws GameActionException {
         // ---------- Game state info ------------
+        round = rc.getRoundNum();
         phase = Phase.getPhase(rc.getRoundNum(), MAP_AREA);
         chips = rc.getChips();
         chipsRate = ChipProductionRate.calculate();
@@ -72,6 +88,8 @@ public class _Info {
 
         // ----------- Internal info ------------
         robotLoc = rc.getLocation();
+        isActionReady = rc.isActionReady();
+        isMovementReady = rc.isMovementReady();
 
         // ----------- External info ------------
         nearbyAllies = rc.senseNearbyRobots(-1, rc.getTeam());
