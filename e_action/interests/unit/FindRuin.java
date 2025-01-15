@@ -10,6 +10,7 @@ import e_action.utils.Debug;
 
 
 public class FindRuin extends Interest {
+
     public RobotController rc;
 
     public FindRuin(){
@@ -69,4 +70,5 @@ public class FindRuin extends Interest {
         }
         return closestRuin;
     }
+
 }

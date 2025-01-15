@@ -21,6 +21,9 @@ public class Constants {
     public static final int CompleteSrpScore = 10;
     public static final int RefillPaintScore = 10;
     public static final int FindRuinScore = 10;
+    public static final int FindEnemyPaint = 10;
+    public static final int MopEnemyPaint = 5;
+    public static final int AvoidEnemyPaint = 2;
     // Tower Action variables
     public static final int SpawnUnitsScore = 10;
 }

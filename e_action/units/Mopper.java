@@ -12,7 +12,9 @@ public class Mopper extends Robot {
         super(rc);
 
         interests.add(new Explore());
-
+        interests.add(new FindEnemyPaint());
+        actions.add(new MopPaint());
+        interests.add(new StayOnAllyPaint());
         Robot.initUnit();
     }
 }
