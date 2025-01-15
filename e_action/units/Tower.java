@@ -12,7 +12,7 @@ public class Tower extends Robot {
 
         actions.add(new SpawnUnits());
 
-        Robot.initUnit();
+        initUnit();
     }
 }
 

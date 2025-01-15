@@ -18,6 +18,6 @@ public class Soldier extends Robot {
         actions.add(new CompleteTowerPattern());
         // interests.add(new StayOnAllyPaint());
 
-        Robot.initUnit();
+        initUnit();
     }
 }

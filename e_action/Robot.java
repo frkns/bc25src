@@ -16,18 +16,19 @@ public abstract class Robot {
     public static ArrayDeque<Action> actions = new ArrayDeque<>();
     public static ArrayDeque<Interest> interests = new ArrayDeque<>();
 
-
     public Robot(RobotController r) throws GameActionException {
         rc = r;
         Debug.init();
-        Debug.print(0, "Create unit => " + rc.getType() + " at " + rc.getLocation());
+        Utils.init();
         _Info.init();
         Pathfinder.init(rc);
         Communication.init(rc);
     }
 
-    // This runs after the Robot's interests and actions are added
+    // Call after setting Action and Interest
     public static void initUnit() throws GameActionException {
+        Debug.print(0, "Create unit => " + rc.getType() + " at " + rc.getLocation());
+
         for (Interest interest : interests) {
             interest.initUnit();
         }

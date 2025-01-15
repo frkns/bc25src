@@ -13,7 +13,7 @@ public class StayOnAllyPaint extends Interest {
 
     public StayOnAllyPaint(){
         rc = Robot.rc;
-        name = "FUNC NAME HERE";
+        name = "StayOnAllyPaint";
         debugInterest = false;
         Debug.print(3, Debug.INIT + name, debugInterest);
     }
@@ -27,6 +27,16 @@ public class StayOnAllyPaint extends Interest {
         Debug.print(3, Debug.UPDATE_DIR_SCORES + name, debugInterest);
         int distance = 0;
 
+        for(MapInfo tile : rc.senseNearbyMapInfos(2)) {
+            Direction direction = tile.getMapLocation().directionTo(tile.getMapLocation());
+            if(tile.getPaint().isEnemy()){
+                adjustDirectionScore(direction,-1 * Constants.AvoidEnemyPaint);
+                break;
+            }
+            if(tile.getPaint().isAlly()) {
+                adjustDirectionScore(direction,Constants.AvoidEnemyPaint);
+            }
+        }
         int x = rc.getLocation().x;
         int y = rc.getLocation().y;
 

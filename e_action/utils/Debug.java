@@ -8,7 +8,7 @@ import battlecode.common.RobotController;
 import e_action.actions.Action;
 
 public class Debug {
-    public static boolean debug = false;
+    public static boolean debug = true;
 
     public static String INITUNIT = "Init unit ";
     public static String INIT = "Initializing ";
