@@ -15,6 +15,5 @@ public class Mopper extends Robot {
         interests.add(new FindEnemyPaint());
         actions.add(new MopPaint());
         interests.add(new StayOnAllyPaint());
-        Robot.initUnit();
     }
 }

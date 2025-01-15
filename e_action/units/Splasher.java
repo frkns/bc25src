@@ -12,7 +12,5 @@ public class Splasher extends Robot {
         super(rc);
 
         interests.add(new Explore());
-
-        Robot.initUnit();
     }
 }

@@ -16,8 +16,11 @@ public abstract class Robot {
     public static ArrayDeque<Action> actions = new ArrayDeque<>();
     public static ArrayDeque<Interest> interests = new ArrayDeque<>();
 
-    public Robot(RobotController r) throws GameActionException {
-        rc = r;
+    public Robot(RobotController r) throws GameActionException {rc = r;}
+
+
+    // This runs after the instantiation of robot by RobotPlayer
+    public static void initRobot() throws GameActionException {
         Debug.init();
         Debug.print(0, "Create unit => " + rc.getType() + " at " + rc.getLocation());
 
@@ -25,10 +28,7 @@ public abstract class Robot {
         _Info.init();
         Pathfinder.init(rc);
         Communication.init(rc);
-    }
 
-    // This runs after the Robot's interests and actions are added
-    public static void initUnit() throws GameActionException {
         for (Interest interest : interests) {
             interest.initUnit();
         }

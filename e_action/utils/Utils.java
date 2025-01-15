@@ -89,30 +89,37 @@ public class Utils{
      * Return an array boolean[] response where response[direction.ordinal()] = true if and only if, loc.add(direction) is in map
      * */
     public static boolean[] getIsExistingNeighbors(MapLocation loc){
+        int type = 0;
+        if(loc.x > 0){
+            if(loc.x == width){
+                type += 2;
+            }else{
+                type += 1;
+            }
+        }
 
-        /*
-        * Let's take the location(1, 0), we have from :
-        * 1) LocNortEast.directionTo(loc) : →
-        * 2) LocStouhEst.directionTo(loc) : ↖
-        * Then location should be in the first row (according to 1) and not in upper right corner (2 is not
-        * */
-        return switch(LocNortWest.directionTo(loc).ordinal() * 10 + LocStouhEast.directionTo(loc).ordinal()){
-            case ORD_CENTER * 10 + ORD_NORTHWEST -> neighborsInMap[ORD_NORTHWEST];
+        if(loc.y > 0){
+            if(loc.y == height){
+                type += 20;
+            }else{
+                type += 10;
+            }
+        }
 
-            case ORD_SOUTH * 10 + ORD_WEST -> neighborsInMap[ORD_NORTHWEST];
-            case ORD_SOUTH * 10 + ORD_NORTHWEST -> neighborsInMap[ORD_WEST];
+        return switch(type){
+            case 00 -> neighborsInMap[ORD_NORTHWEST];
+            case 01 -> neighborsInMap[ORD_NORTH];
+            case 02 -> neighborsInMap[ORD_NORTHEAST];
 
-            case ORD_EAST * 10 + ORD_NORTH -> neighborsInMap[ORD_NORTHEAST];
-            case ORD_EAST * 10 + ORD_NORTHWEST -> neighborsInMap[ORD_NORTH];
+            case 10 -> neighborsInMap[ORD_WEST];
+            case 11 -> neighborsInMap[ORD_CENTER];
+            case 12 -> neighborsInMap[ORD_EAST];
 
-            case ORD_SOUTHEAST * 10 + ORD_NORTHWEST -> neighborsInMap[ORD_CENTER];
-            case ORD_SOUTHEAST * 10 + ORD_CENTER -> neighborsInMap[ORD_SOUTHEAST];
-            case ORD_SOUTHEAST * 10 + ORD_EAST -> neighborsInMap[ORD_SOUTH];
-            case ORD_SOUTHEAST * 10 + ORD_NORTH -> neighborsInMap[ORD_EAST];
-
+            case 20 -> neighborsInMap[ORD_SOUTHWEST];
+            case 21 -> neighborsInMap[ORD_SOUTH];
+            case 22 -> neighborsInMap[ORD_SOUTHEAST];
 
             default -> neighborsInMap[ORD_NONE];
         };
     }
-
 }
