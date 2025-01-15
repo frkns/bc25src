@@ -13,7 +13,7 @@ public class StayOnAllyPaint extends Interest {
 
     public StayOnAllyPaint(){
         rc = Robot.rc;
-        name = "FUNC NAME HERE";
+        name = "StayOnAllyPaint";
         debugInterest = false;
         Debug.print(3, Debug.INIT + name, debugInterest);
     }

@@ -16,11 +16,12 @@ public abstract class Robot {
     public static ArrayDeque<Action> actions = new ArrayDeque<>();
     public static ArrayDeque<Interest> interests = new ArrayDeque<>();
 
-
     public Robot(RobotController r) throws GameActionException {
         rc = r;
         Debug.init();
         Debug.print(0, "Create unit => " + rc.getType() + " at " + rc.getLocation());
+
+        Utils.init();
         _Info.init();
         Pathfinder.init(rc);
         Communication.init(rc);
