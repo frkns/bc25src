@@ -4,7 +4,7 @@ import battlecode.common.Direction;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotController;
 import battlecode.common.UnitType;
-import templateBot.Robot;
+import e_action.Robot;
 
 public class Utils{
     static RobotController rc;

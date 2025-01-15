@@ -28,7 +28,6 @@ public class RobotPlayer {
                 robot = new Tower(rc);
                 break;
         }
-        Robot.initRobot();
     }
 
     public static void run(RobotController r) throws GameActionException {
