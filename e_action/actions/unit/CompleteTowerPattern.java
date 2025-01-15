@@ -16,22 +16,7 @@ public class CompleteTowerPattern extends Action {
     public MapLocation cursor = null; // Keeps track of the last painted tile and keeps shifting until it finds another tile it can paint
     public int cursorVerticalDirection; // Keeps track of the direction the cursor is moving in. 1 = NORTH, -1 = SOUTH
 
-    @Override
-    public void initUnit() throws GameActionException {
-
-    }
-
-    @Override
-    public void calcScore() throws GameActionException {
-
-    }
-
-    @Override
-    public void play() throws GameActionException {
-
-    }
     
-    /*
     public UnitType currentTower;
     public boolean[][] currentPattern = null;
     public boolean[][] moneyPattern;
@@ -88,6 +73,7 @@ public class CompleteTowerPattern extends Action {
                         }
                         moveCursor();
                     }
+                    spawnCursor();
                 } else {
                     markInvalid();
                 }
@@ -97,8 +83,7 @@ public class CompleteTowerPattern extends Action {
         }
     }
 
-         */
-/*
+
     // If a pattern tile needs to be painted, move towards it and paint
     public void play() throws GameActionException {
         Debug.print(3, Debug.PLAY + name);
@@ -115,8 +100,7 @@ public class CompleteTowerPattern extends Action {
         }
         return true;
     }
-    */
-        /*
+
     public void markInvalid() throws GameActionException {
         _Info.invalidTowerCenters.add(_Info.towerCenter);
         _Info.towerCenter = null;
@@ -138,7 +122,6 @@ public class CompleteTowerPattern extends Action {
      * Pattern example:
      * ↓→↑→↓→↑
      */
-    /*
     public void moveCursor() throws GameActionException {
         if (cursor == null) return;
 
@@ -195,7 +178,6 @@ public class CompleteTowerPattern extends Action {
         //     }
         // }
     }
-    /*
 
     public boolean[][] getTowerPattern(UnitType tower) {
         if(tower == UnitType.LEVEL_ONE_MONEY_TOWER) {
@@ -207,5 +189,4 @@ public class CompleteTowerPattern extends Action {
         }
     }
 
-     */
 }
