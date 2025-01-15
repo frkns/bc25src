@@ -27,18 +27,58 @@ public class StayOnAllyPaint extends Interest {
         Debug.print(3, Debug.UPDATE_DIR_SCORES + name, debugInterest);
         int distance = 0;
 
-        for(MapInfo tile : _Info.nearbyTiles) {
-            distance = rc.getLocation().distanceSquaredTo(tile.getMapLocation());
-            Direction direction = rc.getLocation().directionTo(tile.getMapLocation());
-            int score = Constants.AvoidEnemyPaint / (Math.max(distance,1));
-            if(tile.getPaint().isEnemy()) {
-                adjustDirectionScore(direction,-1 * score);
-            } else if (tile.getPaint().isAlly() && distance <= 2) {
-                adjustDirectionScore(direction,Constants.AvoidEnemyPaint/2);
+        for(MapInfo tile : rc.senseNearbyMapInfos(2)) {
+            Direction direction = tile.getMapLocation().directionTo(tile.getMapLocation());
+            if(tile.getPaint().isEnemy()){
+                adjustDirectionScore(direction,-1 * Constants.AvoidEnemyPaint);
+                return;
             }
-            if(tile.getPaint() == PaintType.EMPTY && distance >20) {
-                adjustDirectionScore(direction,Constants.AvoidEnemyPaint*2);
+            if(tile.getPaint().isAlly()) {
+                adjustDirectionScore(direction,-1 * Constants.AvoidEnemyPaint);
             }
         }
+        int x = rc.getLocation().x;
+        int y = rc.getLocation().y;
+
+        if(rc.senseMapInfo(new MapLocation(x,y+4)).getPaint() == PaintType.EMPTY)  {
+            adjustDirectionScore(Direction.NORTH,Constants.AvoidEnemyPaint);
+        }
+        if(rc.senseMapInfo(new MapLocation(x+3,y+3)).getPaint() == PaintType.EMPTY)  {
+            adjustDirectionScore(Direction.NORTHEAST,Constants.AvoidEnemyPaint);
+        }
+
+        if (rc.senseMapInfo(new MapLocation(x, y + 4)).getPaint() == PaintType.EMPTY) {
+            adjustDirectionScore(Direction.NORTH, Constants.AvoidEnemyPaint);
+        }
+
+        if (rc.senseMapInfo(new MapLocation(x + 3, y + 3)).getPaint() == PaintType.EMPTY) {
+            adjustDirectionScore(Direction.NORTHEAST, Constants.AvoidEnemyPaint);
+        }
+
+        if (rc.senseMapInfo(new MapLocation(x + 4, y)).getPaint() == PaintType.EMPTY) {
+            adjustDirectionScore(Direction.EAST, Constants.AvoidEnemyPaint);
+        }
+
+        if (rc.senseMapInfo(new MapLocation(x + 3, y - 3)).getPaint() == PaintType.EMPTY) {
+            adjustDirectionScore(Direction.SOUTHEAST, Constants.AvoidEnemyPaint);
+        }
+
+        if (rc.senseMapInfo(new MapLocation(x, y - 4)).getPaint() == PaintType.EMPTY) {
+            adjustDirectionScore(Direction.SOUTH, Constants.AvoidEnemyPaint);
+        }
+
+        if (rc.senseMapInfo(new MapLocation(x - 3, y - 3)).getPaint() == PaintType.EMPTY) {
+            adjustDirectionScore(Direction.SOUTHWEST, Constants.AvoidEnemyPaint);
+        }
+
+        if (rc.senseMapInfo(new MapLocation(x - 4, y)).getPaint() == PaintType.EMPTY) {
+            adjustDirectionScore(Direction.WEST, Constants.AvoidEnemyPaint);
+        }
+
+        if (rc.senseMapInfo(new MapLocation(x - 3, y + 3)).getPaint() == PaintType.EMPTY) {
+            adjustDirectionScore(Direction.NORTHWEST, Constants.AvoidEnemyPaint);
+        }
+
+
     }
 }
