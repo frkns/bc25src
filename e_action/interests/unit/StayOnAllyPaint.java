@@ -41,10 +41,10 @@ public class StayOnAllyPaint extends Interest {
         int y = rc.getLocation().y;
 
         if(rc.senseMapInfo(new MapLocation(x,y+4)).getPaint() == PaintType.EMPTY)  {
-            adjustDirectionScore(Direction.NORTH,Constants.AvoidEnemyPaint);
+            adjustDirectionScore(Direction.NORTH, Constants.AvoidEnemyPaint);
         }
         if(rc.senseMapInfo(new MapLocation(x+3,y+3)).getPaint() == PaintType.EMPTY)  {
-            adjustDirectionScore(Direction.NORTHEAST,Constants.AvoidEnemyPaint);
+            adjustDirectionScore(Direction.NORTHEAST, Constants.AvoidEnemyPaint);
         }
 
         if (rc.senseMapInfo(new MapLocation(x, y + 4)).getPaint() == PaintType.EMPTY) {
