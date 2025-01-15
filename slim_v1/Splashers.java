@@ -80,7 +80,7 @@
 //                 rc.attack(targetLoc);
 //             }
 //         } else
-//             HeurisitcPath.move();
+//             HeuristicPath.move();
 
 
 

@@ -58,6 +58,9 @@ public class Phase3 extends RobotPlayer{
         distance = Integer.MAX_VALUE;
 
         for (MapInfo tile : nearbyTiles){
+            // if (tile.getMapLocation().equals(target)){
+            //     target = null;
+            // }
             // for some reason throws an exception
             if (tile.hasRuin() && /*!rc.isLocationOccupied(tile.getMapLocation())*/
                 !rc.canSenseRobotAtLocation(tile.getMapLocation())) {
@@ -87,7 +90,7 @@ public class Phase3 extends RobotPlayer{
         if (target == null) {
             target = new MapLocation(rng.nextInt(width-1),rng.nextInt(height-1));
         }
-        if(rc.getLocation() == target) {
+        if(rc.getLocation().equals(target)) {
             target = new MapLocation(rng.nextInt(width-1),rng.nextInt(height-1));
         }
 
@@ -99,10 +102,11 @@ public class Phase3 extends RobotPlayer{
             target = new MapLocation(rng.nextInt(width-1),rng.nextInt(height-1));
             dir = rc.getLocation().directionTo(target);
         }
-        if(rc.canMove(dir) && !(rc.senseMapInfo(rc.getLocation().add(dir)).getPaint().equals(PaintType.ENEMY_PRIMARY)) && !(rc.senseMapInfo(rc.getLocation().add(dir)).getPaint().equals(PaintType.ENEMY_SECONDARY))) {
+        if(rc.canMove(dir)) {
             rc.move(dir);
         }
-        // HeurisitcPath.move();
+
+        // HeuristicPath.move(target);
 
         for(MapInfo tile : nearbyTiles) {
             if(rc.canCompleteResourcePattern(tile.getMapLocation())) {

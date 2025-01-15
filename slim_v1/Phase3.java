@@ -106,7 +106,7 @@ public class Phase3 extends RobotPlayer{
             rc.move(dir);
         }
 
-        // HeurisitcPath.move(target);
+        // HeuristicPath.move(target);
 
         for(MapInfo tile : nearbyTiles) {
             if(rc.canCompleteResourcePattern(tile.getMapLocation())) {

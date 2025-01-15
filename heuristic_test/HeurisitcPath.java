@@ -74,6 +74,12 @@ public class HeurisitcPath extends RobotPlayer {
             //     directionCost[i] += 1000;
             // }
 
+            // add a cost if new location is the previous one
+            MapLocation lastLoc = locationHistory[(rc.getRoundNum() - 1 + 8) % 8];
+            if (newLoc.equals(lastLoc)) {
+                directionCost[i] += 500;
+            }
+
             if (targetLoc != null) {
                 // remove cost for moving in a direction that gets us further away from target
                 directionCost[i] += Utils.manhattanDistance(newLoc, targetLoc) * targetIncentive;

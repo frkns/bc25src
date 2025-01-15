@@ -30,9 +30,25 @@ public class RobotPlayer {
 
     static boolean isRefilling = false;
 
+    static int turnsAlive = 0;
+
     static RobotInfo[] nearbyRobots;
     static MapInfo[] nearbyTiles;
     static MapLocation nearestPaintTower;
+    static MapLocation nearestEnemyTower;
+    static MapLocation nearestEmptyTile;  // not used
+    static MapLocation nearestEnemyPaint;
+
+    static MapInfo curRuin;
+    static boolean isFillingRuin = false;
+    static MapLocation nearestWrongInRuin;
+
+    static MapLocation curSRP;
+    static boolean isFillingSRP = false;
+    static MapLocation nearestWrongInSRP;
+
+    static int siegePhase;
+    static int mopperPhase;
 
     public static void run(RobotController r) throws GameActionException {
         rc = r;
@@ -50,8 +66,12 @@ public class RobotPlayer {
             }
         }
 
+        siegePhase = Math.max(mapWidth, mapHeight) * 3;
+        mopperPhase = Math.max(mapWidth, mapHeight) * 2;
+
         while (true) {
             try {
+                turnsAlive++;
                 roundNum = rc.getRoundNum();
 
                 // update stuff
@@ -60,19 +80,11 @@ public class RobotPlayer {
                 nearbyTiles = rc.senseNearbyMapInfos();
 
                 if (!rc.getType().isTowerType())
-                for (RobotInfo robot : nearbyRobots) {
-                    if (robot.getTeam() == rc.getTeam()) {
-                        if (robot.getType().getBaseType() == UnitType.LEVEL_ONE_PAINT_TOWER) {
-                            if (nearestPaintTower == null || rc.getLocation().distanceSquaredTo(robot.getLocation()) < rc.getLocation().distanceSquaredTo(nearestPaintTower)) {
-                                nearestPaintTower = robot.getLocation();
-                            }
-                        }
-                    }
-                }
+                    ImpureUtils.updateNearestPaintTower();
 
                 switch (rc.getType()) {
                     case SOLDIER: runSoldier(); break;
-                    // case MOPPER: runMopper(); break;
+                    case MOPPER: runMopper(); break;
                     // case SPLASHER: runSplasher();
                     default: runTower(); break;
                 }
@@ -97,43 +109,9 @@ public class RobotPlayer {
     }
 
     static int numSpawnedUnits = 0;
-    public static void runTower() throws GameActionException{
-        Direction dir = directions[rng.nextInt(directions.length)];
-        MapLocation nextLoc = rc.getLocation().add(dir);
 
-        // four main dirs
-        if (dir == Direction.NORTH || dir == Direction.SOUTH || dir == Direction.EAST || dir == Direction.WEST) {
-            nextLoc = nextLoc.add(dir);
-        }
-
-        if (numSpawnedUnits == 0 && rc.canBuildRobot(UnitType.SOLDIER, nextLoc)) {
-            rc.buildRobot(UnitType.SOLDIER,nextLoc);
-            numSpawnedUnits++;
-        }
-
-        RobotInfo[] robots = rc.senseNearbyRobots();
-
-        for (RobotInfo robot  : robots) {
-            if (robot.getTeam() != rc.getTeam()) {
-                if (rc.canAttack(robot.getLocation())) {
-                    rc.attack(robot.getLocation());
-                }
-            }
-        }
-
-        // try to transfer paint to nearby friendly robots if we have action cooldown left
-        RobotInfo[] superNearbyRobots = rc.senseNearbyRobots(2);
-        for (RobotInfo robot  : superNearbyRobots) {
-            if (robot.getTeam() == rc.getTeam()) {
-                MapLocation robotLoc = robot.getLocation();
-                int robotPaint = robot.getPaintAmount();
-                int towerPaint = rc.getPaint();
-                int transferAmt = Math.min(towerPaint, robot.getType().paintCapacity - robotPaint);
-                if (rc.canTransferPaint(robotLoc, transferAmt)) {
-                    rc.transferPaint(robotLoc, transferAmt);
-                }
-            }
-        }
+    public static void runTower() throws GameActionException {
+        Towers.run();
     }
 
 
@@ -141,9 +119,9 @@ public class RobotPlayer {
         Soldiers.run();
     }
 
-    // public static void runMopper() throws GameActionException{
-    //     Moppers.run();
-    // }
+    public static void runMopper() throws GameActionException {
+        Moppers.run();
+    }
 
     // public static void runSplasher(RobotController rc) throws GameActionException{
     //     Splashers.run();

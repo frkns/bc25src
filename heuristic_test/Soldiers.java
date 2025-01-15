@@ -43,6 +43,7 @@ public class Soldiers extends RobotPlayer {
 
         if (rc.isMovementReady()) {
             HeurisitcPath.targetIncentive = 500;
+            // target = spawnTowerLocation;
             HeurisitcPath.move(target);
         }
 

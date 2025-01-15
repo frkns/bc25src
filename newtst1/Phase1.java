@@ -64,7 +64,7 @@ public class Phase1 extends RobotPlayer{
 
 
         if (target == null) {
-            // HeurisitcPath.move();
+            // HeuristicPath.move();
             r = rng.nextInt(4);
             last = r;
             switch (r){
@@ -88,7 +88,7 @@ public class Phase1 extends RobotPlayer{
             target = new MapLocation(x,y);
         }
 
-        HeurisitcPath.move(target);
+        HeuristicPath.move(target);
 
         // Direction dir = rc.getLocation().directionTo(target);
         // if(rc.senseMapInfo(rc.getLocation()).getMark() == PaintType.ENEMY_PRIMARY || rc.senseMapInfo(rc.getLocation()).getMark() == PaintType.ENEMY_SECONDARY) {

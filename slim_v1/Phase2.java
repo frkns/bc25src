@@ -139,7 +139,7 @@ public class Phase2 extends RobotPlayer{
         //     rc.move(direction);
         // }
 
-        HeurisitcPath.move();
+        HeuristicPath.move();
 
         /*
         for(MapInfo tile : nearbyTiles) {
