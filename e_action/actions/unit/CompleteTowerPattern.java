@@ -10,17 +10,18 @@ import battlecode.common.*;
 public class CompleteTowerPattern extends Action {
     public RobotController rc;
 
-    //class attributes
-    public boolean alwaysDraw = false;
 
-    public MapLocation ruinLoc = null;
+    public MapInfo [] towerTiles = null;
+    public MapLocation cursor = null; // Keeps track of the last painted tile and keeps shifting until it finds another tile it can paint
+    public int cursorVerticalDirection; // Keeps track of the direction the cursor is moving in. 1 = NORTH, -1 = SOUTH
+    
 
-    public Boolean useSecondary = null;
-    public MapLocation paintLocation = null;
-
-    public PaintType[][] moneyPattern = new PaintType[5][5];
-    public PaintType[][] paintPattern = new PaintType[5][5];
-    public PaintType[][] defensePattern = new PaintType[5][5];
+    public UnitType currentTower;
+    public Boolean[][] currentPattern = null;
+    public Boolean[][] moneyPattern = rc.getTowerPattern(UnitType.LEVEL_ONE_MONEY_TOWER);
+    public Boolean[][] paintPattern = rc.getTowerPattern(UnitType.LEVEL_ONE_PAINT_TOWER);
+    public Boolean[][] defensePattern = rc.getTowerPattern(UnitType.LEVEL_ONE_DEFENSE_TOWER);
+    public boolean useSecondary;
 
     //uses the getTowerPattern methods to generate a grid of PaintTypes for each pattern
     public void initUnit() throws GameActionException {
@@ -53,129 +54,145 @@ public class CompleteTowerPattern extends Action {
         Debug.print(3, Debug.INIT + name);
     }
 
-    // Detects if towers can be constructed on nearby ruins (i.e. is there enemy paint?)
+    // Detects if towers can be constructed on nearby ruins
     public void calcScore() throws GameActionException {
-
-        ruinLoc = null;
-        int distance = Integer.MAX_VALUE;
-
-        // Finds the closest ruin
-        Debug.print(3, Debug.CALCSCORE + name);
-        for(MapLocation ruin : _Info.nearbyRuins) {
-            if(!rc.isLocationOccupied(ruin)) {
-                int dist = rc.getLocation().distanceSquaredTo(ruin);
-                if(dist < distance) {
-                    distance = dist;
-                    ruinLoc = ruin;
+        if (_Info.towerCenter != null) {
+            if (currentTower != null && rc.canCompleteTowerPattern(currentTower, _Info.towerCenter)) {
+                rc.completeTowerPattern(currentTower, _Info.towerCenter);
+                markInvalid();
+            } else if (_Info.robotLoc.isWithinDistanceSquared(_Info.towerCenter, 4)) {
+                if (towerTiles == null) {
+                    towerTiles = rc.senseNearbyMapInfos(_Info.towerCenter, 8);
                 }
-            }
-        }
-
-        if(ruinLoc != null) {
-            // Ignores the tile if there is enemy paint
-            for(MapInfo tile : _Info.nearbyTiles) {
-                MapLocation tileLoc = tile.getMapLocation();
-
-                if (isWithinRange(tileLoc,ruinLoc) && !tile.hasRuin()) {
-                    if(tile.getPaint() == PaintType.ENEMY_SECONDARY || tile.getPaint() == PaintType.ENEMY_PRIMARY) {
-                    score = 0;
-                    return;
+                if (_Info.towerCenter == null) {
+                    _Info.towerCenter = _Info.towerCenter;
+                }
+                if (centerIsValid()) {
+                    if (currentPattern == null) {
+                        currentTower = selectTower();
+                        currentPattern = getTowerPattern(currentTower);
                     }
-                }
-            }
-
-            UnitType tower = selectTower();
-
-            PaintType[][] towerPaintPattern = getTowerPattern(tower);
-            boolean[][] towerPattern = rc.getTowerPattern(tower);
-
-            MapInfo[] nearbyTiles = rc.senseNearbyMapInfos();
-
-            if (rc.canCompleteTowerPattern(tower, ruinLoc)) {
-                rc.completeTowerPattern(tower, ruinLoc);
-                ruinLoc = null;
-                score = 0;
-                return;
-            }
-
-            Boolean paint = null;
-            MapLocation paintLoc = null;
-
-            for (MapInfo tile : nearbyTiles) {
-
-                if (isWithinRange(tile.getMapLocation(),ruinLoc)) {
-                    //rc.setIndicatorString(towerPaintPattern[0][0]+"a");
-                    if (!tile.hasRuin() && tile.getPaint() != towerPaintPattern[tile.getMapLocation().x - ruinLoc.x + 2][tile.getMapLocation().y - ruinLoc.y + 2]) {
-                        paint = towerPattern[tile.getMapLocation().x - ruinLoc.x + 2][tile.getMapLocation().y - ruinLoc.y + 2];
-                        paintLoc = tile.getMapLocation();
-                        break;
+                    if (cursor == null) {
+                        spawnCursor();
                     }
+                    while (cursor.isWithinDistanceSquared(_Info.towerCenter, 8)) {
+                        int relX = cursor.x - _Info.towerCenter.x + 2;
+                        int relY = cursor.y - _Info.towerCenter.y + 2;
+                        System.out.println("relX: " + relX + " relY: " + relY);
+                        System.out.println("cursor: " + cursor);
+                        System.out.println("towerCenter: " + _Info.towerCenter);
+                        useSecondary = currentPattern[relX][relY] == PaintType.ALLY_SECONDARY;
+                        if (!((rc.senseMapInfo(cursor).getPaint() == PaintType.ALLY_SECONDARY && useSecondary) || 
+                            System.out.println("paint: " + rc.senseMapInfo(cursor).getPaint());
+                            (rc.senseMapInfo(cursor).getPaint() == PaintType.ALLY_PRIMARY && !useSecondary))) {
+                            targetLoc = cursor;
+                            score = Constants.CompleteTowerPatternScore;
+                            break;
+                        }
+                        moveCursor();
+                    }
+                } else {
+                    markInvalid();
                 }
-            }
-
-            if (paintLoc != null) {
-                paintLocation = paintLoc;
-                score = Constants.CompleteTowerPatternScore;
-                useSecondary = paint;
-                targetLoc = paintLoc;
             } else {
-                score = Constants.CompleteTowerPatternScore;
-                targetLoc = ruinLoc;
+                score = 0;
             }
-        } else {
-            score = 0;
         }
-
     }
 
-    // If a pattern can be drawn on a nearby ruin, draw a tile and move towards that tile
-    // If the pattern is completed, move towards the ruin
+    // If a pattern tile needs to be painted, move towards it and paint
     public void play() throws GameActionException {
-        if(paintLocation != null) {
-            if(rc.canAttack(paintLocation)) {
-                rc.attack(paintLocation,useSecondary);
-                paintLocation = null;
-            }
+        Debug.print(3, Debug.PLAY + name);
+        if (rc.canPaint(targetLoc)) {
+            rc.attack(targetLoc, useSecondary);
         }
     }
-    //helper function for drawing the tower pattern
 
+    public boolean centerIsValid() throws GameActionException {
+        for (MapInfo tile : towerTiles) {
+            if (tile.getPaint().isEnemy()) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    public void markInvalid() throws GameActionException {
+        _Info.invalidTowerCenters.add(_Info.towerCenter);
+        _Info.towerCenter = null;
+        currentPattern = null;
+        towerTiles = null;
+        cursor = null;
+        score = 0;
+    }
+
+    public void spawnCursor() throws GameActionException{
+        cursor = new MapLocation(_Info.srpCenter.x - 2, _Info.srpCenter.y - 2); // Bottom left
+        cursorVerticalDirection = 1;
+    }
+    
+    /**
+     * The cursor moves vertically within a band of 5 tiles,
+     * then shifts horizontally and reverses vertical direction when reaching the band limits.
+     * 
+     * Pattern example:
+     * ↓→↑→↓→↑
+     */
+    public void moveCursor() throws GameActionException {
+        if (cursor == null) return;
+
+        MapLocation nextLoc = cursor.translate(0, cursorVerticalDirection);
+        // If the vertical shift would move the cursor out of bounds, shift horizontally instead and reverse the vertical direction
+        if (!nextLoc.isWithinDistanceSquared(_Info.srpCenter, 8)) {
+            cursor = cursor.translate(1, 0);
+            cursorVerticalDirection *= -1;
+        } else {
+            cursor = nextLoc;
+        }
+    }
 
     // Select tower type to build based on chips and map size
     public UnitType selectTower() {
         int mapArea = _Info.MAP_AREA;
-        int chipsRate = _Info.chipsRate;
         int round = rc.getRoundNum();
 
-        if(mapArea < 1000) {
-            if(_Info.chipsRate < 60 ) {
-                return UnitType.LEVEL_ONE_MONEY_TOWER;
-            } else {
-                return UnitType.LEVEL_ONE_PAINT_TOWER;
-            }
-        } else if (mapArea < 2000) {
-            if(_Info.chipsRate < 100 ) {
-                return UnitType.LEVEL_ONE_MONEY_TOWER;
-            } else {
-                return UnitType.LEVEL_ONE_PAINT_TOWER;
-            }
-        } else if (mapArea < 3000) {
-            if(_Info.chipsRate < 100 ) {
-                return UnitType.LEVEL_ONE_MONEY_TOWER;
-            } else if(round < 300){
-                return UnitType.LEVEL_ONE_PAINT_TOWER;
-            } else {
-                return UnitType.LEVEL_ONE_DEFENSE_TOWER;
-            }
+        if (_Info.chipsRate < 150){
+            return UnitType.LEVEL_ONE_MONEY_TOWER;
         } else {
-            if(_Info.chipsRate < 160 ) {
-                return UnitType.LEVEL_ONE_MONEY_TOWER;
-            } else if (round < 300) {
-                return UnitType.LEVEL_ONE_PAINT_TOWER;
-            } else {
-                return UnitType.LEVEL_ONE_DEFENSE_TOWER;
-            }
+            return UnitType.LEVEL_ONE_PAINT_TOWER;
         }
+        // } else {
+        //     return UnitType.LEVEL_ONE_DEFENSE_TOWER;
+        // }
+        // if(mapArea < 1000) {
+        //     if(_Info.chipsRate < 60 ) {
+        //         return UnitType.LEVEL_ONE_MONEY_TOWER;
+        //     } else {
+        //         return UnitType.LEVEL_ONE_PAINT_TOWER;
+        //     }
+        // } else if (mapArea < 2000) {
+        //     if(_Info.chipsRate < 100 ) {
+        //         return UnitType.LEVEL_ONE_MONEY_TOWER;
+        //     } else {
+        //         return UnitType.LEVEL_ONE_PAINT_TOWER;
+        //     }
+        // } else if (mapArea < 3000) {
+        //     if(_Info.chipsRate < 100 ) {
+        //         return UnitType.LEVEL_ONE_MONEY_TOWER;
+        //     } else if(round < 300){
+        //         return UnitType.LEVEL_ONE_PAINT_TOWER;
+        //     } else {
+        //         return UnitType.LEVEL_ONE_DEFENSE_TOWER;
+        //     }
+        // } else {
+        //     if(_Info.chipsRate < 160 ) {
+        //         return UnitType.LEVEL_ONE_MONEY_TOWER;
+        //     } else if (round < 300) {
+        //         return UnitType.LEVEL_ONE_PAINT_TOWER;
+        //     } else {
+        //         return UnitType.LEVEL_ONE_DEFENSE_TOWER;
+        //     }
+        // }
     }
 
     public PaintType[][] getTowerPattern(UnitType tower) {
@@ -186,10 +203,5 @@ public class CompleteTowerPattern extends Action {
         } else {
             return defensePattern;
         }
-    }
-
-    public boolean isWithinRange(MapLocation tileLoc, MapLocation ruinLoc) {
-        return tileLoc.x >= ruinLoc.x - 2 && tileLoc.x <= ruinLoc.x + 2 &&
-                tileLoc.y >= ruinLoc.y - 2 && tileLoc.y <= ruinLoc.y + 2;
     }
 }

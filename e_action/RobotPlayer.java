@@ -35,6 +35,9 @@ public class RobotPlayer {
         setRobotType();
         while (true) {
             try {
+                // if (_Info.round > 100) {
+                //     rc.resign();
+                // }
                 robot.initTurn();
                 robot.playTurn();
                 robot.endTurn();
@@ -42,11 +45,11 @@ public class RobotPlayer {
             catch (GameActionException e) {
                 System.out.println("GameActionException");
                  e.printStackTrace();
-//                rc.resign();
+                 rc.resign();
             } catch (Exception e) {
                 System.out.println("Exception");
                 e.printStackTrace();
-//                rc.resign();
+                rc.resign();
             } finally {
                 if (rc.getRoundNum() != _Info.round) {
                     System.out.println("Went over bytecode limit");

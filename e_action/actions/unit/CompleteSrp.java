@@ -17,7 +17,7 @@ public class CompleteSrp extends Action {
     public MapInfo [] srpTiles = null;
     public MapLocation cursor = null; // Keeps track of the last painted tile and keeps shifting until it finds another tile it can paint
     public int cursorVerticalDirection; // Keeps track of the direction the cursor is moving in. 1 = NORTH, -1 = SOUTH
-    public int cursorHorizontalDirection; // Keeps track of the direction the cursor is moving in. 1 = EAST, -1 = WEST
+
     public boolean[][] pattern;
     public boolean useSecondary;
 
@@ -55,7 +55,8 @@ public class CompleteSrp extends Action {
                             targetLoc = cursor;
                             score = Constants.CompleteSrpScore;
                             break;
-                        } else {moveCursor();}
+                        }
+                        moveCursor();
                     }
                 } else {
                     markInvalid();
@@ -76,33 +77,10 @@ public class CompleteSrp extends Action {
     }
     
     public void spawnCursor() throws GameActionException{
-        cursor = new MapLocation(_Info.srpCenter.x - 2, _Info.srpCenter.y + 2); // Top left
-        cursorVerticalDirection = -1;
-        cursorHorizontalDirection = 1;
-//        // Find closest corner. Removed for bytecode efficiency
-//        int robotDist1 = _Info.robotLoc.distanceSquaredTo(new MapLocation(_Info.srpCenter.x - 2, _Info.srpCenter.y + 2));
-//        int robotDist2 = _Info.robotLoc.distanceSquaredTo(new MapLocation(_Info.srpCenter.x + 2, _Info.srpCenter.y - 2));
-//        int robotDist3 = _Info.robotLoc.distanceSquaredTo(new MapLocation(_Info.srpCenter.x + 2, _Info.srpCenter.y + 2));
-//        int robotDist4 = _Info.robotLoc.distanceSquaredTo(new MapLocation(_Info.srpCenter.x - 2, _Info.srpCenter.y - 2));
-//
-//        if (robotDist1 <= robotDist2 && robotDist1 <= robotDist3 && robotDist1 <= robotDist4) {
-//            cursor = new MapLocation(_Info.srpCenter.x - 2, _Info.srpCenter.y + 2); // Top left
-//            cursorVerticalDirection = -1;
-//            cursorHorizontalDirection = 1;
-//        } else if (robotDist2 <= robotDist1 && robotDist2 <= robotDist4) {
-//            cursor = new MapLocation(_Info.srpCenter.x + 2, _Info.srpCenter.y - 2);  // Bottom right
-//            cursorVerticalDirection = 1;
-//            cursorHorizontalDirection = -1;
-//        } else if (robotDist3 <= robotDist4) {
-//            cursor = new MapLocation(_Info.srpCenter.x + 2, _Info.srpCenter.y + 2);  // Top right
-//            cursorVerticalDirection = -1;
-//            cursorHorizontalDirection = -1;
-//        } else {
-//            cursor = new MapLocation(_Info.srpCenter.x - 2, _Info.srpCenter.y - 2); // Bottom left
-//            cursorVerticalDirection = 1;
-//            cursorHorizontalDirection = 1;
-//        }
+        cursor = new MapLocation(_Info.srpCenter.x - 2, _Info.srpCenter.y - 2); // Bottom left
+        cursorVerticalDirection = 1;
     }
+    
     /**
      * The cursor moves vertically within a band of 5 tiles,
      * then shifts horizontally and reverses vertical direction when reaching the band limits.
@@ -126,8 +104,13 @@ public class CompleteSrp extends Action {
     public boolean centerIsValid() throws GameActionException {
         for (MapLocation ruin : _Info.nearbyRuins){
             if (_Info.srpCenter.isWithinDistanceSquared(ruin, 8)){
+                rc.setIndicatorDot(_Info.srpCenter, 255, 0, 0);
                 return false;
             }
+        }
+        if (_Info.srpCenter.x <= 1 || _Info.srpCenter.x >= rc.getMapWidth() - 2 ||
+            _Info.srpCenter.y <= 1 || _Info.srpCenter.y >= rc.getMapHeight() - 2) {
+            return false;
         }
         for (MapInfo tile : srpTiles) {
             if (tile.isWall() ||
@@ -135,6 +118,7 @@ public class CompleteSrp extends Action {
                 return false;
             }
         }
+
         return true;
     }
     
@@ -142,6 +126,7 @@ public class CompleteSrp extends Action {
         _Info.invalidSrpCenters.add(_Info.srpCenter);
         _Info.srpCenter = null;
         srpTiles = null;
+        cursor = null;
         score = 0;
     }
 

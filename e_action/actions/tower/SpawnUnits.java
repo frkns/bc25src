@@ -40,6 +40,7 @@ public class SpawnUnits extends Action {
 
         if (rc.canBuildRobot(Unit, spawnLoc) && shouldSpawn()) {
             score = Constants.SpawnUnitsScore;
+            spawnedUnits++;
         } else {
             score = 0;
         }

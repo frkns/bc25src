@@ -55,10 +55,13 @@ public class _Info {
 
     // Interest + Action specific info (shared between interests and actions that work closely together)
     public static MapLocation srpCenter;
-    public static FastLocSet invalidSrpCenters = new FastLocSet();
-    public static FastLocSet completedPatterns = new FastLocSet(); // Add to completed patterns when pattern is complete but cannot build tower.
+    public static MapLocation towerCenter;
+    public static FastLocSet invalidSrpCenters = new FastLocSet(); // Includes completed SRP centers
+    public static FastLocSet invalidTowerCenters = new FastLocSet(); // Includes completed tower centers & enemy paint blocking
+    // Add to completed patterns when pattern is complete but cannot build tower.
     // When tower completed, check for the ruin location in the set. If exists, pop the set
-    public static FastLocSet avoidRuins = new FastLocSet(); // If enemy paint, add to this set.
+    // public static FastLocSet completedPatterns = new FastLocSet(); 
+
 
 
 

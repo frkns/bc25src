@@ -89,7 +89,9 @@ public abstract class Robot {
             // ---------- Play best action and move ----------
             if (Interest.bestDirScore >= bestTotalScore) { // It is better to move and skip the action.
                 Debug.print(1, "Action skipped or no legal actions");
-                rc.setIndicatorString("No action.");
+                if (Debug.debug){
+                    rc.setIndicatorString("No action.");
+                }
                 if (Interest.bestDir != Direction.CENTER) {
                     rc.move(Interest.bestDir);
                 }

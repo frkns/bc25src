@@ -8,7 +8,7 @@ import battlecode.common.RobotController;
 import e_action.actions.Action;
 
 public class Debug {
-    public static boolean debug = true;
+    public static boolean debug = false;
 
     public static String INITUNIT = "Init unit ";
     public static String INIT = "Initializing ";
@@ -91,6 +91,7 @@ public class Debug {
     }
 
     public static void setActionIndicatorString(Action action){
+        if(!debug) return;
         if (action.targetLoc != null) {
             rc.setIndicatorString(action.name + " - " + action.targetLoc.toString());
         } else {

@@ -41,13 +41,13 @@ public class FindSrpCenter extends Interest {
         // Calculate the shifted x-coordinate based on y position
         int x = _Info.robotLoc.x + ((_Info.robotLoc.y + dy) / 3);
         // Calculate the horizontal offset needed to reach the next valid x-coordinate ((x + y/3) % 4 == 2)
-        int dx = (2 - x % 4) % 4;
+        int dx = (2 - x % 4 + 4) % 4;
 
         // Generate four potential srpCenter locations by applying offsets in all combinations
         MapLocation srpCenter1 = new MapLocation(_Info.robotLoc.x + dx, _Info.robotLoc.y + dy);
-        MapLocation srpCenter2 = new MapLocation(_Info.robotLoc.x + dx, _Info.robotLoc.y - dy);
-        MapLocation srpCenter3 = new MapLocation(_Info.robotLoc.x - dx, _Info.robotLoc.y + dy);
-        MapLocation srpCenter4 = new MapLocation(_Info.robotLoc.x - dx, _Info.robotLoc.y - dy);
+        MapLocation srpCenter2 = new MapLocation(_Info.robotLoc.x + dx - 4, _Info.robotLoc.y + dy);
+        MapLocation srpCenter3 = new MapLocation(_Info.robotLoc.x + dx + 1, _Info.robotLoc.y + dy - 3);
+        MapLocation srpCenter4 = new MapLocation(_Info.robotLoc.x + dx - 1, _Info.robotLoc.y + dy + 3);
 
         // Calculate distances to each srpCenter, setting to MAX_VALUE if srpCenter is illegal or completed
         int d1 = _Info.invalidSrpCenters.contains(srpCenter1) ? Integer.MAX_VALUE : _Info.robotLoc.distanceSquaredTo(srpCenter1);
