@@ -36,10 +36,6 @@ public abstract class Robot {
         }
     }
 
-    private static void extracted(Action bestAction) throws GameActionException {
-        bestAction.play();
-    }
-
     public void initTurn() throws GameActionException {
         Debug.reset(rc.getRoundNum()); // Reset clock to benchmark
         Debug.print(0, "Start turn => " + rc.getType() + " at " + _Info.robotLoc);
@@ -47,12 +43,20 @@ public abstract class Robot {
         _Info.update();
         Communication.initTurn();
         Communication.readMessages();
-    }
+        }
 
     public void playTurn() throws GameActionException {
         // ----------------- Calculate interests -----------------
         Debug.print(1, "");
         Debug.print(1, "Calculate interests.");
+        if (_Info.unitType.isRobotType()) {
+            playBunnyTurn();
+        } else {
+            playTowerTurn();
+        }
+    }
+
+    public void playBunnyTurn() throws GameActionException {
         for (Interest interest : interests) {
             Debug.print(2, interest.name + " ...", interest.debugInterest);
             interest.updateDirectionScores();
@@ -65,76 +69,76 @@ public abstract class Robot {
         Debug.print(1, "Calculate actions.");
         Action bestAction = null;
         int bestTotalScore = 0;
-
-        // ======================= Bunnies =======================
-
-        if (_Info.unitType.isRobotType()) {
-            int scoreWithDir;
-            for (Action action : actions) {
-                Debug.print(2, action.name + " ...", action.debugAction);
-                action.calcScore();
-                if (action.score > 0) {
-                    action.setPossibleDirs(action.targetLoc);
-                    scoreWithDir = action.calcScoreWithDir(Interest.directionScores);
-                    if (scoreWithDir > bestTotalScore) {
-                        bestTotalScore = scoreWithDir;
-                        bestAction = action;
-                    }
-                }
+        int scoreWithDir;
+        for (Action action : actions) {
+            Debug.print(2, action.name + " ...", action.debugAction);
+            action.calcScore();
+            if (action.score > 0) {
+            action.setPossibleDirs(action.targetLoc);
+            scoreWithDir = action.calcScoreWithDir(Interest.directionScores);
+            if (scoreWithDir > bestTotalScore) {
+                bestTotalScore = scoreWithDir;
+                bestAction = action;
             }
-            if (bestAction != null){
-                Interest.calcBestDirWithAction(bestAction);
             }
-
-            // ---------- Play best action and move ----------
-            if (Interest.bestDirScore >= bestTotalScore) { // It is better to move and skip the action.
-                Debug.print(1, "Action skipped or no legal actions");
-                if (Debug.debug){
-                    rc.setIndicatorString("No action.");
-                }
-                if (Interest.bestDir != Direction.CENTER) {
+        }
+        if (bestAction != null){
+            Interest.calcBestDirWithAction(bestAction);
+        }
+        // ---------- Play best action and move ----------
+        if (Interest.bestDirScore >= bestTotalScore) { // It is better to move and skip the action.
+            Debug.print(1, "Action skipped or no legal actions");
+            if (Debug.debug){
+            rc.setIndicatorString("No action.");
+            }
+            if (Interest.bestDir != Direction.CENTER) {
+            rc.move(Interest.bestDir);
+            }
+        } else {
+            Debug.print(1, "Playing action: " + bestAction.name);
+            Debug.setActionIndicatorString(bestAction);
+            if (bestAction.possibleDirs[8]) { // If the robot can play the action before moving, play it first
+            bestAction.play();
+            if (Interest.bestDir != Direction.CENTER) {
+                if (rc.getPaint() > 0){ // Edge case where the robot uses its last paint, disabling its movement
                     rc.move(Interest.bestDir);
                 }
-            } else {
-                Debug.print(1, "Playing action: " + bestAction.name);
-                Debug.setActionIndicatorString(bestAction);
-                if (bestAction.possibleDirs[8]) { // If the robot can play the action before moving, play it first
-                    bestAction.play();
-                    if (Interest.bestDir != Direction.CENTER) {
-                        rc.move(Interest.bestDir);
-                    }
-                } else {
-                    if (Interest.bestDir != Direction.CENTER) {
-                        rc.move(Interest.bestDir);
-                        bestAction.play(); // In case our action was dependent on movement
-                    }
-                }
             }
+            } else {
+            if (Interest.bestDir != Direction.CENTER) {
+                rc.move(Interest.bestDir);
+                bestAction.play(); // In case our action was dependent on movement
+            }
+            }
+        }
+        }
 
+    public void playTowerTurn() throws GameActionException {
+        Debug.print(1, "");
+        Debug.print(1, "Calculate actions.");
+        Action bestAction = null;
+        int bestTotalScore = 0;
 
-        // ==================== Towers ======================
+        for (Action action : actions) {
+            Debug.print(2, action.name + " ...", action.debugAction);
+            action.calcScore();
+            if (action.score > 0) {
+            if (action.score > bestTotalScore) {
+                bestTotalScore = action.score;
+                bestAction = action;
+            }
+            }
+        }
+        if (bestAction != null) {
+            Debug.print(1, "Playing action: " + bestAction.name);
+            Debug.setActionIndicatorString(bestAction);
+            bestAction.play();
         } else {
-            for (Action action : actions) {
-                Debug.print(2, action.name + " ...", action.debugAction);
-                action.calcScore();
-                if (action.score > 0) {
-                    if (action.score > bestTotalScore) {
-                        bestTotalScore = action.score;
-                        bestAction = action;
-                    }
-                }
-            }
-            if (bestAction != null) {
-                Debug.print(1, "Playing action: " + bestAction.name);
-                Debug.setActionIndicatorString(bestAction);
-                bestAction.play();
-            } else {
-                Debug.print(1, "No action to play");
-            }
+            Debug.print(1, "No action to play");
         }
     }
 
-    public void endTurn(){
+        public void endTurn(){
         // Comms.write();
         Debug.print(0, "End turn.");
     }

@@ -17,34 +17,18 @@ public class CompleteTowerPattern extends Action {
     
 
     public UnitType currentTower;
-    public Boolean[][] currentPattern = null;
-    public Boolean[][] moneyPattern = rc.getTowerPattern(UnitType.LEVEL_ONE_MONEY_TOWER);
-    public Boolean[][] paintPattern = rc.getTowerPattern(UnitType.LEVEL_ONE_PAINT_TOWER);
-    public Boolean[][] defensePattern = rc.getTowerPattern(UnitType.LEVEL_ONE_DEFENSE_TOWER);
+    public boolean[][] currentPattern = null;
+    public boolean[][] moneyPattern;
+    public boolean[][] paintPattern; 
+    public boolean[][] defensePattern;
     public boolean useSecondary;
 
     //uses the getTowerPattern methods to generate a grid of PaintTypes for each pattern
     public void initUnit() throws GameActionException {
         Debug.print(1, Debug.INITUNIT + name, debugAction);
-        for(int i = 0; i < 5; i++){
-            for(int j = 0; j < 5; j++){
-                if(rc.getTowerPattern(UnitType.LEVEL_ONE_MONEY_TOWER)[i][j]) {
-                    moneyPattern[i][j] = PaintType.ALLY_SECONDARY;
-                } else {
-                    moneyPattern[i][j] = PaintType.ALLY_PRIMARY;
-                }
-                if(rc.getTowerPattern(UnitType.LEVEL_ONE_PAINT_TOWER)[i][j]) {
-                    paintPattern[i][j] = PaintType.ALLY_SECONDARY;
-                } else {
-                    paintPattern[i][j] = PaintType.ALLY_PRIMARY;
-                }
-                if(rc.getTowerPattern(UnitType.LEVEL_ONE_DEFENSE_TOWER)[i][j]) {
-                    defensePattern[i][j] = PaintType.ALLY_SECONDARY;
-                } else {
-                    defensePattern[i][j] = PaintType.ALLY_PRIMARY;
-                }
-            }
-        }
+        moneyPattern = rc.getTowerPattern(UnitType.LEVEL_ONE_MONEY_TOWER);
+        paintPattern = rc.getTowerPattern(UnitType.LEVEL_ONE_PAINT_TOWER);
+        defensePattern = rc.getTowerPattern(UnitType.LEVEL_ONE_DEFENSE_TOWER);
     }
 
     public CompleteTowerPattern() {
@@ -56,7 +40,7 @@ public class CompleteTowerPattern extends Action {
 
     // Detects if towers can be constructed on nearby ruins
     public void calcScore() throws GameActionException {
-        if (_Info.towerCenter != null) {
+        if (_Info.towerCenter != null && rc.getChips() > 1000) {
             if (currentTower != null && rc.canCompleteTowerPattern(currentTower, _Info.towerCenter)) {
                 rc.completeTowerPattern(currentTower, _Info.towerCenter);
                 markInvalid();
@@ -78,13 +62,10 @@ public class CompleteTowerPattern extends Action {
                     while (cursor.isWithinDistanceSquared(_Info.towerCenter, 8)) {
                         int relX = cursor.x - _Info.towerCenter.x + 2;
                         int relY = cursor.y - _Info.towerCenter.y + 2;
-                        System.out.println("relX: " + relX + " relY: " + relY);
-                        System.out.println("cursor: " + cursor);
-                        System.out.println("towerCenter: " + _Info.towerCenter);
-                        useSecondary = currentPattern[relX][relY] == PaintType.ALLY_SECONDARY;
-                        if (!((rc.senseMapInfo(cursor).getPaint() == PaintType.ALLY_SECONDARY && useSecondary) || 
-                            System.out.println("paint: " + rc.senseMapInfo(cursor).getPaint());
-                            (rc.senseMapInfo(cursor).getPaint() == PaintType.ALLY_PRIMARY && !useSecondary))) {
+                        useSecondary = currentPattern[relX][relY];
+                        MapInfo cursorMapInfo = rc.senseMapInfo(cursor);
+                        if (!((cursorMapInfo.getPaint() == PaintType.ALLY_SECONDARY && useSecondary) || 
+                            (cursorMapInfo.getPaint() == PaintType.ALLY_PRIMARY && !useSecondary)) && !cursor.equals(_Info.towerCenter)) {
                             targetLoc = cursor;
                             score = Constants.CompleteTowerPatternScore;
                             break;
@@ -103,7 +84,7 @@ public class CompleteTowerPattern extends Action {
     // If a pattern tile needs to be painted, move towards it and paint
     public void play() throws GameActionException {
         Debug.print(3, Debug.PLAY + name);
-        if (rc.canPaint(targetLoc)) {
+        if (rc.canAttack(targetLoc)) {
             rc.attack(targetLoc, useSecondary);
         }
     }
@@ -127,7 +108,7 @@ public class CompleteTowerPattern extends Action {
     }
 
     public void spawnCursor() throws GameActionException{
-        cursor = new MapLocation(_Info.srpCenter.x - 2, _Info.srpCenter.y - 2); // Bottom left
+        cursor = new MapLocation(_Info.towerCenter.x - 2, _Info.towerCenter.y - 2); // Bottom left
         cursorVerticalDirection = 1;
     }
     
@@ -143,7 +124,7 @@ public class CompleteTowerPattern extends Action {
 
         MapLocation nextLoc = cursor.translate(0, cursorVerticalDirection);
         // If the vertical shift would move the cursor out of bounds, shift horizontally instead and reverse the vertical direction
-        if (!nextLoc.isWithinDistanceSquared(_Info.srpCenter, 8)) {
+        if (!nextLoc.isWithinDistanceSquared(_Info.towerCenter, 8)) {
             cursor = cursor.translate(1, 0);
             cursorVerticalDirection *= -1;
         } else {
@@ -195,7 +176,7 @@ public class CompleteTowerPattern extends Action {
         // }
     }
 
-    public PaintType[][] getTowerPattern(UnitType tower) {
+    public boolean[][] getTowerPattern(UnitType tower) {
         if(tower == UnitType.LEVEL_ONE_MONEY_TOWER) {
             return moneyPattern;
         } else if (tower == UnitType.LEVEL_ONE_PAINT_TOWER) {

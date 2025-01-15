@@ -45,6 +45,7 @@ public class _Info {
     public static MapLocation robotLoc;
     public static boolean isActionReady;
     public static boolean isMovementReady;
+    public static int getPaint;
 
     // External info
     public static RobotInfo[] nearbyAllies;

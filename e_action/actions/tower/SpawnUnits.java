@@ -15,7 +15,7 @@ public class SpawnUnits extends Action {
         Debug.print(3, Debug.INIT + name, debugAction);
     }
 
-    static UnitType[] productionList = {UnitType.SOLDIER, UnitType.MOPPER, UnitType.SPLASHER};
+    static UnitType[] productionList = {UnitType.SOLDIER};
     static int productionTypeCounter = 0;
     static MapLocation spawnLoc;
     static UnitType Unit;

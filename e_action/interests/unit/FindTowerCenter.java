@@ -9,12 +9,12 @@ import e_action.utils.Constants;
 import e_action.utils.Debug;
 
 
-public class FindRuin extends Interest {
+public class FindTowerCenter extends Interest {
     public RobotController rc;
 
-    public FindRuin(){
+    public FindTowerCenter(){
         rc = Robot.rc;
-        name = "FIND RUINS";
+        name = "FIND TOWER CENTER";
         Debug.print(3, Debug.INIT + name, debugInterest);
     }
 
@@ -48,7 +48,7 @@ public class FindRuin extends Interest {
         //     }
         // } else {
         //     if(rc.getChips() > 1000) {
-        //         adjustDirectionScore(rc.getLocation().directionTo(_Info.completedPatterns.getKeys()[0]), Constants.FindRuinScore);
+        //         adjustDirectionScore(rc.getLocation().directionTo(_Info.completedPatterns.getKeys()[0]), Constants.FindTowerCenterScore);
         //     }
         // }
     }

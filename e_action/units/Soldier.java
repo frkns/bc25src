@@ -13,8 +13,8 @@ public class Soldier extends Robot {
         super(rc);
 
         interests.add(new FindSrpCenter());
-        interests.add(new Explore());
-        interests.add(new FindRuin());
+        // interests.add(new Explore());
+        interests.add(new FindTowerCenter());
         actions.add(new CompleteSrp());
         actions.add(new CompleteTowerPattern());
 
