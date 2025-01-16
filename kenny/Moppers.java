@@ -26,11 +26,11 @@ public class Moppers extends RobotPlayer{
         if (target == null
                 || rc.getLocation().isWithinDistanceSquared(target, 9)
                 || rc.getRoundNum() - lastTargetChangeRound > targetChangeWaitTime) {
-            if (target != null) rc.setIndicatorDot(target, 0, 0, 0);
-            target = new MapLocation(rng.nextInt(mapWidth-1), rng.nextInt(mapHeight-1));
+            // if (target != null) rc.setIndicatorDot(target, 0, 0, 0);
+            target = new MapLocation(rng.nextInt(mapWidth), rng.nextInt(mapHeight));
             lastTargetChangeRound = rc.getRoundNum();
         }
-        rc.setIndicatorDot(target, 200, 200, 200);
+        // rc.setIndicatorDot(target, 200, 200, 200);
 
         // target = Utils.mirror(spawnTowerLocation);
         HeuristicPath.mopperMove(target);

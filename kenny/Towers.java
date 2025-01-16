@@ -6,9 +6,14 @@ public class Towers extends RobotPlayer {
 
     static boolean spawnedFirstMopper = false;
     static int nonGreedyPhase = Math.max(mapWidth, mapHeight) * 2;  // allow other units to complete ruins if money capped
+    static int firstMopper = Math.max(mapWidth, mapHeight) * 2;
     static int reverseChips = 2000;
 
     public static void run() throws GameActionException {
+        for (int i = 0; i < 4; i++) {
+            rc.setIndicatorDot(quadrantCenters[i], 255, 255, 255);
+        }
+
         if (rc.getRoundNum() <= 1 && rc.getType() == UnitType.LEVEL_ONE_PAINT_TOWER) {
             System.out.println("Number of towers " + rc.getNumberTowers());
             System.out.println("Siege phase " + siegePhase);
@@ -31,7 +36,7 @@ public class Towers extends RobotPlayer {
             System.out.println("Tower: no empty spaces left in 8 main tiles!");
         }
 
-        if (turnsAlive > 5 && !spawnedFirstMopper && rc.getMoney() > reverseChips) {
+        if (turnsAlive > 5 && rc.getRoundNum() > firstMopper && !spawnedFirstMopper && rc.getMoney() > reverseChips) {
             if (rc.canBuildRobot(UnitType.MOPPER, nextLoc)) {
                 System.out.println("spawned first mopper");
                 rc.buildRobot(UnitType.MOPPER, nextLoc);
@@ -47,7 +52,7 @@ public class Towers extends RobotPlayer {
 
         if (rc.getRoundNum() >= mopperPhase) {
             // if (rc.getRoundNum() % 5 == 0) {
-            if (r < 10) {
+            if (r < 20) {
                 spawn = UnitType.MOPPER;
             }
         }

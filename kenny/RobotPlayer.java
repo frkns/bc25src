@@ -69,11 +69,24 @@ public class RobotPlayer {
 
     static MapLocation avgClump;
 
+    static MapLocation[] quadrantCenters = new MapLocation[4];
+    static MapLocation[] quadrantCorners = new MapLocation[4];
+    static int[] roundsSpentInQuadrant = new int[4];
+
     public static void run(RobotController r) throws GameActionException {
         rc = r;
         mapHeight = rc.getMapHeight();
         mapWidth = rc.getMapWidth();
         mapCenter = new MapLocation(mapWidth/2, mapHeight/2);
+        quadrantCenters[0] = new MapLocation(3*mapWidth/4, 3*mapHeight/4);
+        quadrantCenters[1] = new MapLocation(1*mapWidth/4, 3*mapHeight/4);
+        quadrantCenters[2] = new MapLocation(1*mapWidth/4, 1*mapHeight/4);
+        quadrantCenters[3] = new MapLocation(3*mapWidth/4, 1*mapHeight/4);
+        quadrantCorners[0] = new MapLocation(mapWidth-1, mapHeight-1);
+        quadrantCorners[1] = new MapLocation(0, mapHeight-1);
+        quadrantCorners[2] = new MapLocation(0, 0);
+        quadrantCorners[3] = new MapLocation(mapWidth-1, 0);
+
         nearbyRobots = rc.senseNearbyRobots();
         for (RobotInfo robot : nearbyRobots) {
             if (robot.getTeam() == rc.getTeam()) {
@@ -116,6 +129,8 @@ public class RobotPlayer {
             try {
                 turnsAlive++;
                 roundNum = rc.getRoundNum();
+
+                roundsSpentInQuadrant[Utils.currentQuadrant()]++;
 
                 // update stuff
                 locationHistory[rc.getRoundNum() % locationHistory.length] = rc.getLocation();

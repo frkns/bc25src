@@ -10,19 +10,19 @@ public class Soldiers extends RobotPlayer {
     static int targetChangeWaitTime = Math.max(mapWidth, mapHeight);
 
     static int lastTargetChangeRound = 0;
+
+    // not using these
     static boolean wasFillingSRPlastRound = false;
-
     static int consecutiveRoundsFillingSRP = 0;
-
     static MapLocation avoidSRPloc;
-
     static MapLocation lastSRPloc;
     static int lastSRProundNum = 0;
+    /* */
 
     static int numWrongTilesInRuin;
     static int numWrongTilesInSRP;
 
-    static int noSRPuntil = 0;  // no SRPs until x towers have been built
+    static int noSRPuntil = 5;  // no SRPs until x towers have been built
 
     static MapInfo[] _attackableNearbyTiles;  // var names that start with an underscore are set static to save bytecode
 
@@ -177,10 +177,14 @@ public class Soldiers extends RobotPlayer {
         if (isRefilling) {
             HeuristicPath.fullFill = false;
 
-            // HeuristicPath.targetIncentive = 1000;
-            // HeuristicPath.move(paintTarget);
+            // two options for paint refill : 1. is probably more efficient because it avoids non allied paint but is greedy
+            // 2. is guaranteed to make it but could take longer and make it die of paint loss
 
-            Pathfinder.move(paintTarget);
+            // 1.
+            HeuristicPath.refill(paintTarget);
+
+            // 2.
+            // Pathfinder.move(paintTarget);
 
             rc.setIndicatorLine(rc.getLocation(), paintTarget, 131, 252, 131);
         }
@@ -194,8 +198,8 @@ public class Soldiers extends RobotPlayer {
         if (target == null
                 || rc.getLocation().isWithinDistanceSquared(target, 9)
                 || rc.getRoundNum() - lastTargetChangeRound > targetChangeWaitTime) {
-            if (target != null) rc.setIndicatorDot(target, 0, 0, 0);
-            target = new MapLocation(rng.nextInt(mapWidth-1), rng.nextInt(mapHeight-1));
+
+            target = new MapLocation(rng.nextInt(mapWidth), rng.nextInt(mapHeight));
             lastTargetChangeRound = rc.getRoundNum();
         }
 
@@ -205,7 +209,7 @@ public class Soldiers extends RobotPlayer {
             ImpureUtils.updateNearestEmptyTile();
         }
 
-        rc.setIndicatorDot(target, 200, 200, 200);
+        // rc.setIndicatorDot(target, 200, 200, 200);
         if (rc.isMovementReady()) {
             HeuristicPath.fullFill = fullFilling;
             HeuristicPath.targetIncentive = 500;
