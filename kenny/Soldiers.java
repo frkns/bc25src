@@ -7,7 +7,7 @@ public class Soldiers extends RobotPlayer {
     static MapLocation target;
 
     // how long of not being able to reach target till we change it?
-    static int targetChangeWaitTime = Math.max(mapWidth, mapHeight);
+    static int targetChangeWaitTime = mx;
 
     static int lastTargetChangeRound = 0;
 
@@ -18,6 +18,8 @@ public class Soldiers extends RobotPlayer {
     static MapLocation lastSRPloc;
     static int lastSRProundNum = 0;
     /* */
+
+    static int stopQuadrantModifierPhase = mx * 2;
 
     static int numWrongTilesInRuin;
     static int numWrongTilesInSRP;
@@ -138,7 +140,7 @@ public class Soldiers extends RobotPlayer {
 
                 FillSRP.tryToPaintSRP();
 
-                if (rc.getPaint() < 5 * numWrongTilesInSRP) {
+                if (rc.getPaint() < 5 * numWrongTilesInSRP) {  // cannot finish the SRP and must refill
                     isFillingSRP = false;
                     isRefilling = true;
                 }
@@ -177,8 +179,9 @@ public class Soldiers extends RobotPlayer {
         if (isRefilling) {
             HeuristicPath.fullFill = false;
 
-            // two options for paint refill : 1. is probably more efficient because it avoids non allied paint but is greedy
-            // 2. is guaranteed to make it but could take longer and make it die of paint loss
+            // two options for paint refill :
+            // 1. is probably more efficient because it avoids non allied paint but is greedy so not guaranteed to make it
+            // 2. is guaranteed to make it but could take longer and make it die of paint loss also does not taking into clumping penalties
 
             // 1.
             HeuristicPath.refill(paintTarget);
@@ -199,7 +202,13 @@ public class Soldiers extends RobotPlayer {
                 || rc.getLocation().isWithinDistanceSquared(target, 9)
                 || rc.getRoundNum() - lastTargetChangeRound > targetChangeWaitTime) {
 
-            target = new MapLocation(rng.nextInt(mapWidth), rng.nextInt(mapHeight));
+            // selecting a random target location on the map has an inherent bias towards the center if e.g. we are in a corner
+            // this is more of a problem on big maps
+            // try to combat this but also instead sometimes selecting a location in our current quadrant
+            if (rc.getRoundNum() % 2 == 0 && rc.getRoundNum() < stopQuadrantModifierPhase)
+                target = Utils.randomLocationInQuadrant(Utils.currentQuadrant());
+            else
+                target = new MapLocation(rng.nextInt(mapWidth), rng.nextInt(mapHeight));
             lastTargetChangeRound = rc.getRoundNum();
         }
 

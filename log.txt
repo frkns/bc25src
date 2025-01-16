@@ -1,0 +1,29 @@
+
+
+=== Results at 2025-01-16_12-14-08 ===  // added random same quadrant filling in early game to prevent center bias on large maps
+ref_best wins: 19 (45.24% win rate)
+kenny wins: 23 (54.76% win rate)
+Tied maps (9):
+- DefaultLarge
+- DefaultHuge
+- Fossil
+- Justice
+- Money
+- Racetrack
+- SaltyPepper
+- TargetPractice
+- gardenworld
+Maps ref_best wins on as both red and blue (5):
+- DefaultSmall
+- Gears
+- Thirds
+- UglySweater
+- catface
+Maps kenny wins on as both red and blue (7):
+- DefaultMedium
+- Mirage
+- MoneyTower
+- Restart
+- SMILE
+- UnderTheSea
+- memstore

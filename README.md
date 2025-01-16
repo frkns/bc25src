@@ -29,7 +29,7 @@ python compare_bots.py ref_best {your_bot}
 ```
 Notes:
 * closing the Battlecode client may speed this up
-* to stop midway, run `./gradlew --stop` in `java` folder (not `src`)
+* to stop midway, run `./gradlew --stop` in `java` folder (not `src`), try not to do this as it may cause thread/lock problems with `compare_bots.py`, but you can do it stop a match you started manually in the client
 * if fails to run on macOS, try using the original: https://github.com/chenyx512/battlecode24/blob/main/compare_bots.py
 
 

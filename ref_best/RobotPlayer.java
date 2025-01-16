@@ -63,17 +63,33 @@ public class RobotPlayer {
     static int fullFillPhase;
     static int attackBasePhase;
 
-    static int startPaintingFloorTowerNum = 5;  // don't want to paint floor before this to conserve paint
+    static int startPaintingFloorTowerNum = 5;  // don't paint floor before this to conserve paint
 
     static int role = 0;
 
     static MapLocation avgClump;
+
+    // some of these are unused
+    static MapLocation[] quadrantCenters = new MapLocation[4];
+    static MapLocation[] quadrantCorners = new MapLocation[4];
+    static int[] roundsSpentInQuadrant = new int[4];
+
+    static int mx;  // max of mapWidth and mapHeight
 
     public static void run(RobotController r) throws GameActionException {
         rc = r;
         mapHeight = rc.getMapHeight();
         mapWidth = rc.getMapWidth();
         mapCenter = new MapLocation(mapWidth/2, mapHeight/2);
+        quadrantCenters[0] = new MapLocation(3*mapWidth/4, 3*mapHeight/4);
+        quadrantCenters[1] = new MapLocation(1*mapWidth/4, 3*mapHeight/4);
+        quadrantCenters[2] = new MapLocation(1*mapWidth/4, 1*mapHeight/4);
+        quadrantCenters[3] = new MapLocation(3*mapWidth/4, 1*mapHeight/4);
+        quadrantCorners[0] = new MapLocation(mapWidth-1, mapHeight-1);
+        quadrantCorners[1] = new MapLocation(0, mapHeight-1);
+        quadrantCorners[2] = new MapLocation(0, 0);
+        quadrantCorners[3] = new MapLocation(mapWidth-1, 0);
+
         nearbyRobots = rc.senseNearbyRobots();
         for (RobotInfo robot : nearbyRobots) {
             if (robot.getTeam() == rc.getTeam()) {
@@ -89,7 +105,7 @@ public class RobotPlayer {
         if (spawnTowerLocation == null)  // it is possible that is spawn tower is destroyed in the middle of the turn
             spawnTowerLocation = new MapLocation(0, 0);
 
-        int mx = Math.max(mapWidth, mapHeight);  // ~60 for huge ~35 for medium
+        mx = Math.max(mapWidth, mapHeight);  // ~60 for huge ~35 for medium
         siegePhase = mx * 3;
         fullFillPhase = mx * 3;
         mopperPhase = mx * 4;
@@ -116,6 +132,8 @@ public class RobotPlayer {
             try {
                 turnsAlive++;
                 roundNum = rc.getRoundNum();
+
+                roundsSpentInQuadrant[Utils.currentQuadrant()]++;
 
                 // update stuff
                 locationHistory[rc.getRoundNum() % locationHistory.length] = rc.getLocation();

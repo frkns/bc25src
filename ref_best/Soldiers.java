@@ -7,22 +7,24 @@ public class Soldiers extends RobotPlayer {
     static MapLocation target;
 
     // how long of not being able to reach target till we change it?
-    static int targetChangeWaitTime = Math.max(mapWidth, mapHeight);
+    static int targetChangeWaitTime = mx;
 
     static int lastTargetChangeRound = 0;
+
+    // not using these
     static boolean wasFillingSRPlastRound = false;
-
     static int consecutiveRoundsFillingSRP = 0;
-
     static MapLocation avoidSRPloc;
-
     static MapLocation lastSRPloc;
     static int lastSRProundNum = 0;
+    /* */
+
+    static int stopQuadrantModifierPhase = mx * 2;
 
     static int numWrongTilesInRuin;
     static int numWrongTilesInSRP;
 
-    static int noSRPuntil = 0;  // no SRPs until x towers have been built
+    static int noSRPuntil = 5;  // no SRPs until x towers have been built
 
     static MapInfo[] _attackableNearbyTiles;  // var names that start with an underscore are set static to save bytecode
 
@@ -138,7 +140,7 @@ public class Soldiers extends RobotPlayer {
 
                 FillSRP.tryToPaintSRP();
 
-                if (rc.getPaint() < 5 * numWrongTilesInSRP) {
+                if (rc.getPaint() < 5 * numWrongTilesInSRP) {  // cannot finish the SRP and must refill
                     isFillingSRP = false;
                     isRefilling = true;
                 }
@@ -177,10 +179,15 @@ public class Soldiers extends RobotPlayer {
         if (isRefilling) {
             HeuristicPath.fullFill = false;
 
-            // HeuristicPath.targetIncentive = 1000;
-            // HeuristicPath.move(paintTarget);
+            // two options for paint refill :
+            // 1. is probably more efficient because it avoids non allied paint but is greedy so not guaranteed to make it
+            // 2. is guaranteed to make it but could take longer and make it die of paint loss also does not taking into clumping penalties
 
-            Pathfinder.move(paintTarget);
+            // 1.
+            HeuristicPath.refill(paintTarget);
+
+            // 2.
+            // Pathfinder.move(paintTarget);
 
             rc.setIndicatorLine(rc.getLocation(), paintTarget, 131, 252, 131);
         }
@@ -194,8 +201,14 @@ public class Soldiers extends RobotPlayer {
         if (target == null
                 || rc.getLocation().isWithinDistanceSquared(target, 9)
                 || rc.getRoundNum() - lastTargetChangeRound > targetChangeWaitTime) {
-            if (target != null) rc.setIndicatorDot(target, 0, 0, 0);
-            target = new MapLocation(rng.nextInt(mapWidth-1), rng.nextInt(mapHeight-1));
+
+            // selecting a random target location on the map has an inherent bias towards the center if e.g. we are in a corner
+            // this is more of a problem on big maps
+            // try to combat this but also instead sometimes selecting a location in our current quadrant
+            if (rc.getRoundNum() % 2 == 0 && rc.getRoundNum() < stopQuadrantModifierPhase)
+                target = Utils.randomLocationInQuadrant(Utils.currentQuadrant());
+            else
+                target = new MapLocation(rng.nextInt(mapWidth), rng.nextInt(mapHeight));
             lastTargetChangeRound = rc.getRoundNum();
         }
 
@@ -205,7 +218,7 @@ public class Soldiers extends RobotPlayer {
             ImpureUtils.updateNearestEmptyTile();
         }
 
-        rc.setIndicatorDot(target, 200, 200, 200);
+        // rc.setIndicatorDot(target, 200, 200, 200);
         if (rc.isMovementReady()) {
             HeuristicPath.fullFill = fullFilling;
             HeuristicPath.targetIncentive = 500;

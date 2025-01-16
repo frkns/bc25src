@@ -63,15 +63,18 @@ public class RobotPlayer {
     static int fullFillPhase;
     static int attackBasePhase;
 
-    static int startPaintingFloorTowerNum = 5;  // don't want to paint floor before this to conserve paint
+    static int startPaintingFloorTowerNum = 5;  // don't paint floor before this to conserve paint
 
     static int role = 0;
 
     static MapLocation avgClump;
 
+    // some of these are unused
     static MapLocation[] quadrantCenters = new MapLocation[4];
     static MapLocation[] quadrantCorners = new MapLocation[4];
     static int[] roundsSpentInQuadrant = new int[4];
+
+    static int mx;  // max of mapWidth and mapHeight
 
     public static void run(RobotController r) throws GameActionException {
         rc = r;
@@ -102,7 +105,7 @@ public class RobotPlayer {
         if (spawnTowerLocation == null)  // it is possible that is spawn tower is destroyed in the middle of the turn
             spawnTowerLocation = new MapLocation(0, 0);
 
-        int mx = Math.max(mapWidth, mapHeight);  // ~60 for huge ~35 for medium
+        mx = Math.max(mapWidth, mapHeight);  // ~60 for huge ~35 for medium
         siegePhase = mx * 3;
         fullFillPhase = mx * 3;
         mopperPhase = mx * 4;

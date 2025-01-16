@@ -104,8 +104,6 @@ public class HeuristicPath extends RobotPlayer {
             //         * 30;
             // }
 
-            // add a stacking cost for
-
         }
 
         // find the minimum cost Direction and move there
