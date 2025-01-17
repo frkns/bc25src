@@ -58,4 +58,5 @@ These are less important.
 * place defense tower in contested areas instead of using build order? - maybe make tower drop mark when health is not full?
 * improve build order?
 * dynamic build order depending map size and such?
+* Infiltrating the enemy base by walking straight through their paint to attack towers. Will help reduce clumping on home base too.
 * ~~make paint tower reserve paint for refills?~~ done
