@@ -36,6 +36,10 @@ public class RobotPlayer {
         setRobotType();
         while (true) {
             try {
+                if(rc.getRoundNum() > 1000){
+                    rc.resign();
+                }
+
                 robot.initTurn();
                 robot.playTurn();
                 robot.endTurn();
