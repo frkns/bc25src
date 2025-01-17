@@ -5,6 +5,49 @@ import battlecode.common.*;
 // these Utils are pure functions - no side-effects, they don't change variables or modify game state in any way
 
 public class Utils extends RobotPlayer {
+
+    // returns null if it's already dotted and there's no enemy paint on the ruin, otherwise returns nearest empty location
+    static MapLocation nearestEmptyOnRuinIfEnemyOrIsUndotted(MapLocation ruinLoc) throws GameActionException {
+
+        // this code checks to see if ruinLoc has an ally tower on it (update: removed because we want to dot it anyway)
+        // if (rc.canSenseRobotAtLocation(ruinLoc)) {
+        //     RobotInfo ruinLocInfo = rc.senseRobotAtLocation(ruinLoc);
+        //     if (ruinLocInfo.getTeam() == rc.getTeam())
+        //         return null;  // this "ruin" is acutally an ally tower
+        // }
+
+        boolean hasEnemyPaint = false;
+        boolean hasAllyPaint = false;
+        MapLocation nearestEmpty = null;
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 5; j++) {
+                if (i == 2 && j == 2)
+                    continue;
+                MapLocation loc = new MapLocation(ruinLoc.x + i - 2, ruinLoc.y + j - 2);
+                if (!rc.canSenseLocation(loc))
+                    continue;
+                PaintType paint = rc.senseMapInfo(loc).getPaint();
+                if (paint.isEnemy()) {
+                    hasEnemyPaint = true;
+                }
+                else if (paint.isAlly()) {
+                    hasAllyPaint = true;
+                }
+                else  {
+                    assert(paint == PaintType.EMPTY);
+                    if (nearestEmpty == null || rc.getLocation().distanceSquaredTo(loc) < rc.getLocation().distanceSquaredTo(nearestEmpty)) {
+                        nearestEmpty = loc;
+                    }
+                }
+            }
+        }
+
+        if (hasAllyPaint && !hasEnemyPaint)  // we have >= 1 paint there and there is no enemy paint
+            return null;
+        if (hasAllyPaint && hasEnemyPaint)  // remove this to full paint ruins with enemy paint on them (but it will be really bad on specific maps)
+            return null;
+        return nearestEmpty;
+    }
     static int currentQuadrant() throws GameActionException {  // numbered like the cartesian plane, except 0-indexed
         MapLocation loc = rc.getLocation();
         if (loc.x > mapWidth/2) {

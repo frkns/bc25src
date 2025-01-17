@@ -1,5 +1,92 @@
 
 
+=== Results at 2025-01-16_17-53-10 ===  // added dotting of ruins and paint reservation paint a certain round
+ref_best wins: 17 (40.48% win rate)
+kenny wins: 25 (59.52% win rate)
+Tied maps (11):
+- DefaultLarge
+- DefaultHuge
+- Mirage
+- Money
+- MoneyTower
+- Racetrack
+- Restart
+- SMILE
+- TargetPractice
+- UnderTheSea
+- gardenworld
+Maps ref_best wins on as both red and blue (3):
+- Justice
+- Thirds
+- memstore
+Maps kenny wins on as both red and blue (7):
+- DefaultSmall
+- DefaultMedium
+- Fossil
+- Gears
+- SaltyPepper
+- UglySweater
+- catface
+
+
+=== Results at 2025-01-16_16-14-59 ===
+ref_best wins: 20 (47.62% win rate)
+kenny wins: 22 (52.38% win rate)
+Tied maps (14):
+- DefaultLarge
+- Fossil
+- Gears
+- Justice
+- MoneyTower
+- Racetrack
+- SaltyPepper
+- TargetPractice
+- Thirds
+- UglySweater
+- UnderTheSea
+- catface
+- gardenworld
+- memstore
+Maps ref_best wins on as both red and blue (3):
+- DefaultMedium
+- DefaultHuge
+- Money
+Maps kenny wins on as both red and blue (4):
+- DefaultSmall
+- Mirage
+- Restart
+- SMILE
+
+
+=== Results at 2025-01-16_15-52-03 ===
+ref_best wins: 26 (61.90% win rate)
+kenny wins: 16 (38.10% win rate)
+Tied maps (10):
+- DefaultMedium
+- DefaultHuge
+- Fossil
+- MoneyTower
+- Racetrack
+- Restart
+- SaltyPepper
+- TargetPractice
+- UglySweater
+- UnderTheSea
+Maps ref_best wins on as both red and blue (8):
+- DefaultSmall
+- Gears
+- Mirage
+- Money
+- SMILE
+- Thirds
+- gardenworld
+- memstore
+Maps kenny wins on as both red and blue (3):
+- DefaultLarge
+- Justice
+- catface
+
+
 === Results at 2025-01-16_12-14-08 ===  // added random same quadrant filling in early game to prevent center bias on large maps
 ref_best wins: 19 (45.24% win rate)
 kenny wins: 23 (54.76% win rate)

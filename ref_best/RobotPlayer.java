@@ -63,7 +63,7 @@ public class RobotPlayer {
     static int fullFillPhase;
     static int attackBasePhase;
 
-    static int startPaintingFloorTowerNum = 5;  // don't paint floor before this to conserve paint
+    static int startPaintingFloorTowerNum = 4;  // don't paint floor before this to conserve paint
 
     static int role = 0;
 
@@ -73,6 +73,10 @@ public class RobotPlayer {
     static MapLocation[] quadrantCenters = new MapLocation[4];
     static MapLocation[] quadrantCorners = new MapLocation[4];
     static int[] roundsSpentInQuadrant = new int[4];
+
+    static int reservePaintPhase;  // it is really bad to reserve paint in the first few rounds because we'll fall behind
+    static int reservePaint = 100;
+    static int reserveChips = 1700;
 
     static int mx;  // max of mapWidth and mapHeight
 
@@ -106,10 +110,14 @@ public class RobotPlayer {
             spawnTowerLocation = new MapLocation(0, 0);
 
         mx = Math.max(mapWidth, mapHeight);  // ~60 for huge ~35 for medium
-        siegePhase = mx * 3;
-        fullFillPhase = mx * 3;
-        mopperPhase = mx * 4;
-        attackBasePhase = mx * 4;
+        siegePhase = (int)(mx * 3);  // cast to int, will be useful for tuning later
+        fullFillPhase = (int)(mx * 3);
+        mopperPhase = (int)(mx * 4);
+        attackBasePhase = (int)(mx * 3);
+        reservePaintPhase = (int)(mx * 1.5);
+        if (mx < 30) {
+            attackBasePhase = 0;  // may be beneficial to send immediately on small maps
+        }
         if (rc.getType() == UnitType.SOLDIER && rc.getRoundNum() >= attackBasePhase) {
             // we do divison by ~10 first because we want to send the attackers in "waves"
             if ((rc.getRoundNum() / 10) % 3 == 0) {
@@ -168,7 +176,7 @@ public class RobotPlayer {
 
             } finally {
                 if (roundNum != rc.getRoundNum()) {
-                    System.out.println("~~~ Went over bytecode limit!! " + rc.getType());
+                    System.out.println("~~~ Went over bytecode limit!! " + rc.getType() + ", role: " + role);
                     rc.setIndicatorLine(new MapLocation(0, 0), rc.getLocation(), 255, 0, 0);
                 }
                 Clock.yield();

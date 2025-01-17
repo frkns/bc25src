@@ -47,7 +47,7 @@ class Pathfinder extends RobotPlayer {
         static int currentTurnDir = 0;
         static int stackDepthCutoff = 8;
         static final int MAX_DEPTH = 20;
-        static final int BYTECODE_CUTOFF = 6000;
+        static final int BYTECODE_CUTOFF = 5000;
         static int lastMoveRound = -1;
 
         static Direction turn(Direction dir) {

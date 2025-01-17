@@ -194,27 +194,38 @@ def main() -> None:
     print(f"{args.player1} wins: {player1_wins} ({player1_wins / (player1_wins + player2_wins) * 100:,.2f}% win rate)")
     print(f"{args.player2} wins: {player2_wins} ({player2_wins / (player1_wins + player2_wins) * 100:,.2f}% win rate)")
 
-    # Append results to log.txt
-    with open("log.txt", "a") as log_file:
-        log_timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        log_file.write(f"\n\n=== Results at {log_timestamp} ===\n")
-        log_file.write(f"{args.player1} wins: {player1_wins} ({player1_wins / (player1_wins + player2_wins) * 100:,.2f}% win rate)\n")
-        log_file.write(f"{args.player2} wins: {player2_wins} ({player2_wins / (player1_wins + player2_wins) * 100:,.2f}% win rate)\n")
+    # Generate the new log content
+    log_timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    new_log_content = f"\n\n=== Results at {log_timestamp} ===\n"
+    new_log_content += f"{args.player1} wins: {player1_wins} ({player1_wins / (player1_wins + player2_wins) * 100:,.2f}% win rate)\n"
+    new_log_content += f"{args.player2} wins: {player2_wins} ({player2_wins / (player1_wins + player2_wins) * 100:,.2f}% win rate)\n"
 
-        if len(tied_maps) > 0:
-            log_file.write(f"Tied maps ({len(tied_maps)}):\n")
-            for map in tied_maps:
-                log_file.write(f"- {map}\n")
+    if len(tied_maps) > 0:
+        new_log_content += f"Tied maps ({len(tied_maps)}):\n"
+        for map in tied_maps:
+            new_log_content += f"- {map}\n"
 
-        if len(player1_superior_maps) > 0:
-            log_file.write(f"Maps {args.player1} wins on as both red and blue ({len(player1_superior_maps)}):\n")
-            for map in player1_superior_maps:
-                log_file.write(f"- {map}\n")
+    if len(player1_superior_maps) > 0:
+        new_log_content += f"Maps {args.player1} wins on as both red and blue ({len(player1_superior_maps)}):\n"
+        for map in player1_superior_maps:
+            new_log_content += f"- {map}\n"
 
-        if len(player2_superior_maps) > 0:
-            log_file.write(f"Maps {args.player2} wins on as both red and blue ({len(player2_superior_maps)}):\n")
-            for map in player2_superior_maps:
-                log_file.write(f"- {map}\n")
+    if len(player2_superior_maps) > 0:
+        new_log_content += f"Maps {args.player2} wins on as both red and blue ({len(player2_superior_maps)}):\n"
+        for map in player2_superior_maps:
+            new_log_content += f"- {map}\n"
+
+    # Read the existing content of the log file
+    try:
+        with open("log.txt", "r") as log_file:
+            existing_content = log_file.read()
+    except FileNotFoundError:
+        existing_content = ""
+
+    # Write the new content followed by the existing content
+    with open("log.txt", "w") as log_file:
+        log_file.write(new_log_content + existing_content)
+
 
 
 if __name__ == "__main__":
