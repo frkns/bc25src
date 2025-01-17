@@ -60,6 +60,15 @@ public class _Info {
 
     // Memory
 
+    // --------- Towers   ----------
+    MapInfo[] visibleRuins; // Visibles ruins without towers
+    MapInfo[] visibleTowers; // Visible towers
+
+    MapInfo[] knowsRuins; // knows ruins, with or without tower
+    MapInfo[] knownEmptyRuins; // ruins without towers
+    MapInfo[] knownTowers; // ruins with tower
+
+
     // --------- SRP only ----------
     public static MapLocation srpCenter;
     public static FastLocSet srpMarkedCorners = new FastLocSet();
@@ -117,6 +126,7 @@ public class _Info {
         if (rc.getType().isRobotType()) {
             nearbyRuins = rc.senseNearbyRuins(-1);
         }
+
 
         //update nearestPaintTower (assumes the last paintTower we passed by is closest)
         for (RobotInfo robot : nearbyAllies) {
