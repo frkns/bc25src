@@ -1,3 +1,7 @@
+2025-01-17 **Note: please do not move the autotuner scripts - they must be placed in the correct directories in order to execute.**
+
+---
+
 ## Overview
 
 The idea of tests is to try out changes and test them against the best bot so far. We only merge changes that improve the eval of the bot (+ optimizations). This means that at every merge the bot gets better.
@@ -43,11 +47,24 @@ Notes:
 Finished items that could still be improved are ~~struckthrough~~.
 
 * splashers - Ryan
-* rework clump avoidance - current mech sucks
 * tune heuristics - don't waste too much time on this, planning on making something that automatically tunes
 * bytecode opts
 * soldiers stop idling around the tower while waiting for it to complete (memory that goes back to tower when 1000 chips?)
-* * ~~soldiers dot enemy ruins~~ done
+* make a builder robot that stay at ruins wainting for enough chips
+* reactionary tower spawn
+* defense tower in contested areas and after a certain round
+* not getting suck on gears map
+* build towers before rushing?
+* better soldier spawning away from walls
+* stop attacking tower on low health
+* leave when there is enemy paint on ruin (already done but logic needs improvement)
+* mopper prio unfinished ruins
+* fix to 4 soldier start
+* don’t upgrade damaged towers
+* better tower micro (don’t walk into tower range if not isActionReady)
+
+* ~~rework clump avoidance - current mech sucks~~ done
+* ~~soldiers dot enemy ruins~~ done
 
 ### Random Ideas
 
@@ -55,8 +72,7 @@ These are less important.
 
 * switch to Super-Cow-Powers-style SRP tiling on maps with large, open spaces? (current tiling is local & greedy). May require comms
 * better self-destruct logic?
-* place defense tower in contested areas instead of using build order? - maybe make tower drop mark when health is not full?
 * improve build order?
 * dynamic build order depending map size and such?
-* Infiltrating the enemy base by walking straight through their paint to attack towers. Will help reduce clumping on home base too.
+* ~~Infiltrating the enemy base by walking straight through their paint to attack towers. Will help reduce clumping on home base too.~~ done
 * ~~make paint tower reserve paint for refills?~~ done

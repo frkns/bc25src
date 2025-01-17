@@ -13,7 +13,9 @@ public class Moppers extends RobotPlayer{
 
     public static void run() throws GameActionException {
 
-        ImpureUtils.updateNearbyUnits();
+        ImpureUtils.updateNearbyUnits(); // pending removal
+
+        ImpureUtils.updateNearbyMask();
 
         ImpureUtils.updateNearestEnemyPaint();
         ImpureUtils.updateNearestEnemyTower();
