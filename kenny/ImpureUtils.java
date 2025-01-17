@@ -8,7 +8,7 @@ public class ImpureUtils extends RobotPlayer {
     static void updateNearbyMask() throws GameActionException {  // can later change this to also update nearby enemies
         nearbyAlliesMask = new boolean[5][5];  // reset everything to false
 
-        RobotInfo[] nearbyTiles5x5 = rc.senseNearbyRobots(9);  // includes 2 extra tiles which need to be skipped
+        RobotInfo[] nearbyTiles5x5 = rc.senseNearbyRobots(9);  // includes 4 extra tiles which need to be skipped
         for (RobotInfo robot : nearbyTiles5x5) {
             if (rc.getTeam() == robot.getTeam()) {
                 int i = robot.getLocation().x - rc.getLocation().x + 2;
