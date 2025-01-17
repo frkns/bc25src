@@ -3,6 +3,7 @@ package e.knowledge;
 import battlecode.common.*;
 import e.Robot;
 import e.utils.Utils;
+import e.utils.fast.FastIterableLocSet;
 import e.utils.fast.FastLocSet;
 
 import java.util.Random;
@@ -58,6 +59,10 @@ public class _Info {
     public static MapInfo[] nearbyTiles;
     public static MapLocation[] nearbyTileLocsR4;
 
+    public static FastIterableLocSet knownRuins = new FastIterableLocSet(); // knows ruins, with or without tower
+    public static FastIterableLocSet knownEmptyRuins = new FastIterableLocSet(); // ruins without towers
+    public static FastIterableLocSet knownTowers = new FastIterableLocSet(); // ruins with tower
+
     // Memory
 
     // --------- SRP only ----------
@@ -77,10 +82,6 @@ public class _Info {
     public static MapLocation towerCenter;
     public static FastLocSet invalidTowerCenters = new FastLocSet(); // Includes completed tower centers & enemy paint blocking. Clear every 25 turns.
     public static FastLocSet completedPatterns = new FastLocSet();
-
-
-
-
 
 
     public static void init() {
@@ -115,8 +116,28 @@ public class _Info {
         nearbyTiles = rc.senseNearbyMapInfos();
         nearbyTileLocsR4 = rc.getAllLocationsWithinRadiusSquared(_Info.robotLoc, 4);
         if (rc.getType().isRobotType()) {
+
+            for(MapLocation loc: nearbyRuins){
+                knownRuins.add(loc);
+            }
+
             nearbyRuins = rc.senseNearbyRuins(-1);
+
+            for(MapLocation loc: nearbyRuins){
+                if(rc.isLocationOccupied(loc)){
+                    knownTowers.add(loc);
+                    knownEmptyRuins.remove(loc);
+                }else{
+                    knownTowers.remove(loc);
+                    knownRuins.add(loc);
+                }
+                knownRuins.add(loc);
+            }
         }
+
+        knownRuins.updateIterable();
+        knownTowers.updateIterable();
+        knownEmptyRuins.updateIterable();
 
         //update nearestPaintTower (assumes the last paintTower we passed by is closest)
         for (RobotInfo robot : nearbyAllies) {
