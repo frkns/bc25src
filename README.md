@@ -47,6 +47,7 @@ Finished items that could still be improved are ~~struckthrough~~.
 * rework clump avoidance - current mech sucks
 * tune heuristics - don't waste too much time on this, planning on making something that automatically tunes
 * bytecode opts
+* soldiers stop idling around the tower while waiting for it to complete (memory that goes back to tower when 1000 chips?)
 * ???
 
 ### Random Ideas
