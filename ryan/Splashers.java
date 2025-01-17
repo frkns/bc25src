@@ -1,105 +1,114 @@
-package ryan;// package ref_best;
+package ryan;
 
-// import battlecode.common.*;
+import battlecode.common.*;
 
-// //phase 1 for soldiers
-// //spread out and build cash towers
-// public class Splashers extends RobotPlayer{
-//     static MapLocation nearestPaintTower = null;
-//     public static MapLocation target;
+public class Splashers extends RobotPlayer {
+    // Movement target variables
+    static MapLocation target;
+    static int targetChangeWaitTime = mx;
+    static int lastTargetChangeRound = 0;
+    
+    static int stopQuadrantModifierPhase = mx * 1;
+    
+    // Tracking attackable tiles
+    static MapInfo[] _attackableNearbyTiles;
 
-//     public static void run (RobotController rc) throws GameActionException {
-//         int height = rc.getMapHeight();
-//         int width = rc.getMapWidth();
+    public static void run() throws GameActionException {
+        // Update nearby unit information
+        ImpureUtils.updateNearbyUnits();
 
-//         RobotInfo[] nearbyRobots = rc.senseNearbyRobots();
-//         MapInfo[] nearbyTiles = rc.senseNearbyMapInfos();
-//         // Search for a nearby ruin to complete.
-//         MapInfo curTile = null;
-//         int distance = 0;
-//         RobotInfo curBot = null;
+        // Check and execute self-destruct if conditions are met
+        if (Utils.selfDestructRequirementsMet()) {
+            System.out.println("Self destructing...  Type: " + rc.getType() + ", Round: " + rc.getRoundNum() + ", Nearby Friend Robots: " + nearbyFriendlyRobots + ", Paint: " + rc.getPaint());
+            rc.disintegrate();
+        }
 
+        // Handle tower targeting and attacks
+        ImpureUtils.updateNearestEnemyTower();
+        if (nearestEnemyTower != null && rc.getRoundNum() > siegePhase) {
+            if (rc.canAttack(nearestEnemyTower)) {
+                rc.attack(nearestEnemyTower);
+                inTowerRange = true;
+            }
+            if (rc.isMovementReady())
+                HeuristicPath.towerMicro();
+            inTowerRange = false;
+            if (rc.canAttack(nearestEnemyTower)) {
+                rc.attack(nearestEnemyTower);
+                inTowerRange = true;
+            }
+        }
 
-//         for (RobotInfo robot : nearbyRobots){
-//             if (robot.getTeam() == rc.getTeam()) {
-//                 if (robot.getType() == UnitType.LEVEL_ONE_PAINT_TOWER
-//                     || robot.getType() == UnitType.LEVEL_TWO_PAINT_TOWER
-//                     || robot.getType() == UnitType.LEVEL_THREE_PAINT_TOWER) {
-//                     if (nearestPaintTower == null ||
-//                         rc.getLocation().distanceSquaredTo(robot.getLocation()) < rc.getLocation().distanceSquaredTo(nearestPaintTower)) {
-//                         nearestPaintTower = robot.getLocation();
-//                     }
-//                 }
-//             }
-//             // if(rc.canUpgradeTower(robot.getLocation())) {
-//             //     rc.upgradeTower(robot.getLocation());
-//             // }
-//         }
+        // Handle paint refilling logic
+        boolean canRefill = true;
+        MapLocation paintTarget = nearestPaintTower;
+        if (paintTarget == null) {
+            paintTarget = spawnTowerLocation;
+            if (spawnTowerType == UnitType.LEVEL_ONE_DEFENSE_TOWER) {
+                canRefill = false;
+                isRefilling = false;
+            }
+        }
+        ImpureUtils.withdrawPaintIfPossible(paintTarget);
 
-//         // better splasher refill
-//         int paint = rc.getPaint();
-//         int towerPaint = -1;
-//         if (nearestPaintTower != null) {
-//             if (rc.canSenseRobotAtLocation(nearestPaintTower))
-//                 towerPaint = rc.senseRobotAtLocation(nearestPaintTower).getPaintAmount();
-//         }
-//         if (towerPaint != -1 && paint < 70) {
-//             rc.setIndicatorString("Getting some paint!");
-//             int mxPaint = rc.getType().paintCapacity;
-//             int amt = mxPaint - paint;
-//             amt = Math.min(amt, towerPaint);  // cannot take more than the tower has
-//             if (rc.canTransferPaint(nearestPaintTower, -1 * amt)) {
-//                 rc.transferPaint(nearestPaintTower, -1 * amt);
-//                 System.out.println("Transferred " + amt + " paint!!!");
-//             }
-//             target = nearestPaintTower;
-//         } else
-//         if (target == null || rc.getLocation() == target) {
-//             if (rc.getRoundNum() % 2 == 0)
-//                 target = Utils.randomEnemyLocation();
-//             else
-//                 target = new MapLocation(rng.nextInt(width-1),rng.nextInt(height-1));
-//         }
+        isRefilling = rc.getPaint() < 100 && canRefill;
 
+        // Move towards paint source if refilling
+        if (isRefilling) {
+            HeuristicPath.fullFill = false;
+            Pathfinder.move(paintTarget);
+            rc.setIndicatorLine(rc.getLocation(), paintTarget, 131, 252, 131);
+        }
 
-//         for (MapInfo tile : nearbyTiles){
-//             if (tile.getPaint() == PaintType.ENEMY_SECONDARY || tile.getPaint() == PaintType.ENEMY_PRIMARY){
-//                 if(tile.getMapLocation().distanceSquaredTo(rc.getLocation()) > distance && rc.canAttack(tile.getMapLocation())){
-//                     distance = tile.getMapLocation().distanceSquaredTo(rc.getLocation());
-//                     curTile = tile;
-//                 }
-//             }
+        // Random movement and target selection
+        if (target == null
+            || rc.getLocation().isWithinDistanceSquared(target, 9)
+            || rc.getRoundNum() - lastTargetChangeRound > targetChangeWaitTime) {
 
-//         }
-//         if (curTile != null){
-//             MapLocation targetLoc = curTile.getMapLocation();
-//             Direction dir = rc.getLocation().directionTo(targetLoc);
-//             if (paint >= 70 && rc.canMove(dir) && !(rc.senseMapInfo(rc.getLocation().add(dir)).getPaint().equals(PaintType.ENEMY_PRIMARY)) && !(rc.senseMapInfo(rc.getLocation().add(dir)).getPaint().equals(PaintType.ENEMY_SECONDARY)))
-//                 rc.move(dir);
-//             if(rc.canAttack(targetLoc)) {
-//                 rc.attack(targetLoc);
-//             }
-//         } else
-//             HeuristicPath.move();
+            // First priority: Find enemy paint
+            ImpureUtils.updateNearestEnemyPaint();
+            if (nearestEnemyPaint != null) {
+            target = nearestEnemyPaint;
+            } 
+            // Second priority: Move toward map center initially
+            else if (rc.getRoundNum() > stopQuadrantModifierPhase) {
+            target = new MapLocation(
+                mapCenter.x + rng.nextInt(11) - 5,
+                mapCenter.y + rng.nextInt(11) - 5
+            );
+            }
+            // Fall back to random exploration
+            else {
+            target = new MapLocation(rng.nextInt(mapWidth), rng.nextInt(mapHeight));
+            }
+            lastTargetChangeRound = rc.getRoundNum();
+        }
 
+        // Movement and painting logic
+        boolean fullFilling = rc.getRoundNum() >= fullFillPhase;
+        
+        if (fullFilling) {
+            ImpureUtils.updateNearestEmptyTile();
+        }
 
+        if (rc.isMovementReady()) {
+            HeuristicPath.fullFill = fullFilling;
+            HeuristicPath.targetIncentive = 500;
+            HeuristicPath.move(target);
+        }
 
-//         // Direction dir = rc.getLocation().directionTo(target);
-//         // int tries = 0;
-//         // rc.setIndicatorString(String.valueOf(rc.senseMapInfo(rc.getLocation().add(dir)).getPaint()));
-//         // while(!rc.canMove(dir) && tries < 20) {
-//         //     tries = tries + 1;
-//         //     target = new MapLocation(rng.nextInt(width-1),rng.nextInt(height-1));
-//         //     dir = rc.getLocation().directionTo(target);
-//         // }
-//         // if(rc.canMove(dir) && !(rc.senseMapInfo(rc.getLocation().add(dir)).getPaint().equals(PaintType.ENEMY_PRIMARY)) && !(rc.senseMapInfo(rc.getLocation().add(dir)).getPaint().equals(PaintType.ENEMY_SECONDARY))) {
-//         //     rc.move(dir);
-//         // }
+        // Paint floor tiles when appropriate
+        if (rc.getNumberTowers() >= startPaintingFloorTowerNum && !isRefilling)
+            ImpureUtils.paintFloor();
 
-//         // MapInfo currentTile = rc.senseMapInfo(rc.getLocation());
-//         // if (!currentTile.getPaint().isAlly() && rc.canAttack(rc.getLocation())){
-//         //     rc.attack(rc.getLocation());
-//         // }
-//     }
-
-// }
+        // Attack empty tiles when possible
+        if (rc.isActionReady() && fullFilling && !isRefilling) {
+            _attackableNearbyTiles = rc.senseNearbyMapInfos(9);
+            for (MapInfo tile : _attackableNearbyTiles) {
+                if (tile.getPaint() == PaintType.EMPTY && rc.canAttack(tile.getMapLocation())) {
+                    rc.attack(tile.getMapLocation());
+                }
+            }
+        }
+    }
+}

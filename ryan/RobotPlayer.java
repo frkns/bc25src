@@ -6,8 +6,7 @@ import java.util.Random;
 
 
 public class RobotPlayer {
-    public static MapLocation[] locationHistory = new MapLocation[8];
-
+    //region Constants and Configuration
     static final Random rng = new Random();
     static final Direction[] directions = {
         Direction.NORTH,
@@ -20,21 +19,56 @@ public class RobotPlayer {
         Direction.NORTHWEST,
     };
 
-    static MapLocation spawnTowerLocation;
-    static UnitType spawnTowerType;
+    static int startPaintingFloorTowerNum = 4;
+    static int selfDestructFriendlyRobotsThreshold = 20;
+    static int selfDestructEnemyRobotsThreshold = 5;
+    static int selfDestructPaintThreshold = 50;
+    //endregion
 
+    //region Game State Variables
     static RobotController rc;
     static int roundNum;
     static int mapWidth;
     static int mapHeight;
     static MapLocation mapCenter;
-
-    static boolean isRefilling = false;
-
     static int turnsAlive = 0;
+    static int numSpawnedUnits = 0;
+    //endregion
 
+    //region Map and Location Tracking
+    public static MapLocation[] locationHistory = new MapLocation[8];
+    static MapLocation spawnTowerLocation;
+    static UnitType spawnTowerType;
+    static MapLocation[] quadrantCenters = new MapLocation[4];
+    static MapLocation[] quadrantCorners = new MapLocation[4];
+    static int[] roundsSpentInQuadrant = new int[4];
+    //endregion
+
+    //region Nearby Info
     static RobotInfo[] nearbyRobots;
     static MapInfo[] nearbyTiles;
+    static int nearbyFriendlyRobots;
+    static int nearbyEnemyRobots;
+    static boolean inTowerRange = false;
+    //endregion
+
+    //region Strategy Phase Variables
+    static int siegePhase;
+    static int mopperPhase;
+    static int splasherPhase;
+    static int selfDestructPhase = 300;
+    static int fullFillPhase;
+    static int attackBasePhase;
+    static int reservePaintPhase;
+    static int role = 0;
+    //endregion
+
+    //region Resource Management
+    static boolean isRefilling = false;
+    static int reservePaint = 100;
+    static int reserveChips = 1700;
+    //endregion
+
     static MapLocation nearestPaintTower;
     static MapLocation nearestEnemyTower;
     static MapLocation nearestEmptyTile;  // not used (update: we use it now for full fill)
@@ -48,39 +82,11 @@ public class RobotPlayer {
     static boolean isFillingSRP = false;
     static MapLocation nearestWrongInSRP;
 
-    static int siegePhase;
-    static int mopperPhase;
-    static int selfDestructPhase = 300;
-
-    static int selfDestructFriendlyRobotsThreshold = 20;  // > this to self destruct
-    static int selfDestructEnemyRobotsThreshold = 5;  // < this to self destruct
-    static int selfDestructPaintThreshold = 50;
-
-    static int nearbyFriendlyRobots;
-    static int nearbyEnemyRobots;
-
-    static boolean inTowerRange = false;
-    static int fullFillPhase;
-    static int attackBasePhase;
-
-    static int startPaintingFloorTowerNum = 4;  // don't paint floor before this to conserve paint
-
-    static int role = 0;
+    static int mx;  // max of mapWidth and mapHeight
 
     static MapLocation avgClump;
 
-    // some of these are unused
-    static MapLocation[] quadrantCenters = new MapLocation[4];
-    static MapLocation[] quadrantCorners = new MapLocation[4];
-    static int[] roundsSpentInQuadrant = new int[4];
-
-    static int reservePaintPhase;  // it is really bad to reserve paint in the first few rounds because we'll fall behind
-    static int reservePaint = 100;
-    static int reserveChips = 1700;
-
-    static int mx;  // max of mapWidth and mapHeight
-
-    public static void run(RobotController r) throws GameActionException {
+    private static void initializeGame(RobotController r) throws GameActionException {
         rc = r;
         mapHeight = rc.getMapHeight();
         mapWidth = rc.getMapWidth();
@@ -113,6 +119,7 @@ public class RobotPlayer {
         siegePhase = (int)(mx * 3);  // cast to int, will be useful for tuning later
         fullFillPhase = (int)(mx * 3);
         mopperPhase = (int)(mx * 4);
+        splasherPhase = (int)(mx * 4);
         attackBasePhase = (int)(mx * 3);
         reservePaintPhase = (int)(mx * 1.5);
         if (mx < 30) {
@@ -135,37 +142,45 @@ public class RobotPlayer {
                 break;
             }
         }
+    }
+
+    private static void updateGameState() throws GameActionException {
+        turnsAlive++;
+        roundNum = rc.getRoundNum();
+        roundsSpentInQuadrant[Utils.currentQuadrant()]++;
+        locationHistory[rc.getRoundNum() % locationHistory.length] = rc.getLocation();
+        nearbyRobots = rc.senseNearbyRobots();
+        nearbyTiles = rc.senseNearbyMapInfos();
+    }
+
+    private static void executeUnitLogic() throws GameActionException {
+        switch (rc.getType()) {
+            case SOLDIER: {
+                switch (role) {
+                    case 1:
+                        AttackBase.run();
+                        break;
+                    default: runSoldier();
+                }
+                break;
+            }
+            case MOPPER: runMopper(); break;
+            case SPLASHER: runSplasher(); break;
+            default: runTower(); break;
+        }
+    }
+
+    public static void run(RobotController r) throws GameActionException {
+        initializeGame(r);
+        Debug.init();
 
         while (true) {
             try {
-                turnsAlive++;
-                roundNum = rc.getRoundNum();
-
-                roundsSpentInQuadrant[Utils.currentQuadrant()]++;
-
-                // update stuff
-                locationHistory[rc.getRoundNum() % locationHistory.length] = rc.getLocation();
-                nearbyRobots = rc.senseNearbyRobots();
-                nearbyTiles = rc.senseNearbyMapInfos();
-
-                if (!rc.getType().isTowerType())
+                updateGameState();
+                if (!rc.getType().isTowerType()) {
                     ImpureUtils.updateNearestPaintTower();
-
-                switch (rc.getType()) {
-                    case SOLDIER: {
-                        switch (role) {
-                            case 1:
-                                AttackBase.run();
-                                break;
-                            default: runSoldier();
-                        }
-                        break;
-                    }
-                    case MOPPER: runMopper(); break;
-                    // case SPLASHER: runSplasher();
-                    default: runTower(); break;
                 }
-
+                executeUnitLogic();
             } catch (GameActionException e) {
                 System.out.println("GameActionException");
                 e.printStackTrace();
@@ -187,8 +202,6 @@ public class RobotPlayer {
         // Your code should never reach here (unless it's intentional)! Self-destruction imminent...
     }
 
-    static int numSpawnedUnits = 0;
-
     public static void runTower() throws GameActionException {
         Towers.run();
     }
@@ -201,7 +214,7 @@ public class RobotPlayer {
         Moppers.run();
     }
 
-    // public static void runSplasher(RobotController rc) throws GameActionException{
-    //     Splashers.run();
-    // }
+    public static void runSplasher() throws GameActionException{
+        Splashers.run();
+    }
 }
