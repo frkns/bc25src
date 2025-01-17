@@ -42,13 +42,12 @@ Notes:
 
 Finished items that could still be improved are ~~struckthrough~~.
 
-* splashers
-* ~~soldiers dot enemy ruins~~ done
+* splashers - Ryan
 * rework clump avoidance - current mech sucks
 * tune heuristics - don't waste too much time on this, planning on making something that automatically tunes
 * bytecode opts
 * soldiers stop idling around the tower while waiting for it to complete (memory that goes back to tower when 1000 chips?)
-* ???
+* * ~~soldiers dot enemy ruins~~ done
 
 ### Random Ideas
 
@@ -56,7 +55,7 @@ These are less important.
 
 * switch to Super-Cow-Powers-style SRP tiling on maps with large, open spaces? (current tiling is local & greedy). May require comms
 * better self-destruct logic?
-* ~~make paint tower reserve paint for refills?~~ done
 * place defense tower in contested areas instead of using build order? - maybe make tower drop mark when health is not full?
 * improve build order?
 * dynamic build order depending map size and such?
+* ~~make paint tower reserve paint for refills?~~ done
