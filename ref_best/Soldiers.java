@@ -25,6 +25,7 @@ public class Soldiers extends RobotPlayer {
     static int numWrongTilesInSRP;
 
     static int noSRPuntil = 5;  // no SRPs until x towers have been built
+    static int noFullFillUntil = 5;
 
     static MapInfo[] _attackableNearbyTiles;  // var names that start with an underscore are set static to save bytecode
 
@@ -119,6 +120,7 @@ public class Soldiers extends RobotPlayer {
                 FillRuin.tryToPaintRuin(buildTowerType);
 
                 if (rc.getPaint() < 5 * numWrongTilesInRuin) {  // we cannot finish the ruin and must refill
+                    System.out.println("early refill; can't complete ruin");
                     isFillingRuin = false;
                     isRefilling = true;
                 }
@@ -141,6 +143,8 @@ public class Soldiers extends RobotPlayer {
                 FillSRP.tryToPaintSRP();
 
                 if (rc.getPaint() < 5 * numWrongTilesInSRP) {  // cannot finish the SRP and must refill
+                    System.out.println("early refill; can't complete SRP");
+                    isFillingRuin = false;
                     isFillingSRP = false;
                     isRefilling = true;
                 }
@@ -170,11 +174,7 @@ public class Soldiers extends RobotPlayer {
         }
         ImpureUtils.withdrawPaintIfPossible(paintTarget);
 
-        if (rc.getPaint() < 100 && canRefill) {
-            isRefilling = true;
-        } else {
-            isRefilling = false;
-        }
+        isRefilling = rc.getPaint() < 100 && canRefill;
 
         if (isRefilling) {
             HeuristicPath.fullFill = false;
@@ -184,10 +184,10 @@ public class Soldiers extends RobotPlayer {
             // 2. is guaranteed to make it but could take longer and make it die of paint loss also does not taking into clumping penalties
 
             // 1.
-            HeuristicPath.refill(paintTarget);
+            // HeuristicPath.refill(paintTarget);
 
             // 2.
-            // Pathfinder.move(paintTarget);
+            Pathfinder.move(paintTarget);
 
             rc.setIndicatorLine(rc.getLocation(), paintTarget, 131, 252, 131);
         }
@@ -196,6 +196,29 @@ public class Soldiers extends RobotPlayer {
         //     HeuristicPath.circleSRP();
         // }
         // ImpureUtils.tryMarkSRP();
+
+
+        // dot nearby empty/ enemy ruins
+        if (rc.isActionReady()) {
+            MapLocation closestRuinToDot = null;
+
+            int distance = (int)2e9;
+            for (MapInfo tile : nearbyTiles) {
+                if (tile.hasRuin()) {
+                    if (tile.getMapLocation().distanceSquaredTo(rc.getLocation()) < distance) {
+                        distance = tile.getMapLocation().distanceSquaredTo(rc.getLocation());
+                        closestRuinToDot = tile.getMapLocation();
+                    }
+                }
+            }
+            if (closestRuinToDot != null) {
+                MapLocation locToDot = Utils.nearestEmptyOnRuinIfEnemyOrIsUndotted(closestRuinToDot);
+                if (locToDot != null && rc.canAttack(locToDot)) {
+                    // System.out.println("dotted a ruin");
+                    rc.attack(locToDot);
+                }
+            }
+        }
 
 
         if (target == null
@@ -212,7 +235,7 @@ public class Soldiers extends RobotPlayer {
             lastTargetChangeRound = rc.getRoundNum();
         }
 
-        boolean fullFilling = rc.getRoundNum() >= fullFillPhase;
+        boolean fullFilling = rc.getRoundNum() >= fullFillPhase && rc.getNumberTowers() >= noFullFillUntil;
 
         if (fullFilling) {
             ImpureUtils.updateNearestEmptyTile();
@@ -223,13 +246,13 @@ public class Soldiers extends RobotPlayer {
             HeuristicPath.fullFill = fullFilling;
             HeuristicPath.targetIncentive = 500;
             HeuristicPath.move(target);
-            nearbyTiles = rc.senseNearbyMapInfos();
+            // nearbyTiles = rc.senseNearbyMapInfos();
         }
 
-        if (rc.getNumberTowers() >= startPaintingFloorTowerNum)
+        if (rc.getNumberTowers() >= startPaintingFloorTowerNum && !isRefilling)
             ImpureUtils.paintFloor();
 
-        if (rc.isActionReady() && fullFilling) {
+        if (rc.isActionReady() && fullFilling && !isRefilling) {
             _attackableNearbyTiles = rc.senseNearbyMapInfos(9);
             for (MapInfo tile : _attackableNearbyTiles) {
                 if (tile.getPaint() == PaintType.EMPTY && rc.canAttack(tile.getMapLocation())) {

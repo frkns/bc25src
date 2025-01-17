@@ -5,20 +5,21 @@ import battlecode.common.*;
 public class Towers extends RobotPlayer {
 
     static boolean spawnedFirstMopper = false;
-    static int nonGreedyPhase = Math.max(mapWidth, mapHeight) * 2;  // allow other units to complete ruins if money capped
-    static int firstMopper = Math.max(mapWidth, mapHeight) * 2;
-    static int reverseChips = 2000;
+    static int nonGreedyPhase = (int)(mx * 2);  // allow other units to complete ruins / upgrade towers if money capped
+    static int firstMopper = (int)(mx * 2);
+
 
     public static void run() throws GameActionException {
+        // debugging stuff
         for (int i = 0; i < 4; i++) {
             rc.setIndicatorDot(quadrantCenters[i], 255, 255, 255);
         }
-
         if (rc.getRoundNum() <= 1 && rc.getType() == UnitType.LEVEL_ONE_PAINT_TOWER) {
             System.out.println("Number of towers " + rc.getNumberTowers());
             System.out.println("Siege phase " + siegePhase);
             System.out.println("Mopper phase " + mopperPhase);
         }
+        /* */
 
         int tries = 8;
         Direction dir = directions[rng.nextInt(8)];
@@ -36,14 +37,6 @@ public class Towers extends RobotPlayer {
             System.out.println("Tower: no empty spaces left in 8 main tiles!");
         }
 
-        if (turnsAlive > 5 && rc.getRoundNum() > firstMopper && !spawnedFirstMopper && rc.getMoney() > reverseChips) {
-            if (rc.canBuildRobot(UnitType.MOPPER, nextLoc)) {
-                System.out.println("spawned first mopper");
-                rc.buildRobot(UnitType.MOPPER, nextLoc);
-                numSpawnedUnits++;
-                spawnedFirstMopper = true;
-            }
-        }
 
         int r = rng.nextInt(100);
         rc.setIndicatorString("RNG: " + r);
@@ -57,9 +50,20 @@ public class Towers extends RobotPlayer {
             }
         }
 
-        if ((rc.getRoundNum() < nonGreedyPhase || rc.getMoney() > 2000) && rc.getMoney() > reverseChips)
+        boolean spawnIsFirstMopper = false;
+        if (turnsAlive > 5 && rc.getRoundNum() > firstMopper && !spawnedFirstMopper && rc.getMoney() > reserveChips) {
+            spawn = UnitType.MOPPER;
+            spawnIsFirstMopper = true;
+        }
+
+        if ((rc.getRoundNum() < nonGreedyPhase || rc.getMoney() > 2000)
+            && rc.getMoney() - spawn.moneyCost >= reserveChips
+            && (rc.getPaint() - spawn.paintCost >= reservePaint || rc.getRoundNum() < reservePaintPhase || rc.getType().getBaseType() != UnitType.LEVEL_ONE_PAINT_TOWER))
+            // only reserve paint if we are a paint tower ^
         if (rc.canBuildRobot(spawn, nextLoc)) {
             rc.buildRobot(spawn, nextLoc);
+            if (spawnIsFirstMopper)
+                spawnedFirstMopper = true;
             numSpawnedUnits++;
         }
 
