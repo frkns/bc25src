@@ -86,6 +86,9 @@ public class Towers extends RobotPlayer {
                 int towerPaint = rc.getPaint();
                 int transferAmt = Math.min(towerPaint, robot.getType().paintCapacity - robotPaint);
                 if (rc.canTransferPaint(robotLoc, transferAmt)) {
+                    // can towers transfer paint?
+                    assert(false);  // apparantely not? pending deletion
+                    System.out.println("Tower transfered paint");
                     rc.transferPaint(robotLoc, transferAmt);
                 }
             }

@@ -93,8 +93,19 @@ public class HeuristicPath extends RobotPlayer {
                 directionCost[i] += Utils.manhattanDistance(newLoc, nearestEmptyTile) * 500;
             }
 
-            // add (negative) cost for moving in a direction that gets us gets us closer to a clump
-            directionCost[i] -= Utils.manhattanDistance(newLoc, avgClump) * nearbyFriendlyRobots * 50;
+            // pending deletion
+            // // add (negative) cost for moving in a direction that gets us gets us closer to a clump
+            // directionCost[i] -= Utils.manhattanDistance(newLoc, avgClump) * nearbyFriendlyRobots * 50;
+
+            int maskx = dir.dx + 2;
+            int masky = dir.dy + 2;
+            int allyRobotsInNewLoc = 0;
+            for (int d = 8; d-- > 0;) {
+                if (nearbyAlliesMask[maskx + dx8[d]][masky + dy8[d]]) {
+                    allyRobotsInNewLoc++;
+                }
+            }
+            directionCost[i] += allyRobotsInNewLoc * 1000;
 
             // add a stacking cost for staying current quadrant for too long (doesnt seem to work)
             // if (rc.getRoundNum() >= 400) {
@@ -103,7 +114,6 @@ public class HeuristicPath extends RobotPlayer {
             //         * Math.max(100, roundsSpentInQuadrant[curQ])  // only apply the penalty after a some # of rounds in quadrant
             //         * 30;
             // }
-
         }
 
         // find the minimum cost Direction and move there
@@ -222,7 +232,7 @@ public class HeuristicPath extends RobotPlayer {
 
             if (nearestWrongInRuin != null) {
                 // add cost for moving in a direction that gets us further away from nearest empty tile
-                directionCost[i] += Utils.manhattanDistance(newLoc, nearestWrongInRuin) * 500 * 3;
+                directionCost[i] += Math.max(9, newLoc.distanceSquaredTo(nearestWrongInRuin)) * 500;
             }
 
             if (ruinLoc != null) {
@@ -470,8 +480,15 @@ public class HeuristicPath extends RobotPlayer {
             directionCost[i] +=
                 Utils.manhattanDistance(newLoc, Utils.mirror(spawnTowerLocation)) * 10 * nearbyFriendlyRobots;
 
-            // add cost for moving in a direction that gets us gets us closer to a clump;
-            // directionCost[i] -= Utils.manhattanDistance(newLoc, avgClump) * (nearbyFriendlyRobots) * 20;
+            int maskx = dir.dx + 2;
+            int masky = dir.dy + 2;
+            int allyRobotsInNewLoc = 0;
+            for (int d = 8; d-- > 0;) {
+                if (nearbyAlliesMask[maskx + dx8[d]][masky + dy8[d]]) {
+                    allyRobotsInNewLoc++;
+                }
+            }
+            directionCost[i] += allyRobotsInNewLoc * 1000;
         }
 
         // find the minimum cost Direction and move there

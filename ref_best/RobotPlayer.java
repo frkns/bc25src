@@ -8,6 +8,9 @@ import java.util.Random;
 public class RobotPlayer {
     public static MapLocation[] locationHistory = new MapLocation[8];
 
+    static final int dx8[] = {0, 1, 1, 1, 0, -1, -1, -1};
+    static final int dy8[] = {-1, -1, 0, 1, 1, 1, 0, -1};
+
     static final Random rng = new Random();
     static final Direction[] directions = {
         Direction.NORTH,
@@ -35,7 +38,8 @@ public class RobotPlayer {
 
     static RobotInfo[] nearbyRobots;
     static MapInfo[] nearbyTiles;
-    static MapLocation nearestPaintTower;
+    static boolean nearestPaintTowerIsPaintTower = false;
+    static MapLocation nearestPaintTower;  // can be money/defense tower if we haven't see a paint tower yet
     static MapLocation nearestEnemyTower;
     static MapLocation nearestEmptyTile;  // not used (update: we use it now for full fill)
     static MapLocation nearestEnemyPaint;
@@ -65,9 +69,12 @@ public class RobotPlayer {
 
     static int startPaintingFloorTowerNum = 4;  // don't paint floor before this to conserve paint
 
-    static int role = 0;
+    static int role = 0;  // default = 0. can assign different roles to a type e.g. 1 = base attacker
 
-    static MapLocation avgClump;
+    static MapLocation avgClump;  // will eventually get rid of this one, in favor of 5x5 bool map
+
+    static boolean[][] nearbyAlliesMask = new boolean[5][5];  // 5x5 area centered around robot
+    static boolean[][] nearbyEnemyMask = new boolean[5][5];
 
     // some of these are unused
     static MapLocation[] quadrantCenters = new MapLocation[4];
@@ -79,6 +86,7 @@ public class RobotPlayer {
     static int reserveChips = 1700;
 
     static int mx;  // max of mapWidth and mapHeight
+
 
     public static void run(RobotController r) throws GameActionException {
         rc = r;

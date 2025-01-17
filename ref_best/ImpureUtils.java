@@ -5,10 +5,32 @@ import battlecode.common.*;
 
 public class ImpureUtils extends RobotPlayer {
 
+    static void updateNearbyMask() throws GameActionException {  // can later change this to also update nearby enemies
+        nearbyAlliesMask = new boolean[5][5];  // reset everything to false
+
+        RobotInfo[] nearbyTiles5x5 = rc.senseNearbyRobots(9);  // includes 2 extra tiles which need to be skipped
+        for (RobotInfo robot : nearbyTiles5x5) {
+            if (rc.getTeam() == robot.getTeam()) {
+                int i = robot.getLocation().x - rc.getLocation().x + 2;
+                int j = robot.getLocation().y - rc.getLocation().y + 2;
+                if (i < 0 || i > 4 || j < 0 || j > 4)
+                    continue;  // skip
+                nearbyAlliesMask[i][j] = true;
+            }
+        }
+    }
+
+    // really, after the change, this should be called updateNearestPaintTarget, because moppers/money/defense towers are inlcuded
     static void updateNearestPaintTower() throws GameActionException {
         for (RobotInfo robot : nearbyRobots) {
-            if (robot.getTeam() == rc.getTeam()) {
+            if (robot.getTeam() == rc.getTeam() && (robot.getType().isTowerType() || robot.getType() == UnitType.MOPPER)) {
                 if (robot.getType().getBaseType() == UnitType.LEVEL_ONE_PAINT_TOWER) {
+                    if (nearestPaintTower == null || rc.getLocation().distanceSquaredTo(robot.getLocation()) < rc
+                            .getLocation().distanceSquaredTo(nearestPaintTower)) {
+                        nearestPaintTower = robot.getLocation();
+                        nearestPaintTowerIsPaintTower = true;
+                    }
+                } else if (!nearestPaintTowerIsPaintTower) {
                     if (nearestPaintTower == null || rc.getLocation().distanceSquaredTo(robot.getLocation()) < rc
                             .getLocation().distanceSquaredTo(nearestPaintTower)) {
                         nearestPaintTower = robot.getLocation();
