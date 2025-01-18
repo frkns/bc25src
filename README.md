@@ -46,7 +46,9 @@ Notes:
 
 Finished items are ~~struckthrough~~, they could maybe be improved.
 
-* splashers - Ryan
+* splashers
+* pathfinding - Ryan
+* simple global coordination with comms - Ryan
 * tune heuristics - don't waste too much time on this, planning on making something that automatically tunes
 * bytecode opts
 * soldiers stop idling around the tower while waiting for it to complete (memory that goes back to tower when 1000 chips?)
