@@ -1,9 +1,8 @@
 // Adapted from https://github.com/chenyx512/battlecode24/blob/main/src/bot1/PathFinder.java
-package ryan;
+package ryan2;
 
 import battlecode.common.*;
-import ryan.fast.FastLocSet;
-import ryan.fast.FastMath;
+import ryan2.fast.*;
 
 class Pathfinder extends RobotPlayer {
     static MapLocation target = null;

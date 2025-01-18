@@ -1,9 +1,6 @@
-package ryan;
+package ryan2;
 
-import battlecode.common.GameActionException;
-import battlecode.common.MapLocation;
-import battlecode.common.PaintType;
-import battlecode.common.UnitType;
+import battlecode.common.*;
 
 public class FillRuin extends RobotPlayer {
 

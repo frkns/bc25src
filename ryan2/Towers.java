@@ -1,4 +1,4 @@
-package ryan;
+package ryan2;
 
 import battlecode.common.*;
 
@@ -71,7 +71,7 @@ public class Towers extends RobotPlayer {
         int splasherSpawnPercent = 0;
         int mopperSpawnPercent = 0;
         if (rc.getRoundNum() >= splasherPhase) {
-            splasherSpawnPercent = 25;
+            splasherSpawnPercent = 0;
         }
         if (rc.getRoundNum() >= mopperPhase) {
             mopperSpawnPercent = 20;

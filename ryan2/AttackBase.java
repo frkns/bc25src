@@ -1,7 +1,6 @@
-package ryan;
+package ryan2;
 
 import battlecode.common.*;
-
 import java.util.Arrays;
 import java.util.Comparator;
 

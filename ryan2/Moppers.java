@@ -1,9 +1,6 @@
-package ryan;
+package ryan2;
 
-import battlecode.common.GameActionException;
-import battlecode.common.MapInfo;
-import battlecode.common.MapLocation;
-import battlecode.common.RobotInfo;
+import battlecode.common.*;
 
 public class Moppers extends RobotPlayer{
 
@@ -16,7 +13,9 @@ public class Moppers extends RobotPlayer{
 
     public static void run() throws GameActionException {
 
-        ImpureUtils.updateNearbyUnits();
+        ImpureUtils.updateNearbyUnits(); // pending removal
+
+        ImpureUtils.updateNearbyMask();
 
         ImpureUtils.updateNearestEnemyPaint();
         ImpureUtils.updateNearestEnemyTower();

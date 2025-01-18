@@ -1,8 +1,6 @@
-package ryan;
-
-import battlecode.common.GameActionException;
-import battlecode.common.MapLocation;
-import battlecode.common.PaintType;
+package ryan2;
+import java.util.Random;
+import battlecode.common.*;
 
 // these Utils are pure functions - no side-effects, they don't change variables or modify game state in any way
 

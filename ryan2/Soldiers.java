@@ -1,4 +1,4 @@
-package ryan;
+package ryan2;
 
 import battlecode.common.*;
 
@@ -31,7 +31,9 @@ public class Soldiers extends RobotPlayer {
 
     public static void run() throws GameActionException {
 
-        ImpureUtils.updateNearbyUnits();
+        ImpureUtils.updateNearbyUnits();  // pending removal
+
+        ImpureUtils.updateNearbyMask();
 
         if (Utils.selfDestructRequirementsMet()) {
             System.out.println("Self destructing...  Type: " + rc.getType() + ", Round: " + rc.getRoundNum() + ", Nearby Friend Robots: " + nearbyFriendlyRobots + ", Paint: " + rc.getPaint());

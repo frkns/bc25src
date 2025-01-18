@@ -1,6 +1,5 @@
-package ryan;
-
-import battlecode.common.UnitType;
+package ryan2;
+import battlecode.common.*;
 
 
 // all fields must be marked final

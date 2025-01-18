@@ -1,5 +1,5 @@
 // https://github.com/awesomelemonade/Battlecode2023/blob/master/src/finalBot/util/LambdaUtil.java
-package ryan.fast;
+package ryan2.fast;
 
 import java.util.Comparator;
 import java.util.Optional;
