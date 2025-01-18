@@ -8,7 +8,6 @@ public class Soldiers extends RobotPlayer {
 
     // how long of not being able to reach target till we change it?
     static int targetChangeWaitTime = mx;
-
     static int lastTargetChangeRound = 0;
 
     // not using these
@@ -30,24 +29,24 @@ public class Soldiers extends RobotPlayer {
     static MapInfo[] _attackableNearbyTiles;  // var names that start with an underscore are set static to save bytecode
 
     public static void run() throws GameActionException {
-
+        Debug.print(1, "Init");
         ImpureUtils.updateNearbyUnits();  // pending removal
-
         ImpureUtils.updateNearbyMask();
+        ImpureUtils.updateNearestEnemyTower();
 
         if (Utils.selfDestructRequirementsMet()) {
             System.out.println("Self destructing...  Type: " + rc.getType() + ", Round: " + rc.getRoundNum() + ", Nearby Friend Robots: " + nearbyFriendlyRobots + ", Paint: " + rc.getPaint());
             rc.disintegrate();
         }
 
-        ImpureUtils.updateNearestEnemyTower();
         if (nearestEnemyTower != null && rc.getRoundNum() > siegePhase) {
+            Debug.print(1, "Micro for attacking tower");
             if (rc.canAttack(nearestEnemyTower)) {
                 rc.attack(nearestEnemyTower);
                 inTowerRange = true;
             }
             if (rc.isMovementReady())
-                HeuristicPath.towerMicro();
+                HeuristicPath.move(nearestEnemyTower, Behavior.TOWER_MICRO);
             inTowerRange = false;
             if (rc.canAttack(nearestEnemyTower)) {
                 rc.attack(nearestEnemyTower);
@@ -55,12 +54,13 @@ public class Soldiers extends RobotPlayer {
             }
         }
 
-        if (isFillingRuin && rc.canSenseRobotAtLocation(curRuin.getMapLocation())) {
+        // Check if tower has been built in ruins, or reach max tower
+        if (isFillingRuin && rc.canSenseRobotAtLocation(curRuin.getMapLocation())
+        ||  rc.getNumberTowers() == GameConstants.MAX_NUMBER_OF_TOWERS
+        ) {
             isFillingRuin = false;
             curRuin = null;
         }
-        // Ruin
-        UnitType buildTowerType = AuxConstants.buildOrder[rc.getNumberTowers()];
 
         if (!isRefilling && rc.getNumberTowers() != GameConstants.MAX_NUMBER_OF_TOWERS) {
             int distance = (int)2e9;
@@ -71,15 +71,15 @@ public class Soldiers extends RobotPlayer {
                             distance = tile.getMapLocation().distanceSquaredTo(rc.getLocation());
                             curRuin = tile;
                             isFillingRuin = true;
+                            Debug.print(1, "Ruins have been found at : " + curRuin);
                         }
                     }
                 }
             }
         }
-        if (rc.getNumberTowers() == GameConstants.MAX_NUMBER_OF_TOWERS) {
-            isFillingRuin = false;
-        }
+
         if (!isRefilling && !isFillingRuin && rc.getNumberTowers() >= noSRPuntil) {
+            Debug.print(1, "Check for SRP");
             // SRP code; can disable
 
             int distance = (int)2e9;
@@ -99,18 +99,15 @@ public class Soldiers extends RobotPlayer {
             }
         }
 
-        // if (consecutiveRoundsFillingSRP > 1) {
-        //     consecutiveRoundsFillingSRP = 0;
-        //     avoidSRPloc = curSRP;
-        //     isFillingSRP = false;
-        //     curSRP = null;
-        // }
 
         if (isFillingRuin) {  // prefer checking isFillingRuin over curRuin == null
+            Debug.print(1, "Filling ruin");
+
+            UnitType buildTowerType = AuxConstants.buildOrder[rc.getNumberTowers()];
             rc.setIndicatorDot(curRuin.getMapLocation(), 255, 0, 0);
             boolean noEnemyPaint = FillRuin.updateNearestWrongInRuin(buildTowerType);
             if (noEnemyPaint) {
-                HeuristicPath.moveToWrongInRuin();
+                HeuristicPath.move(nearestWrongInRuin, Behavior.WRONG_RUINS);
                 FillRuin.updateNearestWrongInRuin(buildTowerType);
 
                 if (rc.canCompleteTowerPattern(buildTowerType, curRuin.getMapLocation())) {
@@ -132,12 +129,13 @@ public class Soldiers extends RobotPlayer {
                 nearestWrongInRuin = null;
             }
         }
-        // SRP
+
         else if (isFillingSRP) {
+            Debug.print(1, "Filling SRP");
             rc.setIndicatorDot(curSRP, 255, 0, 0);
             boolean noEnemyPaint = FillSRP.updateNearestWrongInSRP();
             if (noEnemyPaint) {
-                HeuristicPath.moveToWrongInSRP();
+                HeuristicPath.move(nearestWrongInSRP, Behavior.WRONG_SRP);
                 FillSRP.updateNearestWrongInSRP();
 
                 if (nearestWrongInSRP != null) rc.setIndicatorDot(nearestWrongInSRP, 255, 255, 0);
@@ -160,6 +158,7 @@ public class Soldiers extends RobotPlayer {
         assert(!(isFillingRuin && isFillingSRP));
 
         if (!rc.isMovementReady()) {
+            Debug.print(1, "Movement ready");
             nearbyTiles = rc.senseNearbyMapInfos();
             ImpureUtils.updateNearestEnemyTower();
         }
@@ -247,7 +246,7 @@ public class Soldiers extends RobotPlayer {
         if (rc.isMovementReady()) {
             HeuristicPath.fullFill = fullFilling;
             HeuristicPath.targetIncentive = 500;
-            HeuristicPath.move(target);
+            HeuristicPath.move(target, Behavior.SOLDIER);
             // nearbyTiles = rc.senseNearbyMapInfos();
         }
 

@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 public class AttackBase extends RobotPlayer {
-
     // create an array of the 3 possible symmetries for enemy spawn location
     static MapLocation[] potentialEnemySpawnLocations = new MapLocation[3];
     static boolean[] visited = new boolean[3]; // True if symmetries have been checked
@@ -20,6 +19,8 @@ public class AttackBase extends RobotPlayer {
 
 
     static void init() throws GameActionException {
+        Debug.print("Init AttackBase");
+
         potentialEnemySpawnLocations[0] = Utils.mirror(spawnTowerLocation);
         potentialEnemySpawnLocations[1] = Utils.verticalMirror(spawnTowerLocation);
         potentialEnemySpawnLocations[2] = Utils.horizontalMirror(spawnTowerLocation);
@@ -34,6 +35,7 @@ public class AttackBase extends RobotPlayer {
     }
 
     static void run() throws GameActionException {
+        Debug.print("Action AttackBase");
         rc.setIndicatorString("Base attacker");
 
         ImpureUtils.updateNearbyUnits();
@@ -42,33 +44,40 @@ public class AttackBase extends RobotPlayer {
         ImpureUtils.updateNearestEnemyTower();
 
         if (nearestEnemyTower != null) {
+            Debug.print(1, "Attacking");
+            rc.setIndicatorString("Attacking");
+
             if (rc.canAttack(nearestEnemyTower)) {
+                Debug.print(2, "Attack " + nearestEnemyTower);
                 rc.attack(nearestEnemyTower);
                 inTowerRange = true;
             }
-            HeuristicPath.towerMicro();
+
+            HeuristicPath.move(nearestEnemyTower, Behavior.TOWER_MICRO);
+
             inTowerRange = false;
             if (rc.canAttack(nearestEnemyTower)) {
+                Debug.print(2, "Attack " + nearestEnemyTower);
                 rc.attack(nearestEnemyTower);
                 inTowerRange = true;
             }
         }
 
         if (foundLoc == null) {
+            Debug.print(1, "Calculating for next tower");
             for (MapInfo tile : nearbyTiles) {
                 for (int i = 0; i < 3; i++) {
                     if (tile.getMapLocation().equals(potentialEnemySpawnLocations[i])) {
-                        // System.out.println("Found **potential** enemy spawn location");
+                        Debug.print("In range of **potential** enemy spawn location @ " + potentialEnemySpawnLocations[i]);
                         visited[i] = true;
                         RobotInfo robot = null;
-                        if (rc.canSenseRobotAtLocation(tile.getMapLocation()))
+                        if (rc.canSenseRobotAtLocation(tile.getMapLocation())){
                             robot = rc.senseRobotAtLocation(tile.getMapLocation());
-                        else {
-                            // System.out.println("Haha I destroyed the enemy tower");
-                            // role = 0;
+                        }else {
+                            Debug.print(2, "No tower" + tile.getMapLocation());
                         }
                         if (robot != null && robot.getTeam() != rc.getTeam() && robot.getType() == spawnTowerType) {
-                            // System.out.println("Found enemy tower @ " + tile.getMapLocation());
+                            Debug.print(2, "Found enemy tower @ " + tile.getMapLocation());
                             foundLocInfo = tile;
                             foundLoc = tile.getMapLocation();
                         }
@@ -77,22 +86,8 @@ public class AttackBase extends RobotPlayer {
             }
         }
 
-        // if (nearestEnemyTower != null) {
-        //     if (rc.canAttack(nearestEnemyTower)) {
-        //         rc.attack(nearestEnemyTower);
-        //         inTowerRange = true;
-        //     }
-        //     if (rc.isActionReady())
-        //         HeuristicPath.towerMicro();
-        //     inTowerRange = false;
-        //     if (rc.canAttack(nearestEnemyTower)) {
-        //         rc.attack(nearestEnemyTower);
-        //         inTowerRange = true;
-        //     }
-        // }
-
         if (foundLoc == null) {
-            // System.out.println("No enemy tower found");
+            Debug.print(1, "No enemy tower found");
             for (int i = 0; i < 3; i++) {
                 if (!visited[i]) {
                     target = potentialEnemySpawnLocations[i];
@@ -100,7 +95,7 @@ public class AttackBase extends RobotPlayer {
                 }
             }
             if (rc.isMovementReady()) {
-                Pathfinder.move(target);
+                Pathfinder.move(target); // todos : use move with heuristic where target is given by pathfinder
                 // HeuristicPath.attackBaseMove(target);
             }
         }
@@ -144,9 +139,9 @@ public class AttackBase extends RobotPlayer {
 
         if (foundLoc != null && !rc.canSenseRobotAtLocation(foundLoc)) {
             // System.out.println("Haha I destroyed the enemy tower");
-            role = 0;
+            behavior = Behavior.SOLDIER;
         } else if (visited[0] && visited[1] && visited[2] && nearestEnemyTower == null) {  // visited everything
-            role = 0;
+            behavior = Behavior.SOLDIER;
         }
 
     }

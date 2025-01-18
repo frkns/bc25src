@@ -35,7 +35,7 @@ public class Moppers extends RobotPlayer{
         // rc.setIndicatorDot(target, 200, 200, 200);
 
         // target = Utils.mirror(spawnTowerLocation);
-        HeuristicPath.mopperMove(target);
+        HeuristicPath.move(target, Behavior.MOPPER);
 
         MapLocation bestAttackTarget = null;
         int bestScore = 0;
