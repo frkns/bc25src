@@ -1,5 +1,61 @@
 
 
+=== Results at 2025-01-18_09-50-56 ===
+lmx wins: 21 (50.00% win rate)
+ref_best wins: 21 (50.00% win rate)
+Tied maps (21):
+- DefaultSmall
+- DefaultMedium
+- DefaultLarge
+- DefaultHuge
+- Fossil
+- Gears
+- Justice
+- Mirage
+- Money
+- MoneyTower
+- Racetrack
+- Restart
+- SMILE
+- SaltyPepper
+- TargetPractice
+- Thirds
+- UglySweater
+- UnderTheSea
+- catface
+- gardenworld
+- memstore
+
+
+=== Results at 2025-01-17_23-42-15 ===  // bunch of readme items ticked off
+ref_best wins: 15 (35.71% win rate)
+kenny wins: 27 (64.29% win rate)
+Tied maps (13):
+- DefaultLarge
+- DefaultHuge
+- Fossil
+- Gears
+- Justice
+- MoneyTower
+- Restart
+- SMILE
+- TargetPractice
+- UglySweater
+- UnderTheSea
+- catface
+- gardenworld
+Maps ref_best wins on as both red and blue (1):
+- Mirage
+Maps kenny wins on as both red and blue (7):
+- DefaultSmall
+- DefaultMedium
+- Money
+- Racetrack
+- SaltyPepper
+- Thirds
+- memstore
+
+
 === Results at 2025-01-17_15-55-41 ===  // massively improved declumping + better ruin fills + better refills
 ref_best wins: 15 (35.71% win rate)
 kenny wins: 27 (64.29% win rate)

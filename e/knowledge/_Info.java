@@ -116,12 +116,12 @@ public class _Info {
         nearbyTiles = rc.senseNearbyMapInfos();
         nearbyTileLocsR4 = rc.getAllLocationsWithinRadiusSquared(_Info.robotLoc, 4);
         if (rc.getType().isRobotType()) {
+            nearbyRuins = rc.senseNearbyRuins(-1);
 
             for(MapLocation loc: nearbyRuins){
                 knownRuins.add(loc);
             }
 
-            nearbyRuins = rc.senseNearbyRuins(-1);
 
             for(MapLocation loc: nearbyRuins){
                 if(rc.isLocationOccupied(loc)){

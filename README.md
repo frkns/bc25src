@@ -44,7 +44,7 @@ Notes:
 
 ### What to add
 
-Finished items that could still be improved are ~~struckthrough~~.
+Finished items are ~~struckthrough~~, they could maybe be improved.
 
 * splashers - Ryan
 * tune heuristics - don't waste too much time on this, planning on making something that automatically tunes
@@ -52,19 +52,12 @@ Finished items that could still be improved are ~~struckthrough~~.
 * soldiers stop idling around the tower while waiting for it to complete (memory that goes back to tower when 1000 chips?)
 * make a builder robot that stay at ruins wainting for enough chips
 * reactionary tower spawn
-* defense tower in contested areas and after a certain round
 * not getting suck on gears map
 * build towers before rushing?
 * better soldier spawning away from walls
 * stop attacking tower on low health
 * leave when there is enemy paint on ruin (already done but logic needs improvement)
-* mopper prio unfinished ruins
-* fix to 4 soldier start
-* don’t upgrade damaged towers
-* better tower micro (don’t walk into tower range if not isActionReady)
 
-* ~~rework clump avoidance - current mech sucks~~ done
-* ~~soldiers dot enemy ruins~~ done
 
 ### Random Ideas
 
@@ -74,5 +67,17 @@ These are less important.
 * better self-destruct logic?
 * improve build order?
 * dynamic build order depending map size and such?
-* ~~Infiltrating the enemy base by walking straight through their paint to attack towers. Will help reduce clumping on home base too.~~ done
-* ~~make paint tower reserve paint for refills?~~ done
+
+
+* prioritize spawning paint towers in central locations for easier refilling
+
+* defense tower in contested areas and ~~after a certain round~~, partial finished
+* ~~mopper prio unfinished ruins~~
+* ~~fix to 4 soldier start~~
+* ~~better tower micro (don’t walk into tower range if not isActionReady)~~
+* ~~Infiltrating the enemy base by walking straight through their paint to attack towers. Will help reduce clumping on home base too.~~
+* ~~make paint tower reserve paint for refills?~~
+* ~~rework clump avoidance - current mech sucks~~
+* ~~soldiers dot enemy ruins~~ (to be improved)
+* ~~add mopper mop swing and best target~~ done (mop swing not added because bad)
+* ~~don’t upgrade damaged towers~~ (added with some nuances)

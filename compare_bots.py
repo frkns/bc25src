@@ -8,14 +8,19 @@ from multiprocessing import Pool, Manager
 from pathlib import Path
 from typing import Any
 
-# Dynamically calculate the directory containing gradlew.bat
+# Dynamically calculate the directory containing gradlew.bat or ./gradlew for linux
 # This assumes the script is located in `src/` and the `java` directory is one level up
 SCRIPT_DIR = Path(__file__).resolve().parent  # Absolute path to the script's directory
 JAVA_DIR = SCRIPT_DIR.parent  # Absolute path to the `java` directory (parent of `src`)
 
 # Ensure the `java` directory contains the Gradle files
-if not (JAVA_DIR / "gradlew.bat").exists():
-    raise FileNotFoundError(f"Could not find 'gradlew.bat' in the Java directory: {JAVA_DIR}")
+GRADLEW = "gradlew.bat"
+if not (JAVA_DIR / GRADLEW).exists():
+    print("Could not found 'gradlew.bat', trying 'gradlew' for linux ...")
+    GRADLEW = "gradlew"
+
+    if not (JAVA_DIR / GRADLEW).exists():
+        raise FileNotFoundError(f"Could not find 'gradlew.bat' or 'gradlew' in the Java directory: {JAVA_DIR}")
 
 NUM_CORES = 6
 assert NUM_CORES % 2 == 0
@@ -56,9 +61,9 @@ def run_matches(player1: str, player2: str, mymaps: list[str], timestamp: str, c
     current_result = None
 
     # Use the absolute path to gradlew.bat
-    gradlew_path = JAVA_DIR / "gradlew.bat"
+    gradlew_path = JAVA_DIR / GRADLEW
     if not gradlew_path.exists():
-        raise FileNotFoundError(f"Could not find 'gradlew.bat' at: {gradlew_path}")
+        raise FileNotFoundError(f"Could not find '{GRADLEW}' at: {gradlew_path}")
 
     args = [
         str(gradlew_path),  # Absolute path to gradlew.bat

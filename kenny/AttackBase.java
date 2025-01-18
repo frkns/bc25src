@@ -32,21 +32,23 @@ public class AttackBase extends RobotPlayer {
     static MapLocation foundLoc = null;
     static MapInfo foundLocInfo = null;
 
-    // simpler if false but also take more damage
-    static final boolean ATTACK_MICRO = true;  // do we want to shift back and forth to avoid tower shots?
 
     static void run() throws GameActionException {
+
         rc.setIndicatorString("Base attacker");
 
         ImpureUtils.updateNearbyUnits();
-
-        rc.setIndicatorDot(avgClump, 0, 0, 255);
         ImpureUtils.updateNearestEnemyTower();
 
         if (nearestEnemyTower != null) {
             if (rc.canAttack(nearestEnemyTower)) {
                 rc.attack(nearestEnemyTower);
                 inTowerRange = true;
+            }
+            if (rc.getHealth() < 31) {  // stop attacking if low health, 30 or less means we die to level 1 paint/money tower shot + AoE
+                role = 0;
+                Soldiers.run();
+                return;
             }
             HeuristicPath.towerMicro();
             inTowerRange = false;
@@ -131,23 +133,48 @@ public class AttackBase extends RobotPlayer {
             }
         }
 
+        // // dot nearby empty/ enemy ruins
+        // if (rc.isActionReady()) {
+        //     MapLocation closestRuinToDot = null;
+        //     int distance = (int)2e9;
+        //     for (MapInfo tile : nearbyTiles) {
+        //         if (tile.hasRuin()) {
+        //             if (tile.getMapLocation().distanceSquaredTo(rc.getLocation()) < distance) {
+        //                 distance = tile.getMapLocation().distanceSquaredTo(rc.getLocation());
+        //                 closestRuinToDot = tile.getMapLocation();
+        //             }
+        //         }
+        //     }
+        //     if (closestRuinToDot != null) {
+        //         MapLocation locToDot = Utils.nearestEmptyOnRuinIfEnemyOrIsUndotted(closestRuinToDot);
+        //         if (locToDot != null && rc.canAttack(locToDot)) {
+        //             // System.out.println("dotted a ruin");
+        //             rc.attack(locToDot);
+        //         }
+        //     }
+        // }
+
 
         boolean fullFilling = rc.getRoundNum() >= fullFillPhase;
         if (rc.getPaint() > 150 && fullFilling) {
             ImpureUtils.paintFloor();
-            _attackableNearbyTiles = rc.senseNearbyMapInfos(9);
-            for (MapInfo tile : _attackableNearbyTiles) {
-                if (tile.getPaint() == PaintType.EMPTY && rc.canAttack(tile.getMapLocation())) {
-                    rc.attack(tile.getMapLocation());
-                }
-            }
+            // _attackableNearbyTiles = rc.senseNearbyMapInfos(9);
+            // for (MapInfo tile : _attackableNearbyTiles) {
+            //     if (tile.getPaint() == PaintType.EMPTY && rc.canAttack(tile.getMapLocation())) {
+            //         rc.attack(tile.getMapLocation());
+            //     }
+            // }
         }
 
         if (foundLoc != null && !rc.canSenseRobotAtLocation(foundLoc)) {
             // System.out.println("Haha I destroyed the enemy tower");
             role = 0;
+            Soldiers.run();
+            return;
         } else if (visited[0] && visited[1] && visited[2] && nearestEnemyTower == null) {  // visited everything
             role = 0;
+            Soldiers.run();
+            return;
         }
 
     }
