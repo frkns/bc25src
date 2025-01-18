@@ -65,7 +65,7 @@ public class FillSRP extends RobotPlayer {
         Soldiers.lastSRPloc = curSRP;
         Soldiers.lastSRProundNum = rc.getRoundNum();
     }
-//
+
     public static void tryToPaintSRP() throws GameActionException {
         MapLocation SRPloc = curSRP;
 
