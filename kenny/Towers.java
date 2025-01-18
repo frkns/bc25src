@@ -6,14 +6,12 @@ public class Towers extends RobotPlayer {
 
     static boolean spawnedFirstMopper = false;
     static int nonGreedyPhase = (int)(mx * 2);  // allow other units to complete ruins / upgrade towers if money capped
-    static int firstMopper = (int)(mx * 2);
+    static int firstMopper = (int)(mx);
 
+    static int numSpawnedUnits = 0;
 
     public static void run() throws GameActionException {
         // debugging stuff
-        for (int i = 0; i < 4; i++) {
-            rc.setIndicatorDot(quadrantCenters[i], 255, 255, 255);
-        }
         if (rc.getRoundNum() <= 1 && rc.getType() == UnitType.LEVEL_ONE_PAINT_TOWER) {
             System.out.println("Number of towers " + rc.getNumberTowers());
             System.out.println("Siege phase " + siegePhase);
@@ -51,12 +49,13 @@ public class Towers extends RobotPlayer {
         }
 
         boolean spawnIsFirstMopper = false;
-        if (turnsAlive > 5 && rc.getRoundNum() > firstMopper && !spawnedFirstMopper && rc.getMoney() > reserveChips) {
+        if (turnsAlive > 2 && rc.getRoundNum() > firstMopper && !spawnedFirstMopper && rc.getMoney() > reserveChips) {
             spawn = UnitType.MOPPER;
             spawnIsFirstMopper = true;
         }
 
-        if ((rc.getRoundNum() < nonGreedyPhase || rc.getMoney() > 2000)
+        if (numSpawnedUnits < 2 ||  // don't conserve resources if we haven't spawned two units yet
+            (rc.getRoundNum() < nonGreedyPhase || rc.getMoney() > 2000)
             && rc.getMoney() - spawn.moneyCost >= reserveChips
             && (rc.getPaint() - spawn.paintCost >= reservePaint || rc.getRoundNum() < reservePaintPhase || rc.getType().getBaseType() != UnitType.LEVEL_ONE_PAINT_TOWER))
             // only reserve paint if we are a paint tower ^

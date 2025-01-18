@@ -39,10 +39,11 @@ public class RobotPlayer {
     static RobotInfo[] nearbyRobots;
     static MapInfo[] nearbyTiles;
     static boolean nearestPaintTowerIsPaintTower = false;
-    static MapLocation nearestPaintTower;  // can be money/defense tower if we haven't see a paint tower yet
+    static MapLocation nearestPaintTower;  // misnomer, can be money/defense tower if we haven't see a paint tower yet
     static MapLocation nearestEnemyTower;
     static MapLocation nearestEmptyTile;  // not used (update: we use it now for full fill)
     static MapLocation nearestEnemyPaint;
+    static MapLocation nearestEnemyRobot;  // non-tower
 
     static MapInfo curRuin;
     static boolean isFillingRuin = false;
@@ -54,8 +55,12 @@ public class RobotPlayer {
 
     static int siegePhase;
     static int mopperPhase;
-    static int selfDestructPhase = 300;
+    static int fullFillPhase;
+    static int attackBasePhase;
+    static int alwaysBuildDefenseTowerPhase;
 
+    // not sure if self destructing is worth it, needs more testing
+    static int selfDestructPhase = 300;
     static int selfDestructFriendlyRobotsThreshold = 20;  // > this to self destruct
     static int selfDestructEnemyRobotsThreshold = 5;  // < this to self destruct
     static int selfDestructPaintThreshold = 50;
@@ -64,8 +69,6 @@ public class RobotPlayer {
     static int nearbyEnemyRobots;
 
     static boolean inTowerRange = false;
-    static int fullFillPhase;
-    static int attackBasePhase;
 
     static int startPaintingFloorTowerNum = 4;  // don't paint floor before this to conserve paint
 
@@ -74,7 +77,7 @@ public class RobotPlayer {
     static MapLocation avgClump;  // will eventually get rid of this one, in favor of 5x5 bool map
 
     static boolean[][] nearbyAlliesMask = new boolean[5][5];  // 5x5 area centered around robot
-    static boolean[][] nearbyEnemyMask = new boolean[5][5];
+    static boolean[][] nearbyEnemiesMask = new boolean[5][5];
 
     // some of these are unused
     static MapLocation[] quadrantCenters = new MapLocation[4];
@@ -86,6 +89,7 @@ public class RobotPlayer {
     static int reserveChips = 1700;
 
     static int mx;  // max of mapWidth and mapHeight
+
 
 
     public static void run(RobotController r) throws GameActionException {
@@ -123,6 +127,8 @@ public class RobotPlayer {
         mopperPhase = (int)(mx * 4);
         attackBasePhase = (int)(mx * 3);
         reservePaintPhase = (int)(mx * 1.5);
+        alwaysBuildDefenseTowerPhase = (int)(mx * 6);
+
         if (mx < 30) {
             attackBasePhase = 0;  // may be beneficial to send immediately on small maps
         }
@@ -194,8 +200,6 @@ public class RobotPlayer {
 
         // Your code should never reach here (unless it's intentional)! Self-destruction imminent...
     }
-
-    static int numSpawnedUnits = 0;
 
     public static void runTower() throws GameActionException {
         Towers.run();

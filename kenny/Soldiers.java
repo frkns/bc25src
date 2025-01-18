@@ -19,21 +19,25 @@ public class Soldiers extends RobotPlayer {
     static int lastSRProundNum = 0;
     /* */
 
-    static int stopQuadrantModifierPhase = mx * 2;
-
     static int numWrongTilesInRuin;
     static int numWrongTilesInSRP;
 
-    static int noSRPuntil = 5;  // no SRPs until x towers have been built
-    static int noFullFillUntil = 5;
+    static int noSRPuntil = 4;  // no SRPs until x towers have been built
+    static int noFullFillUntil = 4;
 
     static MapInfo[] _attackableNearbyTiles;  // var names that start with an underscore are set static to save bytecode
 
+
+    // experimental
+    // static int stopQuadrantModifierPhase = mx * 2;  // pending deletion?
+    /* */
+
     public static void run() throws GameActionException {
 
-        ImpureUtils.updateNearbyUnits();  // pending removal
+        // ImpureUtils.updateNearbyUnits();  // pending removal
 
-        ImpureUtils.updateNearbyMask();
+        ImpureUtils.tryUpgradeNearbyTowers();
+        ImpureUtils.updateNearbyMask(false);
 
         if (Utils.selfDestructRequirementsMet()) {
             System.out.println("Self destructing...  Type: " + rc.getType() + ", Round: " + rc.getRoundNum() + ", Nearby Friend Robots: " + nearbyFriendlyRobots + ", Paint: " + rc.getPaint());
@@ -61,6 +65,8 @@ public class Soldiers extends RobotPlayer {
         }
         // Ruin
         UnitType buildTowerType = AuxConstants.buildOrder[rc.getNumberTowers()];
+        if (rc.getRoundNum() >= alwaysBuildDefenseTowerPhase)
+            buildTowerType = UnitType.LEVEL_ONE_DEFENSE_TOWER;
 
         if (!isRefilling && rc.getNumberTowers() != GameConstants.MAX_NUMBER_OF_TOWERS) {
             int distance = (int)2e9;
@@ -165,20 +171,14 @@ public class Soldiers extends RobotPlayer {
         }
         ImpureUtils.tryMarkSRP();
 
-        boolean canRefill = true;
         MapLocation paintTarget = nearestPaintTower;
-        if (paintTarget == null) {
-            paintTarget = spawnTowerLocation;
-            if (spawnTowerType == UnitType.LEVEL_ONE_DEFENSE_TOWER) {
-                canRefill = false;
-                isRefilling = false;
-            }
-        }
-        ImpureUtils.withdrawPaintIfPossible(paintTarget);
 
-        isRefilling = rc.getPaint() < 100 && canRefill;
+        if (paintTarget != null)
+            ImpureUtils.withdrawPaintIfPossible(paintTarget);
 
-        if (isRefilling) {
+        isRefilling = rc.getPaint() < 100;
+
+        if (isRefilling && paintTarget != null) {
             HeuristicPath.fullFill = false;
 
             // two options for paint refill :
@@ -186,10 +186,10 @@ public class Soldiers extends RobotPlayer {
             // 2. is guaranteed to make it but could take longer and make it die of paint loss also does not taking into clumping penalties
 
             // 1.
-            // HeuristicPath.refill(paintTarget);
+            HeuristicPath.refill(paintTarget);
 
             // 2.
-            Pathfinder.move(paintTarget);
+            // Pathfinder.move(paintTarget);
 
             rc.setIndicatorLine(rc.getLocation(), paintTarget, 131, 252, 131);
         }
@@ -203,7 +203,6 @@ public class Soldiers extends RobotPlayer {
         // dot nearby empty/ enemy ruins
         if (rc.isActionReady()) {
             MapLocation closestRuinToDot = null;
-
             int distance = (int)2e9;
             for (MapInfo tile : nearbyTiles) {
                 if (tile.hasRuin()) {
@@ -226,16 +225,17 @@ public class Soldiers extends RobotPlayer {
         if (target == null
                 || rc.getLocation().isWithinDistanceSquared(target, 9)
                 || rc.getRoundNum() - lastTargetChangeRound > targetChangeWaitTime) {
-
             // selecting a random target location on the map has an inherent bias towards the center if e.g. we are in a corner
             // this is more of a problem on big maps
             // try to combat this but also instead sometimes selecting a location in our current quadrant
-            if (rc.getRoundNum() % 2 == 0 && rc.getRoundNum() < stopQuadrantModifierPhase)
+            /*if (rc.getRoundNum() % 2 == 0 && rc.getRoundNum() < stopQuadrantModifierPhase)
                 target = Utils.randomLocationInQuadrant(Utils.currentQuadrant());
-            else
-                target = new MapLocation(rng.nextInt(mapWidth), rng.nextInt(mapHeight));
+            else*/ {
+                target = Utils.randomLocationInQuadrant(rng.nextInt(4));
+            }
             lastTargetChangeRound = rc.getRoundNum();
         }
+
 
         boolean fullFilling = rc.getRoundNum() >= fullFillPhase && rc.getNumberTowers() >= noFullFillUntil;
 

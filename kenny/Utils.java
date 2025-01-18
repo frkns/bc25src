@@ -8,14 +8,12 @@ public class Utils extends RobotPlayer {
 
     // returns null if it's already dotted and there's no enemy paint on the ruin, otherwise returns nearest empty location
     static MapLocation nearestEmptyOnRuinIfEnemyOrIsUndotted(MapLocation ruinLoc) throws GameActionException {
-
-        // this code checks to see if ruinLoc has an ally tower on it (update: removed because we want to dot it anyway)
         // if (rc.canSenseRobotAtLocation(ruinLoc)) {
         //     RobotInfo ruinLocInfo = rc.senseRobotAtLocation(ruinLoc);
         //     if (ruinLocInfo.getTeam() == rc.getTeam())
         //         return null;  // this "ruin" is acutally an ally tower
         // }
-
+        // ^ this code checks to see if ruinLoc has an ally tower on it (update: removed because we want to dot it anyway)
         boolean hasEnemyPaint = false;
         boolean hasAllyPaint = false;
         MapLocation nearestEmpty = null;
@@ -48,6 +46,7 @@ public class Utils extends RobotPlayer {
             return null;
         return nearestEmpty;
     }
+
     static int currentQuadrant() throws GameActionException {  // numbered like the cartesian plane, except 0-indexed
         MapLocation loc = rc.getLocation();
         if (loc.x > mapWidth/2) {

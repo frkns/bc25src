@@ -34,7 +34,7 @@ public class HeuristicPath extends RobotPlayer {
         Direction toSpawnTower = rc.getLocation().directionTo(spawnTowerLocation);
 
         int INF = (int)2e9;
-        for (int i = 0; i < 8; i++) {
+        for (int i = 8; i-- > 0;) {
             Direction dir = directions[i];
 
             // if we can't move there, set the cost to infinity
@@ -93,10 +93,7 @@ public class HeuristicPath extends RobotPlayer {
                 directionCost[i] += Utils.manhattanDistance(newLoc, nearestEmptyTile) * 500;
             }
 
-            // pending deletion
-            // // add (negative) cost for moving in a direction that gets us gets us closer to a clump
-            // directionCost[i] -= Utils.manhattanDistance(newLoc, avgClump) * nearbyFriendlyRobots * 50;
-
+            // clump avoidance
             int maskx = dir.dx + 2;
             int masky = dir.dy + 2;
             int allyRobotsInNewLoc = 0;
@@ -119,7 +116,7 @@ public class HeuristicPath extends RobotPlayer {
         // find the minimum cost Direction and move there
         int minCost = INF;
         Direction minDir = null;
-        for (int i = 0; i < 8; i++) {
+        for (int i = 8; i-- > 0;) {
             if (directionCost[i] < minCost) {
                 minCost = directionCost[i];
                 minDir = directions[i];
@@ -136,7 +133,7 @@ public class HeuristicPath extends RobotPlayer {
         MapLocation nearbyEnemyTowerLoc = nearestEnemyTower;
 
         int INF = (int)2e9;
-        for (int i = 0; i < 8; i++) {
+        for (int i = 8; i-- > 0;) {
             Direction dir = directions[i];
 
             // if we can't move there, set the cost to infinity
@@ -185,15 +182,23 @@ public class HeuristicPath extends RobotPlayer {
                 directionCost[i] += Utils.manhattanDistance(newLoc, targetLoc) * 1000;
             }
 
-            // add (negative) cost for moving in a direction that gets us gets us closer to a clump
-            directionCost[i] -= Utils.manhattanDistance(newLoc, avgClump) * nearbyFriendlyRobots * 50;
+            // clump avoidance
+            int maskx = dir.dx + 2;
+            int masky = dir.dy + 2;
+            int allyRobotsInNewLoc = 0;
+            for (int d = 8; d-- > 0;) {
+                if (nearbyAlliesMask[maskx + dx8[d]][masky + dy8[d]]) {
+                    allyRobotsInNewLoc++;
+                }
+            }
+            directionCost[i] += allyRobotsInNewLoc * 1000;
 
         }
 
         // find the minimum cost Direction and move there
         int minCost = INF;
         Direction minDir = null;
-        for (int i = 0; i < 8; i++) {
+        for (int i = 8; i-- > 0;) {
             if (directionCost[i] < minCost) {
                 minCost = directionCost[i];
                 minDir = directions[i];
@@ -208,7 +213,7 @@ public class HeuristicPath extends RobotPlayer {
         int[] directionCost = new int[8];
 
         int INF = (int)2e9;
-        for (int i = 0; i < 8; i++) {
+        for (int i = 8; i-- > 0;) {
             Direction dir = directions[i];
 
             // if we can't move there, set the cost to infinity
@@ -223,16 +228,16 @@ public class HeuristicPath extends RobotPlayer {
             // add a cost if new location is the previous one
             MapLocation lastLoc = locationHistory[(rc.getRoundNum() - 1 + 8) % 8];
             if (newLoc.equals(lastLoc)) {
-                directionCost[i] += 1000;
+                directionCost[i] += 500;
             }
             lastLoc = locationHistory[(rc.getRoundNum() - 2 + 8) % 8];
             if (newLoc.equals(lastLoc)) {
-                directionCost[i] += 1000;
+                directionCost[i] += 500;
             }
 
             if (nearestWrongInRuin != null) {
                 // add cost for moving in a direction that gets us further away from nearest empty tile
-                directionCost[i] += Math.max(9, newLoc.distanceSquaredTo(nearestWrongInRuin)) * 500;
+                directionCost[i] += Math.max(9, newLoc.distanceSquaredTo(nearestWrongInRuin)) * 1000;
             }
 
             if (ruinLoc != null) {
@@ -241,13 +246,21 @@ public class HeuristicPath extends RobotPlayer {
             }
 
             // add cost for moving in a direction that gets us gets us closer to a clump (-)
-            directionCost[i] -= Utils.manhattanDistance(newLoc, avgClump) * Math.max(5, nearbyFriendlyRobots) * 50;
+            int maskx = dir.dx + 2;
+            int masky = dir.dy + 2;
+            int allyRobotsInNewLoc = 0;
+            for (int d = 8; d-- > 0;) {
+                if (nearbyAlliesMask[maskx + dx8[d]][masky + dy8[d]]) {
+                    allyRobotsInNewLoc++;
+                }
+            }
+            directionCost[i] += allyRobotsInNewLoc * 1000;
         }
 
         // find the minimum cost Direction and move there
         int minCost = INF;
         Direction minDir = null;
-        for (int i = 0; i < 8; i++) {
+        for (int i = 8; i-- > 0;) {
             if (directionCost[i] < minCost) {
                 minCost = directionCost[i];
                 minDir = directions[i];
@@ -262,7 +275,7 @@ public class HeuristicPath extends RobotPlayer {
         int[] directionCost = new int[8];
 
         int INF = (int)2e9;
-        for (int i = 0; i < 8; i++) {
+        for (int i = 8; i-- > 0;) {
             Direction dir = directions[i];
 
             // if we can't move there, set the cost to infinity
@@ -291,13 +304,22 @@ public class HeuristicPath extends RobotPlayer {
             }
 
             // add cost for moving in a direction that gets us gets us closer to a clump
-            directionCost[i] -= Utils.manhattanDistance(newLoc, avgClump) * nearbyFriendlyRobots * 50;
+            // directionCost[i] -= Utils.manhattanDistance(newLoc, avgClump) * nearbyFriendlyRobots * 50;
+            int maskx = dir.dx + 2;
+            int masky = dir.dy + 2;
+            int allyRobotsInNewLoc = 0;
+            for (int d = 8; d-- > 0;) {
+                if (nearbyAlliesMask[maskx + dx8[d]][masky + dy8[d]]) {
+                    allyRobotsInNewLoc++;
+                }
+            }
+            directionCost[i] += allyRobotsInNewLoc * 1000;
         }
 
         // find the minimum cost Direction and move there
         int minCost = INF;
         Direction minDir = null;
-        for (int i = 0; i < 8; i++) {
+        for (int i = 8; i-- > 0;) {
             if (directionCost[i] < minCost) {
                 minCost = directionCost[i];
                 minDir = directions[i];
@@ -312,7 +334,7 @@ public class HeuristicPath extends RobotPlayer {
         int[] directionCost = new int[8];
 
         int INF = (int)2e9;
-        for (int i = 0; i < 8; i++) {
+        for (int i = 8; i-- > 0;) {
             Direction dir = directions[i];
 
             // if we can't move there, set the cost to infinity
@@ -347,7 +369,7 @@ public class HeuristicPath extends RobotPlayer {
         // find the minimum cost Direction and move there
         int minCost = INF;
         Direction minDir = null;
-        for (int i = 0; i < 8; i++) {
+        for (int i = 8; i-- > 0;) {
             if (directionCost[i] < minCost) {
                 minCost = directionCost[i];
                 minDir = directions[i];
@@ -361,7 +383,7 @@ public class HeuristicPath extends RobotPlayer {
         int[] directionCost = new int[8];
 
         int INF = (int)2e9;
-        for (int i = 0; i < 8; i++) {
+        for (int i = 8; i-- > 0;) {
             Direction dir = directions[i];
 
             // if we can't move there, set the cost to infinity
@@ -375,31 +397,40 @@ public class HeuristicPath extends RobotPlayer {
 
             // add a cost if the tile is not ally paint
             if (!tileInfo.getPaint().isAlly()) {
-                directionCost[i] += 3000;
+                directionCost[i] += 10_000;
             }
 
-            // if we are not inside tower range we should move inside it
-            if (inTowerRange) {
+            // if we are not inside tower range we should move inside it, iff we are able to attack
+            if (inTowerRange || !rc.isActionReady()) {
                 if (newLoc.isWithinDistanceSquared(nearestEnemyTower, 9)) {
-                    directionCost[i] += 9000;
+                    directionCost[i] += 100_000;
                 }
             } else {
                 if (!newLoc.isWithinDistanceSquared(nearestEnemyTower, 9)) {
-                    directionCost[i] += 9000;
+                    directionCost[i] += 100_000;
                 }
             }
 
             // add cost for moving in a direction that gets us further away from target
-            directionCost[i] += Utils.manhattanDistance(nearestEnemyTower, newLoc) * 500;
+            directionCost[i] += Utils.manhattanDistance(nearestEnemyTower, newLoc) * 2000;
 
             // add cost for moving in a direction that gets us gets us closer to a clump
-            directionCost[i] -= Utils.manhattanDistance(newLoc, avgClump) * nearbyFriendlyRobots * 50;
+            // directionCost[i] -= Utils.manhattanDistance(newLoc, avgClump) * nearbyFriendlyRobots * 50;
+            int maskx = dir.dx + 2;
+            int masky = dir.dy + 2;
+            int allyRobotsInNewLoc = 0;
+            for (int d = 8; d-- > 0;) {
+                if (nearbyAlliesMask[maskx + dx8[d]][masky + dy8[d]]) {
+                    allyRobotsInNewLoc++;
+                }
+            }
+            directionCost[i] += allyRobotsInNewLoc * 1000;
         }
 
         // find the minimum cost Direction and move there
         int minCost = INF;
         Direction minDir = null;
-        for (int i = 0; i < 8; i++) {
+        for (int i = 8; i-- > 0;) {
             if (directionCost[i] < minCost) {
                 minCost = directionCost[i];
                 minDir = directions[i];
@@ -414,7 +445,7 @@ public class HeuristicPath extends RobotPlayer {
         MapLocation nearbyEnemyTowerLoc = nearestEnemyTower;
 
         int INF = (int)2e9;
-        for (int i = 0; i < 8; i++) {
+        for (int i = 8; i-- > 0;) {
             Direction dir = directions[i];
 
             // if we can't move there, set the cost to infinity
@@ -473,13 +504,17 @@ public class HeuristicPath extends RobotPlayer {
             // add cost for moving in a direction that gets us further away from target
             directionCost[i] += Utils.manhattanDistance(newLoc, targetLoc) * 500;
 
-            // add cost for moving in a direction that gets us further away from enemyPaint
-            if (nearestEnemyPaint != null)
+            // add cost for moving in a direction that gets us further away from enemyPaint, prioritize enemy paint on ruins
+            if (Moppers.nearestEnemyPaintOnRuin != null)
+                directionCost[i] += Math.max(1, Utils.manhattanDistance(newLoc, Moppers.nearestEnemyPaintOnRuin)) * 1000;
+            else if (nearestEnemyPaint != null)
                 directionCost[i] += Math.max(1, Utils.manhattanDistance(newLoc, nearestEnemyPaint)) * 1000;
 
+            // small weird declumping thing, not sure if it works
             directionCost[i] +=
                 Utils.manhattanDistance(newLoc, Utils.mirror(spawnTowerLocation)) * 10 * nearbyFriendlyRobots;
 
+            // good anti clumping
             int maskx = dir.dx + 2;
             int masky = dir.dy + 2;
             int allyRobotsInNewLoc = 0;
@@ -488,13 +523,14 @@ public class HeuristicPath extends RobotPlayer {
                     allyRobotsInNewLoc++;
                 }
             }
-            directionCost[i] += allyRobotsInNewLoc * 1000;
+            directionCost[i] += allyRobotsInNewLoc * 500;
+
         }
 
         // find the minimum cost Direction and move there
         int minCost = INF;
         Direction minDir = null;
-        for (int i = 0; i < 8; i++) {
+        for (int i = 8; i-- > 0;) {
             if (directionCost[i] < minCost) {
                 minCost = directionCost[i];
                 minDir = directions[i];
@@ -510,7 +546,7 @@ public class HeuristicPath extends RobotPlayer {
         MapLocation nearbyEnemyTowerLoc = nearestEnemyTower;
 
         int INF = (int)2e9;
-        for (int i = 0; i < 8; i++) {
+        for (int i = 8; i-- > 0;) {
             Direction dir = directions[i];
 
             // if we can't move there, set the cost to infinity
@@ -554,13 +590,20 @@ public class HeuristicPath extends RobotPlayer {
                 directionCost[i] += Utils.manhattanDistance(newLoc, nearestEnemyTower) * 2000;
 
             // add cost for moving in a direction that gets us gets us closer to a clump
-            if (avgClump != null)
-                directionCost[i] -= Utils.manhattanDistance(newLoc, avgClump) * nearbyFriendlyRobots * 20;
+            int maskx = dir.dx + 2;
+            int masky = dir.dy + 2;
+            int allyRobotsInNewLoc = 0;
+            for (int d = 8; d-- > 0;) {
+                if (nearbyAlliesMask[maskx + dx8[d]][masky + dy8[d]]) {
+                    allyRobotsInNewLoc++;
+                }
+            }
+            directionCost[i] += allyRobotsInNewLoc * 1000;
         }
         // find the minimum cost Direction and move there
         int minCost = INF;
         Direction minDir = null;
-        for (int i = 0; i < 8; i++) {
+        for (int i = 8; i-- > 0;) {
             if (directionCost[i] < minCost) {
                 minCost = directionCost[i];
                 minDir = directions[i];
