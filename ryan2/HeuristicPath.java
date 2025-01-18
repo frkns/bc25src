@@ -378,8 +378,7 @@ public class HeuristicPath extends RobotPlayer {
                 directionCost[i] += 3000;
             }
 
-            // if we are not inside tower range we should move inside it
-            if (inTowerRange) {
+            if (inTowerRange) { // If
                 if (newLoc.isWithinDistanceSquared(nearestEnemyTower, 9)) {
                     directionCost[i] += 9000;
                 }
