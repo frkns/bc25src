@@ -1,4 +1,4 @@
-package ryan2;
+package ryan;
 
 import battlecode.common.*;
 
@@ -378,7 +378,8 @@ public class HeuristicPath extends RobotPlayer {
                 directionCost[i] += 3000;
             }
 
-            if (inTowerRange) { // If
+            // if we are not inside tower range we should move inside it
+            if (inTowerRange) {
                 if (newLoc.isWithinDistanceSquared(nearestEnemyTower, 9)) {
                     directionCost[i] += 9000;
                 }

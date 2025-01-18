@@ -1,4 +1,4 @@
-package ryan2;
+package ryan;
 
 import battlecode.common.*;
 
@@ -8,6 +8,7 @@ import java.util.Random;
 public class RobotPlayer {
     public static MapLocation[] locationHistory = new MapLocation[8];
 
+    // ------ Constants ------
     static final int dx8[] = {0, 1, 1, 1, 0, -1, -1, -1};
     static final int dy8[] = {-1, -1, 0, 1, 1, 1, 0, -1};
 
@@ -23,72 +24,75 @@ public class RobotPlayer {
         Direction.NORTHWEST,
     };
 
+    // ------ Robot state ------
+    static RobotController rc;
+    static int roundNum;
+    static boolean isRefilling = false;
+    static boolean isFillingRuin = false;
+    static boolean inTowerRange = false;
+    static int turnsAlive = 0;
+    static int role = 0;  // default = 0. can assign different roles to a type e.g. 1 = base attacker
+
+    // ------ Game info ------
+    static int mapWidth;
+    static int mapHeight;
+    static int mx;  // max of mapWidth and mapHeight
+    static MapLocation mapCenter;
+
     static MapLocation spawnTowerLocation;
     static UnitType spawnTowerType;
 
-    static RobotController rc;
-    static int roundNum;
-    static int mapWidth;
-    static int mapHeight;
-    static MapLocation mapCenter;
+    // some of these are unused
+    static MapLocation[] quadrantCenters = new MapLocation[4];
+    static MapLocation[] quadrantCorners = new MapLocation[4];
+    static int[] roundsSpentInQuadrant = new int[4];
+    static MapLocation avgClump;  // will eventually get rid of this one, in favor of 5x5 bool map
 
-    static boolean isRefilling = false;
 
-    static int turnsAlive = 0;
 
+    // ------ Sensing ------
     static RobotInfo[] nearbyRobots;
     static MapInfo[] nearbyTiles;
-    static boolean nearestPaintTowerIsPaintTower = false;
     static MapLocation nearestPaintTower;  // can be money/defense tower if we haven't see a paint tower yet
     static MapLocation nearestEnemyTower;
     static MapLocation nearestEmptyTile;  // not used (update: we use it now for full fill)
     static MapLocation nearestEnemyPaint;
 
     static MapInfo curRuin;
-    static boolean isFillingRuin = false;
+    static boolean nearestPaintTowerIsPaintTower = false;
     static MapLocation nearestWrongInRuin;
 
     static MapLocation curSRP;
     static boolean isFillingSRP = false;
     static MapLocation nearestWrongInSRP;
 
+    static int nearbyFriendlyRobots;
+    static int nearbyEnemyRobots;
+    static boolean[][] nearbyAlliesMask = new boolean[5][5];  // 5x5 area centered around robot
+    static boolean[][] nearbyEnemyMask = new boolean[5][5];
+
+
+    // ------ Behavior ------
     static int siegePhase;
     static int mopperPhase;
+    static int fullFillPhase;
+    static int attackBasePhase;
     static int selfDestructPhase = 300;
 
     static int selfDestructFriendlyRobotsThreshold = 20;  // > this to self destruct
     static int selfDestructEnemyRobotsThreshold = 5;  // < this to self destruct
     static int selfDestructPaintThreshold = 50;
 
-    static int nearbyFriendlyRobots;
-    static int nearbyEnemyRobots;
-
-    static boolean inTowerRange = false;
-    static int fullFillPhase;
-    static int attackBasePhase;
-
     static int startPaintingFloorTowerNum = 4;  // don't paint floor before this to conserve paint
-
-    static int role = 0;  // default = 0. can assign different roles to a type e.g. 1 = base attacker
-
-    static MapLocation avgClump;  // will eventually get rid of this one, in favor of 5x5 bool map
-
-    static boolean[][] nearbyAlliesMask = new boolean[5][5];  // 5x5 area centered around robot
-    static boolean[][] nearbyEnemyMask = new boolean[5][5];
-
-    // some of these are unused
-    static MapLocation[] quadrantCenters = new MapLocation[4];
-    static MapLocation[] quadrantCorners = new MapLocation[4];
-    static int[] roundsSpentInQuadrant = new int[4];
 
     static int reservePaintPhase;  // it is really bad to reserve paint in the first few rounds because we'll fall behind
     static int reservePaint = 100;
     static int reserveChips = 1700;
 
-    static int mx;  // max of mapWidth and mapHeight
 
 
     public static void run(RobotController r) throws GameActionException {
+        // ---- Init infos ----
         rc = r;
         mapHeight = rc.getMapHeight();
         mapWidth = rc.getMapWidth();
@@ -126,6 +130,7 @@ public class RobotPlayer {
         if (mx < 30) {
             attackBasePhase = 0;  // may be beneficial to send immediately on small maps
         }
+
         if (rc.getType() == UnitType.SOLDIER && rc.getRoundNum() >= attackBasePhase) {
             // we do divison by ~10 first because we want to send the attackers in "waves"
             if ((rc.getRoundNum() / 10) % 3 == 0) {
@@ -133,12 +138,11 @@ public class RobotPlayer {
             }
         }
 
+        // ---- Init role ----
         switch (rc.getType()) {
             case SOLDIER: {
-                switch (role) {
-                    case 1:
-                        AttackBase.init();
-                        break;
+                if (role == 1) {
+                    AttackBase.init();
                 }
                 break;
             }
@@ -146,12 +150,12 @@ public class RobotPlayer {
 
         while (true) {
             try {
+                // ---- Init turn ----
                 turnsAlive++;
                 roundNum = rc.getRoundNum();
 
                 roundsSpentInQuadrant[Utils.currentQuadrant()]++;
 
-                // update stuff
                 locationHistory[rc.getRoundNum() % locationHistory.length] = rc.getLocation();
                 nearbyRobots = rc.senseNearbyRobots();
                 nearbyTiles = rc.senseNearbyMapInfos();
@@ -159,6 +163,7 @@ public class RobotPlayer {
                 if (!rc.getType().isTowerType())
                     ImpureUtils.updateNearestPaintTower();
 
+                // ---- Play by role ----
                 switch (rc.getType()) {
                     case SOLDIER: {
                         switch (role) {
@@ -170,7 +175,7 @@ public class RobotPlayer {
                         break;
                     }
                     case MOPPER: runMopper(); break;
-                    // case SPLASHER: runSplasher();
+                    case SPLASHER: runSplasher(); break;
                     default: runTower(); break;
                 }
 
@@ -191,8 +196,6 @@ public class RobotPlayer {
             }
             // End of loop: go back to the top. Clock.yield() has ended, so it's time for another turn!
         }
-
-        // Your code should never reach here (unless it's intentional)! Self-destruction imminent...
     }
 
     static int numSpawnedUnits = 0;
@@ -209,7 +212,7 @@ public class RobotPlayer {
         Moppers.run();
     }
 
-    // public static void runSplasher(RobotController rc) throws GameActionException{
-    //     Splashers.run();
-    // }
+    public static void runSplasher() throws GameActionException{
+        Splashers.run();
+    }
 }

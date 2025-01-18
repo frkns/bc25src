@@ -1,4 +1,4 @@
-package ryan2;
+package ryan;
 import battlecode.common.*;
 
 // these Utils are NOT pure functions (i.e. they modify state / change global variables, etc.)

@@ -1,4 +1,4 @@
-package ryan2;
+package ryan;
 import java.util.Random;
 import battlecode.common.*;
 

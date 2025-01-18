@@ -175,7 +175,7 @@ public class RobotPlayer {
                         break;
                     }
                     case MOPPER: runMopper(); break;
-                    // case SPLASHER: runSplasher();
+                    case SPLASHER: runSplasher(); break;
                     default: runTower(); break;
                 }
 
@@ -212,7 +212,7 @@ public class RobotPlayer {
         Moppers.run();
     }
 
-    // public static void runSplasher(RobotController rc) throws GameActionException{
-    //     Splashers.run();
-    // }
+    public static void runSplasher() throws GameActionException{
+        Splashers.run();
+    }
 }
