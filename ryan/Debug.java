@@ -95,23 +95,23 @@ public class Debug extends RobotPlayer {
         }
     }
 
-    public static void setIndicatorDot(boolean cond, MapLocation loc, int r, int g, int b) {
+    public static void setIndicatorDot(boolean cond, MapLocation loc, int r, int g, int b) throws GameActionException{
         if (VERBOSE && INDICATORS && cond && loc != null) {
             rc.setIndicatorDot(loc, r, g, b);
         }
     }
 
-    public static void setIndicatorLine(boolean cond, MapLocation startLoc, MapLocation endLoc, int r, int g, int b) {
+    public static void setIndicatorLine(boolean cond, MapLocation startLoc, MapLocation endLoc, int r, int g, int b) throws GameActionException {
         if (VERBOSE && INDICATORS && cond && startLoc != null && endLoc != null) {
             rc.setIndicatorLine(startLoc, endLoc, r, g, b);
         }
     }
 
-    public static void setIndicatorDot(MapLocation loc, int r, int g, int b) {
+    public static void setIndicatorDot(MapLocation loc, int r, int g, int b) throws GameActionException {
         setIndicatorDot(INDICATORS, loc, r, g, b);
     }
 
-    public static void setIndicatorLine(MapLocation startLoc, MapLocation endLoc, int r, int g, int b) {
+    public static void setIndicatorLine(MapLocation startLoc, MapLocation endLoc, int r, int g, int b) throws GameActionException {
         setIndicatorLine(INDICATORS, startLoc, endLoc, r, g, b);
     }
 }
