@@ -43,30 +43,64 @@ public class Towers extends RobotPlayer {
     }
 
     private static MapLocation findSpawnLocation() throws GameActionException {
-        int tries = 8;
-        Direction dir = directions[rng.nextInt(8)];
-        MapLocation nextLoc = rc.getLocation().add(dir);
-        // Double distance for cardinal directions
-        if (dir == Direction.NORTH || dir == Direction.SOUTH || dir == Direction.EAST || dir == Direction.WEST)
-            nextLoc = nextLoc.add(dir);
+        // bytecode efficient way of locating where to spawn
+        MapLocation loc = rc.getLocation();
+        int pos = rng.nextInt(8);
+        boolean[] blocked = new boolean[8];
+        MapLocation nextLoc = null;
+        /*
+        0 North
+        1 Northeast
+        2 East
+        3 Southeast
+        4 South
+        5 Southwest
+        6 West
+        7 Northwest
+         */
 
-        // Keep trying new directions if location is occupied
-        while (rc.canSenseRobotAtLocation(nextLoc) && tries-- > 0) {
-            dir = directions[rng.nextInt(8)];
-            nextLoc = rc.getLocation().add(dir);
-            if (dir == Direction.NORTH || dir == Direction.SOUTH || dir == Direction.EAST || dir == Direction.WEST)
-                nextLoc = nextLoc.add(dir);
+        // spawns units away from walls
+        // looks ugly but trust me it works
+        if(loc.y <= 6) {blocked[4] = true;} else {blocked[4] = false;}
+        if(loc.y >= mapHeight - 7) {blocked[0] = true;} else {blocked[0] = false;}
+        if(loc.x <= 6) {blocked[6] = true;} else {blocked[6] = false;}
+        if(loc.x >= mapWidth - 7) {blocked[2] = true;} else {blocked[2] = false;}
+        if(blocked[0] && blocked[2]) {blocked[1] = true;} else {blocked[1] = false;}
+        if(blocked[2] && blocked[4]) {blocked[3] = true;} else {blocked[3] = false;}
+        if(blocked[4] && blocked[6]) {blocked[5] = true;} else {blocked[5] = false;}
+        if(blocked[6] && blocked[0]) {blocked[7] = true;} else {blocked[7] = false;}
+
+
+        //returns a valid location
+        int count = 0;
+        while(count < 8) {
+            if(pos >= 8) {
+                pos = 0;
+            }
+            if(!blocked[pos]) {
+                Direction direction = directions[pos];
+                nextLoc = rc.getLocation().add(direction);
+                if(direction == Direction.NORTH || direction == Direction.SOUTH || direction == Direction.EAST || direction == Direction.WEST) {
+                    nextLoc = nextLoc.add(direction);
+                }
+                if(!rc.isLocationOccupied(nextLoc)) {
+                    break;
+                }
+            }
+
+            pos++;
+            count++;
         }
-        if (tries == 0) {
-            System.out.println("Tower: no empty spaces left in 8 main tiles!");
+        if(nextLoc == null) {
             return null;
         }
+        rc.setIndicatorString("Spawn Loc: " + nextLoc);
         return nextLoc;
     }
 
     private static UnitType chooseUnitType() {
         int r = rng.nextInt(100);
-        rc.setIndicatorString("RNG: " + r);
+        //rc.setIndicatorString("RNG: " + r);
 
         int splasherSpawnPercent = 0;
         int mopperSpawnPercent = 0;
@@ -93,10 +127,10 @@ public class Towers extends RobotPlayer {
 
     private static boolean checkResourcesAndSpawn(UnitType spawn, MapLocation loc) throws GameActionException {
         boolean hasResources = (rc.getRoundNum() < nonGreedyPhase || rc.getMoney() > 2000)
-            && rc.getMoney() - spawn.moneyCost >= reserveChips
-            && (rc.getPaint() - spawn.paintCost >= reservePaint 
-               || rc.getRoundNum() < reservePaintPhase 
-               || rc.getType().getBaseType() != UnitType.LEVEL_ONE_PAINT_TOWER);
+                && rc.getMoney() - spawn.moneyCost >= reserveChips
+                && (rc.getPaint() - spawn.paintCost >= reservePaint
+                || rc.getRoundNum() < reservePaintPhase
+                || rc.getType().getBaseType() != UnitType.LEVEL_ONE_PAINT_TOWER);
 
         if (hasResources && rc.canBuildRobot(spawn, loc)) {
             rc.buildRobot(spawn, loc);

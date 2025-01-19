@@ -1,8 +1,11 @@
 package ref_best;
 
 import battlecode.common.*;
+
 import java.util.Arrays;
 import java.util.Comparator;
+
+import gavin.fast.FastLocSet;
 
 public class AttackBase extends RobotPlayer {
 
@@ -14,6 +17,8 @@ public class AttackBase extends RobotPlayer {
     static MapLocation foundLoc = null;
     static MapInfo foundLocInfo = null;
     static MapLocation target;
+
+    static FastLocSet dottedRuins = new FastLocSet();
 
     // simpler if false but also take more damage
     static final boolean ATTACK_MICRO = true;  // do we want to shift back and forth to avoid tower shots?
@@ -113,11 +118,14 @@ public class AttackBase extends RobotPlayer {
             MapLocation closestRuinToDot = null;
 
             int distance = (int)2e9;
+
             for (MapInfo tile : nearbyTiles) {
                 if (tile.hasRuin()) {
-                    if (tile.getMapLocation().distanceSquaredTo(rc.getLocation()) < distance) {
+                    if (tile.getMapLocation().distanceSquaredTo(rc.getLocation()) < distance && !dottedRuins.contains(tile.getMapLocation())) {
                         distance = tile.getMapLocation().distanceSquaredTo(rc.getLocation());
                         closestRuinToDot = tile.getMapLocation();
+
+                        //rc.setIndicatorLine(rc.getLocation(),tile.getMapLocation(),255,0,0);
                     }
                 }
             }
@@ -126,6 +134,7 @@ public class AttackBase extends RobotPlayer {
                 if (locToDot != null && rc.canAttack(locToDot)) {
                     // System.out.println("base attacker: dotted a ruin");
                     rc.attack(locToDot);
+                    dottedRuins.add(closestRuinToDot);
                 }
             }
         }
