@@ -10,7 +10,6 @@ public class Splasher extends Robot {
     public Splasher(RobotController rc) throws GameActionException {
         super(rc);
 
-        interests.add(new Explore());
 
         initUnit();
     }
