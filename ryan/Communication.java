@@ -1,7 +1,7 @@
 package ryan;
 
 import battlecode.common.*;
-import ryan.DebugIndicators;
+import ryan.Debug;
 
 
 public class Communication extends RobotPlayer {
@@ -30,19 +30,39 @@ public class Communication extends RobotPlayer {
     static final int MASK_LOCATION_INFO = 0b1111111111111111 << 12;
 
     // ---------- Instantiates and utils ----------
+
+    /**
+     * Initializes the Communication system with a RobotController and creates a reverse ID lookup array.
+     * @param r The RobotController instance to use
+     */
     public static void init(RobotController r){
         rc = r;
         reverseID = "\0".repeat(20000).toCharArray();
     }
 
+    /**
+     * Converts an integer position to a MapLocation.
+     * @param i The integer representing a position (x + y * mapWidth)
+     * @return MapLocation corresponding to the integer position
+     */
     public static MapLocation intToLoc(int i){
         return new MapLocation(i % mapWidth, i / mapWidth);
     }
 
+    /**
+     * Converts a MapLocation to an integer position.
+     * @param loc The MapLocation to convert
+     * @return Integer representation of the location
+     */
     public static int locToInt(MapLocation loc){
         return loc.x + loc.y * mapWidth;
     }
 
+    /**
+     * Retrieves the location of a robot using its unit ID from the nearby robots array.
+     * @param unitID The ID of the robot to locate
+     * @return MapLocation of the robot, or null if not found
+     */
     public static MapLocation getLocation(int unitID){
         char index = reverseID[unitID];
         if(index < nearbyRobots.length){
@@ -54,6 +74,11 @@ public class Communication extends RobotPlayer {
     }
 
     // ---------- Messages ----------
+
+    /**
+     * Initializes the reverse ID lookup array at the start of each turn.
+     * Maps robot IDs to their index in the nearbyRobots array for quick lookup.
+     */
     public static void initTurn(){
         // Maybe only for towers that need to communicate to units ?
         // reverseID[robotID] = index of robotID in nearbyAllies.
@@ -65,7 +90,12 @@ public class Communication extends RobotPlayer {
         }
     }
 
-
+    /**
+     * Sends a class-type message to a specific unit.
+     * @param unitID The ID of the target robot
+     * @param type The class type to send
+     * @throws GameActionException If sending the message fails
+     */
     public static void sendClassMessage(int unitID, int type) throws GameActionException{
         MapLocation loc = getLocation(unitID);
         if(loc != null && rc.canSendMessage(loc)){
@@ -74,18 +104,28 @@ public class Communication extends RobotPlayer {
     }
 
     /**
-     * Send a location 'target' to robot 'unitID' with an integer of 16 bits 'info'.
-     * */
+     * Sends a location-based message to a specific unit with additional information.
+     * @param unitID The ID of the target robot
+     * @param info A 16-bit integer containing additional information
+     * @param target The target MapLocation to send
+     * @throws GameActionException If sending the message fails
+     */
     public static void sendLocationMessage(int unitID, int info, MapLocation target) throws GameActionException{
         MapLocation loc = getLocation(unitID);
         if(loc != null && rc.canSendMessage(loc)){
             rc.sendMessage(loc, HEADER_LOCATION + (info << 12) + locToInt(target));
+            Debug.println(Debug.COMMS, "Sent location message to ID:" + unitID + " info:" + info + " target:" + target);
         }else{
-            DebugIndicators.printString("Can'tsend" + unitID);
+            Debug.println(Debug.COMMS, "Failed to send to ID:" + unitID + " - Target not found or can't send");
         }
     }
 
+    /**
+     * Reads and processes all messages from the previous round.
+     * Delegates to specific handlers based on message header type.
+     */
     public static void readMessages(){
+        Debug.println(Debug.COMMS, "Reading messages from round " + (roundNum - 1));
         // todo read message from actual turn in addition to last turn
         for (Message mes : rc.readMessages(roundNum - 1)) {
             int header = mes.getBytes() & HEADER_MASK;
@@ -97,22 +137,41 @@ public class Communication extends RobotPlayer {
                     readMessageLocation(mes);
                     break;
                 default:
-                    DebugIndicators.printString("Can'tRead" + mes);
+                    Debug.println(Debug.COMMS, "Can't Read" + mes);
             }
         }
     }
 
+    /**
+     * Processes class-type messages.
+     * @param message The message containing class information
+     */
     public static void readMessageClass(Message message){
         int classType = message.getBytes() & MASK_CLASS;
-
-        DebugIndicators.printString("Class" + classType);
+        Debug.println(Debug.COMMS, "Received class message: " + classType);
     }
 
+    /**
+     * Processes location-type messages.
+     * @param message The message containing location and info data
+     */
     public static void readMessageLocation(Message message){
         int info = (message.getBytes() & MASK_LOCATION_INFO) >> 12;
         MapLocation target = intToLoc(message.getBytes() & MASK_LOCATION);
 
-        DebugIndicators.printString("Location" + target + "Info:" + info);
+        if (rc.getType().isRobotType()){ // IF UNIT
+            switch (info) {
+                case 0: // Enemy tower location
+                    Debug.println(Debug.COMMS, "Unit received enemy tower location: " + target);
+                    towerTargetEnemyTower = target;     
+            }
+        } else { // IF TOWER
+            switch (info) {
+                case 0: // Enemy tower location
+                    Debug.println(Debug.COMMS, "Tower received enemy tower location: " + target);
+                    targetEnemyTower = target;
+            }
+        }
     }
 
 }

@@ -13,17 +13,18 @@ import battlecode.common.*;
  * -     s    --> message to print
  * 
  * The flush() method:
- * - Sets the robot's indicator string with accumulated messages from DebugIndicators.printString()
+ * - Sets the robot's indicator string with accumulated messages from Debug.printString()
  * - Clears the string builder for next turn
  * - Resets bytecode debugging
  * - Must be called at the end of each turn to display debug information
  */
-public class DebugIndicators extends RobotPlayer {
-    public static final boolean VERBOSE = false;  // Set to true to enable debug messages
+public class Debug extends RobotPlayer {
+    public static final boolean VERBOSE = true;  // Set to true to enable debug messages
     public static final boolean FAIL_FAST = false;
     public static final boolean INDICATORS = true;
     public static final boolean INFO = true;
     public static final boolean TOWER = true;
+    public static final boolean COMMS = true;
 
 
     public static String bytecodeDebug = new String();
@@ -48,17 +49,17 @@ public class DebugIndicators extends RobotPlayer {
     }
 
     public static void printString(String s) {
-        DebugIndicators.printString(DebugIndicators.INFO, s);
+        Debug.printString(Debug.INFO, s);
     }
 
     public static void failFast(GameActionException ex) {
-        if (DebugIndicators.FAIL_FAST) {
+        if (Debug.FAIL_FAST) {
             throw new IllegalStateException(ex);
         }
     }
 
     public static void failFast(String message) {
-        if (DebugIndicators.FAIL_FAST) {
+        if (Debug.FAIL_FAST) {
             throw new IllegalStateException(message);
         }
     }
@@ -82,11 +83,11 @@ public class DebugIndicators extends RobotPlayer {
     }
 
     public static void println(String s) {
-        DebugIndicators.println(DebugIndicators.INFO, s);
+        Debug.println(Debug.INFO, s);
     }
 
     public static void println(String s, int id) {
-        DebugIndicators.println(DebugIndicators.INFO, s, id);
+        Debug.println(Debug.INFO, s, id);
     }
 
     public static void print(boolean cond, String s) {

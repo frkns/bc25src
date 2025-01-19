@@ -41,7 +41,7 @@ public class ImpureUtils extends RobotPlayer {
     }
 
     static void updateNearestEnemyTower() throws GameActionException {
-        nearestEnemyTower = null;
+        nearestEnemyTower = towerTargetEnemyTower;  // default target if there are no towers in immediate range
         for (RobotInfo robot : nearbyRobots) {  // assumes non-defense tower
             if (robot.getTeam() != rc.getTeam() && robot.getType().isTowerType()) {
                 MapLocation robotLoc = robot.getLocation();
