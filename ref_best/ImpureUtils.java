@@ -20,20 +20,25 @@ public class ImpureUtils extends RobotPlayer {
         }
     }
 
-    // really, after the change, this should be called updateNearestPaintTarget, because moppers/money/defense towers are inlcuded
-    static void updateNearestPaintTower() throws GameActionException {
+    // Find the nearest paint tower. If no paint tower locations are known, then allow other towers & moppers to act as paint sources
+    static void updateNearestPaintSource() throws GameActionException {
+        if (nearestPaintSource != null && rc.canSenseRobotAtLocation(nearestPaintSource)) {
+            if (rc.senseRobotAtLocation(nearestPaintSource).getPaintAmount() == 0) {
+                nearestPaintSource = null;
+            }
+        }
         for (RobotInfo robot : nearbyRobots) {
             if (robot.getTeam() == rc.getTeam() && (robot.getType().isTowerType() || robot.getType() == UnitType.MOPPER)) {
                 if (robot.getType().getBaseType() == UnitType.LEVEL_ONE_PAINT_TOWER) {
-                    if (nearestPaintTower == null || rc.getLocation().distanceSquaredTo(robot.getLocation()) < rc
-                            .getLocation().distanceSquaredTo(nearestPaintTower)) {
-                        nearestPaintTower = robot.getLocation();
-                        nearestPaintTowerIsPaintTower = true;
+                    if (nearestPaintSource == null || rc.getLocation().distanceSquaredTo(robot.getLocation()) < rc
+                            .getLocation().distanceSquaredTo(nearestPaintSource)) {
+                        nearestPaintSource = robot.getLocation();
+                        paintTowerFound = true;
                     }
-                } else if (!nearestPaintTowerIsPaintTower) {
-                    if (nearestPaintTower == null || rc.getLocation().distanceSquaredTo(robot.getLocation()) < rc
-                            .getLocation().distanceSquaredTo(nearestPaintTower)) {
-                        nearestPaintTower = robot.getLocation();
+                } else if (!paintTowerFound) {
+                    if ((nearestPaintSource == null || rc.getLocation().distanceSquaredTo(robot.getLocation()) < rc
+                            .getLocation().distanceSquaredTo(nearestPaintSource)) && robot.getPaintAmount() > 0) {
+                        nearestPaintSource = robot.getLocation();
                     }
                 }
             }
@@ -41,7 +46,6 @@ public class ImpureUtils extends RobotPlayer {
     }
 
     static void updateNearestEnemyTower() throws GameActionException {
-        nearestEnemyTower = null;
         for (RobotInfo robot : nearbyRobots) {  // assumes non-defense tower
             if (robot.getTeam() != rc.getTeam() && robot.getType().isTowerType()) {
                 MapLocation robotLoc = robot.getLocation();
@@ -50,6 +54,19 @@ public class ImpureUtils extends RobotPlayer {
                 }
             }
         }
+         if (nearestEnemyTower == null && towerTargetEnemyTower != null || towerTargetEnemyTower != null && rc.getLocation().distanceSquaredTo(towerTargetEnemyTower) < rc.getLocation().distanceSquaredTo(nearestEnemyTower)){
+             nearestEnemyTower = towerTargetEnemyTower;
+             if (rc.canSenseRobotAtLocation(towerTargetEnemyTower)) {
+                 if (rc.senseRobotAtLocation(towerTargetEnemyTower).getTeam() == rc.getTeam()){
+                     nearestEnemyTower = null;
+                     towerTargetEnemyTower = null;
+                 }
+             } else {
+                 nearestEnemyTower = null;
+                 towerTargetEnemyTower = null;
+             }
+             Debug.println("nearestEnemyTower is towerTargetEnemyTower at " + towerTargetEnemyTower);
+         }
     }
 
     static void updateNearestEmptyTile() throws GameActionException {
@@ -127,7 +144,7 @@ public class ImpureUtils extends RobotPlayer {
             }
         }
     }
-
+    // Calculates the average x and y coordinate of each nearby unit, approximating the center of the clump. Also upgrades towers
     public static void updateNearbyUnits() throws GameActionException {
         // post Sprint 1 balance change: avoid clumping of units
         nearbyFriendlyRobots = 1;  // fixes div 0 error and also includes ourself in the count
@@ -150,7 +167,7 @@ public class ImpureUtils extends RobotPlayer {
             }
         }
         avgClump = new MapLocation(sumx / nearbyFriendlyRobots, sumy / nearbyFriendlyRobots);
-        rc.setIndicatorDot(avgClump, 0, 0, 255);
+//        rc.setIndicatorDot(avgClump, 0, 0, 255);
     }
 
     public static void checkAndCompleteNearbySRPs() throws GameActionException {

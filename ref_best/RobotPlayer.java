@@ -33,61 +33,66 @@ public class RobotPlayer {
     static int turnsAlive = 0;
     static int role = 0;  // default = 0. can assign different roles to a type e.g. 1 = base attacker
 
-    // ------ Game info ------
+    // ------ Map Information ------
     static int mapWidth;
     static int mapHeight;
     static int mx;  // max of mapWidth and mapHeight
     static MapLocation mapCenter;
-
-    static MapLocation spawnTowerLocation;
-    static UnitType spawnTowerType;
-
-    // some of these are unused
     static MapLocation[] quadrantCenters = new MapLocation[4];
     static MapLocation[] quadrantCorners = new MapLocation[4];
     static int[] roundsSpentInQuadrant = new int[4];
+
+    // ------ Tower specific ------
+    static MapLocation targetEnemyTower; // Which enemy tower we are telling the bunnies to attack
+    
+    // ------ Spawn and Base Information ------
+    static MapLocation spawnTowerLocation;
+    static UnitType spawnTowerType;
     static MapLocation avgClump;  // will eventually get rid of this one, in favor of 5x5 bool map
-
-
-
-    // ------ Sensing ------
+    
+    // ------ Sensing State ------
     static RobotInfo[] nearbyRobots;
     static MapInfo[] nearbyTiles;
-    static MapLocation nearestPaintTower;  // can be money/defense tower if we haven't see a paint tower yet
-    static MapLocation nearestEnemyTower;
-    static MapLocation nearestEmptyTile;  // not used (update: we use it now for full fill)
-    static MapLocation nearestEnemyPaint;
-
-    static MapInfo curRuin;
-    static boolean nearestPaintTowerIsPaintTower = false;
-    static MapLocation nearestWrongInRuin;
-
-    static MapLocation curSRP;
-    static boolean isFillingSRP = false;
-    static MapLocation nearestWrongInSRP;
-
     static int nearbyFriendlyRobots;
     static int nearbyEnemyRobots;
     static boolean[][] nearbyAlliesMask = new boolean[5][5];  // 5x5 area centered around robot
     static boolean[][] nearbyEnemyMask = new boolean[5][5];
 
+    // ------ Target Locations ------
+    static MapLocation nearestPaintSource;  // can be money/defense tower if we haven't seen a paint tower yet
+    static boolean paintTowerFound = false;
+    static MapLocation towerTargetEnemyTower; // The tower location that our towers are instructing the bunnies to attack
+    static MapLocation nearestEnemyTower;
+    static MapLocation nearestEmptyTile;  // used for full fill
+    static MapLocation nearestEnemyPaint;
 
-    // ------ Behavior ------
+    // ------ Ruin Management ------
+    static MapInfo curRuin;
+    static MapLocation nearestWrongInRuin;
+    static MapLocation curSRP;
+    static boolean isFillingSRP = false;
+    static MapLocation nearestWrongInSRP;
+
+    // ------ Game Phases ------
+    static int nonGreedyPhase;
+    static int firstMopper;
+    static int splasherPhase;
     static int siegePhase;
     static int mopperPhase;
     static int fullFillPhase;
     static int attackBasePhase;
     static int selfDestructPhase = 300;
+    static int reservePaintPhase;  // it is really bad to reserve paint in the first few rounds because we'll fall behind
 
+    // ------ Resource Management ------
+    static int reservePaint = 100;
+    static int reserveChips = 1700;
+    static int startPaintingFloorTowerNum = 4;  // don't paint floor before this to conserve paint
+
+    // ------ Self Destruct Thresholds ------
     static int selfDestructFriendlyRobotsThreshold = 20;  // > this to self destruct
     static int selfDestructEnemyRobotsThreshold = 5;  // < this to self destruct
     static int selfDestructPaintThreshold = 50;
-
-    static int startPaintingFloorTowerNum = 4;  // don't paint floor before this to conserve paint
-
-    static int reservePaintPhase;  // it is really bad to reserve paint in the first few rounds because we'll fall behind
-    static int reservePaint = 100;
-    static int reserveChips = 1700;
 
 
 
@@ -106,29 +111,30 @@ public class RobotPlayer {
         quadrantCorners[2] = new MapLocation(0, 0);
         quadrantCorners[3] = new MapLocation(mapWidth-1, 0);
 
-        nearbyRobots = rc.senseNearbyRobots();
-        for (RobotInfo robot : nearbyRobots) {
-            if (robot.getTeam() == rc.getTeam()) {
-                if (robot.getType().isTowerType()) {
-                    if (spawnTowerLocation == null || rc.getLocation().distanceSquaredTo(robot.getLocation()) < rc.getLocation().distanceSquaredTo(spawnTowerLocation)) {
-                        spawnTowerLocation = robot.getLocation();
-                        spawnTowerType = robot.getType().getBaseType();
-                    }
-                }
-            }
-        }
-
-        if (spawnTowerLocation == null)  // it is possible that is spawn tower is destroyed in the middle of the turn
-            spawnTowerLocation = new MapLocation(0, 0);
-
         mx = Math.max(mapWidth, mapHeight);  // ~60 for huge ~35 for medium
+
+        firstMopper = (int)(mx * 2);
+        splasherPhase = (int)(mx * 1.5);  // Start spawning splashers earlier than moppers
+        mopperPhase = (int)(mx * 4);
+
+        nonGreedyPhase = (int)(mx * 2);  // allow other units to complete ruins / upgrade towers if money capped
         siegePhase = (int)(mx * 3);  // cast to int, will be useful for tuning later
         fullFillPhase = (int)(mx * 3);
-        mopperPhase = (int)(mx * 4);
         attackBasePhase = (int)(mx * 3);
         reservePaintPhase = (int)(mx * 1.5);
         if (mx < 30) {
             attackBasePhase = 0;  // may be beneficial to send immediately on small maps
+        }
+
+
+        if (rc.getType().isRobotType()){
+            spawnTowerLocation = rc.senseNearbyRuins(4)[0]; // Only 1 ruin within a squaredRadius of 4 from the robot's spawn, and that ruin must be in the same location of the spawn tower
+            if (rc.canSenseRobotAtLocation(spawnTowerLocation)) { // Either it is our tower, or the enemy destroyed and built on it in the same turn
+                RobotInfo robot = rc.senseRobotAtLocation(spawnTowerLocation);
+                if (robot.getTeam() == rc.getTeam()) { // If it is our tower, set the spawn tower type
+                    spawnTowerType = robot.getType().getBaseType();
+                }
+            }
         }
 
         if (rc.getType() == UnitType.SOLDIER && rc.getRoundNum() >= attackBasePhase) {
@@ -148,12 +154,15 @@ public class RobotPlayer {
             }
         }
 
+        nearbyRobots = rc.senseNearbyRobots();
+        Communication.init(rc);
+
         while (true) {
             try {
                 // ---- Init turn ----
                 turnsAlive++;
                 roundNum = rc.getRoundNum();
-
+                Communication.initTurn();
                 roundsSpentInQuadrant[Utils.currentQuadrant()]++;
 
                 locationHistory[rc.getRoundNum() % locationHistory.length] = rc.getLocation();
@@ -161,7 +170,7 @@ public class RobotPlayer {
                 nearbyTiles = rc.senseNearbyMapInfos();
 
                 if (!rc.getType().isTowerType())
-                    ImpureUtils.updateNearestPaintTower();
+                    ImpureUtils.updateNearestPaintSource();
 
                 // ---- Play by role ----
                 switch (rc.getType()) {

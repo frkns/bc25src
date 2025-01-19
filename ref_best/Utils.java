@@ -1,5 +1,4 @@
 package ref_best;
-import java.util.Random;
 import battlecode.common.*;
 
 // these Utils are pure functions - no side-effects, they don't change variables or modify game state in any way

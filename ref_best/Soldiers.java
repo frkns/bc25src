@@ -35,6 +35,10 @@ public class Soldiers extends RobotPlayer {
         }
         //endregion
 
+        //region read Messages
+        Communication.readMessages();  // Communication code saves information to relevant variables (e.g. ruin locs, enemy tower locs)
+        //endregion
+
         //region Tower Attack Logic
         ImpureUtils.updateNearestEnemyTower();
         if (nearestEnemyTower != null && rc.getRoundNum() > siegePhase) {
@@ -159,7 +163,7 @@ public class Soldiers extends RobotPlayer {
         ImpureUtils.tryMarkSRP();
 
         boolean canRefill = true;
-        MapLocation paintTarget = nearestPaintTower;
+        MapLocation paintTarget = nearestPaintSource;
         if (paintTarget == null) {
             paintTarget = spawnTowerLocation;
             if (spawnTowerType == UnitType.LEVEL_ONE_DEFENSE_TOWER) {
@@ -222,6 +226,18 @@ public class Soldiers extends RobotPlayer {
             for (MapInfo tile : _attackableNearbyTiles) {
                 if (tile.getPaint() == PaintType.EMPTY && rc.canAttack(tile.getMapLocation())) {
                     rc.attack(tile.getMapLocation());
+                }
+            }
+        }
+        //endregion
+
+        //region Send Messages
+        if (nearestEnemyTower != null) {
+            // Report to all allied towers in range
+            for (RobotInfo robot : nearbyRobots) {
+                if (robot.getTeam() == rc.getTeam() && robot.getType().isTowerType()) {
+                    Debug.println(Debug.COMMS, "Reporting to tower ID: " + robot.getID());
+                    Communication.sendLocationMessage(robot.getID(), 0, nearestEnemyTower);
                 }
             }
         }

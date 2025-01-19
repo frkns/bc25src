@@ -1,5 +1,5 @@
 // https://github.com/maxwelljones14/BattleCode2023/blob/main/src/MPWorking/Debug.java
-package ryan;
+package ref_best;
 
 import battlecode.common.*;
 

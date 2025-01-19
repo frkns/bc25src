@@ -1,7 +1,6 @@
-package ryan;
+package ref_best;
 
 import battlecode.common.*;
-import ryan.Debug;
 
 
 public class Communication extends RobotPlayer {
@@ -125,7 +124,6 @@ public class Communication extends RobotPlayer {
      * Delegates to specific handlers based on message header type.
      */
     public static void readMessages(){
-        Debug.println(Debug.COMMS, "Reading messages from round " + (roundNum - 1));
         // todo read message from actual turn in addition to last turn
         for (Message mes : rc.readMessages(roundNum - 1)) {
             int header = mes.getBytes() & HEADER_MASK;

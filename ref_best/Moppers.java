@@ -80,7 +80,17 @@ public class Moppers extends RobotPlayer{
             rc.attack(bestAttackTarget);
         }
 
-
+        //region Send Messages
+        if (nearestEnemyTower != null) {
+            // Report to all allied towers in range
+            for (RobotInfo robot : nearbyRobots) {
+                if (robot.getTeam() == rc.getTeam() && robot.getType().isTowerType()) {
+                    Debug.println(Debug.COMMS, "Reporting to tower ID: " + robot.getID());
+                    Communication.sendLocationMessage(robot.getID(), 0, nearestEnemyTower);
+                }
+            }
+        }
+        //endregion
 
 
     }
