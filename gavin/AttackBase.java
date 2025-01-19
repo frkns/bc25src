@@ -1,11 +1,11 @@
-package ref_best;
+package gavin;
 
 import battlecode.common.*;
 
 import java.util.Arrays;
 import java.util.Comparator;
 
-import ref_best.fast.FastLocSet;
+import gavin.fast.FastLocSet;
 
 public class AttackBase extends RobotPlayer {
 
@@ -28,6 +28,11 @@ public class AttackBase extends RobotPlayer {
         potentialEnemySpawnLocations[0] = Utils.mirror(spawnTowerLocation);
         potentialEnemySpawnLocations[1] = Utils.verticalMirror(spawnTowerLocation);
         potentialEnemySpawnLocations[2] = Utils.horizontalMirror(spawnTowerLocation);
+
+        if (spawnTowerLocation == null) {
+            System.out.println("Spawn tower location not found? This should not happen.");
+            return;
+        }
 
         // Sort potentialEnemySpawnLocations based on distance to current location
         Arrays.sort(potentialEnemySpawnLocations, Comparator.comparingInt(loc -> rc.getLocation().distanceSquaredTo(loc)));

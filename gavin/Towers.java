@@ -1,4 +1,4 @@
-package ref_best;
+package gavin;
 
 import battlecode.common.*;
 
@@ -6,16 +6,16 @@ import battlecode.common.*;
 public class Towers extends RobotPlayer {
     //region Configuration
     static boolean spawnedFirstMopper = false;
-
+    static int nonGreedyPhase = (int)(mx * 2);  // allow other units to complete ruins / upgrade towers if money capped
+    static int firstMopper = (int)(mx * 2);
+    static int splasherPhase = (int)(mx * 1.5);  // Start spawning splashers earlier than moppers
     //endregion
 
     public static void run() throws GameActionException {
         debugging();
-        Communication.readMessages();
         handleUnitSpawning();
         performCombatActions();
         handlePaintTransfer();
-        sendMessages();
     }
 
     private static void debugging() throws GameActionException {
@@ -30,7 +30,7 @@ public class Towers extends RobotPlayer {
         }
     }
 
-
+    //region Unit Spawning
     private static void handleUnitSpawning() throws GameActionException {
         MapLocation spawnLoc = findSpawnLocation();
         if (spawnLoc == null) return;
@@ -108,11 +108,7 @@ public class Towers extends RobotPlayer {
             splasherSpawnPercent = 0;
         }
         if (rc.getRoundNum() >= mopperPhase) {
-            if (rc.getRoundNum() >= siegePhase){
-                mopperSpawnPercent = 40;
-            } else {
-                mopperSpawnPercent = 20;
-            }
+            mopperSpawnPercent = 20;
         }
 
         // Special case: First mopper spawn
@@ -131,10 +127,10 @@ public class Towers extends RobotPlayer {
 
     private static boolean checkResourcesAndSpawn(UnitType spawn, MapLocation loc) throws GameActionException {
         boolean hasResources = (rc.getRoundNum() < nonGreedyPhase || rc.getMoney() > 2000)
-                && rc.getMoney() - spawn.moneyCost >= reserveChips
-                && (rc.getPaint() - spawn.paintCost >= reservePaint
-                || rc.getRoundNum() < reservePaintPhase
-                || rc.getType().getBaseType() != UnitType.LEVEL_ONE_PAINT_TOWER);
+            && rc.getMoney() - spawn.moneyCost >= reserveChips
+            && (rc.getPaint() - spawn.paintCost >= reservePaint 
+               || rc.getRoundNum() < reservePaintPhase 
+               || rc.getType().getBaseType() != UnitType.LEVEL_ONE_PAINT_TOWER);
 
         if (hasResources && rc.canBuildRobot(spawn, loc)) {
             rc.buildRobot(spawn, loc);
@@ -145,6 +141,7 @@ public class Towers extends RobotPlayer {
         }
         return false;
     }
+    //endregion
 
     /**
      * Always perform AOE attack
@@ -179,19 +176,5 @@ public class Towers extends RobotPlayer {
                 }
             }
         }
-    }
-
-    private static void sendMessages() throws GameActionException {
-        if (targetEnemyTower != null) {
-            for (RobotInfo robot : nearbyRobots) {
-                if (robot.getTeam() == rc.getTeam() && robot.getType().isRobotType()) {
-                    Communication.sendLocationMessage(robot.getID(), 0, targetEnemyTower);
-                }
-            }
-            rc.setIndicatorLine(rc.getLocation(), targetEnemyTower, 255, 0, 0);
-            if (rc.canBroadcastMessage()) {
-                rc.broadcastMessage(Communication.HEADER_LOCATION + (0 << 12) + Communication.locToInt(targetEnemyTower));
-            }
-    }
     }
 }
