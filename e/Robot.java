@@ -15,7 +15,7 @@ import battlecode.common.Clock;
 import java.util.ArrayDeque;
 
 
-public abstract class Robot {
+public class Robot {
 
     public static RobotController rc;
     public static ArrayDeque<Action> actions = new ArrayDeque<>();
@@ -24,10 +24,9 @@ public abstract class Robot {
     public Robot(RobotController r) throws GameActionException {
         rc = r;
         Debug.init();
-        Utils.init();
         _Info.init();
-        Pathfinder.init(rc);
-        Communication.init(rc);
+        Pathfinder.init();
+        Communication.init();
     }
 
     // Call after setting Actions and Interests
@@ -44,7 +43,7 @@ public abstract class Robot {
     }
 
     public void initTurn() throws GameActionException {
-        Debug.reset(rc.getRoundNum()); // Reset clock to benchmark
+        Debug.reset();
         Debug.print(0, "");
         Debug.print(0, "");
         Debug.print(0, "Start turn => " + rc.getType() + " at " + _Info.robotLoc);
@@ -97,16 +96,14 @@ public abstract class Robot {
         if (Interest.bestDirScore >= bestTotalScore) { // It is better to move and skip the action.
             Debug.print(2, "");
             Debug.print(2, "Action skipped or no legal actions");
-            if (Debug.debug){
             rc.setIndicatorString("No action.");
-            }
             if (Interest.bestDir != Direction.CENTER) {
             rc.move(Interest.bestDir);
             }
         } else {
             Debug.print(2, "");
             Debug.print(2, "Playing actions: ");
-            Debug.setActionIndicatorString(bestAction);
+            rc.setIndicatorString("Playing " + bestAction.name);
             if (bestAction.possibleDirs[8]) { // If the robot can play the action before moving, play it first
             bestAction.play();
             if (Interest.bestDir != Direction.CENTER) {
@@ -141,7 +138,7 @@ public abstract class Robot {
         if (bestAction != null) {
             Debug.print(2, "");
             Debug.print(2, "Playing actions: ");
-            Debug.setActionIndicatorString(bestAction);
+            rc.setIndicatorString("Playing " + bestAction.name);
             bestAction.play();
         } else {
             Debug.print(2, "");
@@ -151,9 +148,6 @@ public abstract class Robot {
 
     public void endTurn() throws GameActionException {
         // Comms.write();
-        _Info.markTiles();
-        _Info.processCorners();
-        _Info.processBlockerTiles();
         Debug.print(0, "End turn.");
     }
 }

@@ -1,14 +1,6 @@
 package e.knowledge;
 
 public class Constants {
-    public static final int SMALL_PHASE1 = 200;
-    public static final int SMALL_PHASE2 = 500;
-    public static final int MEDIUM_PHASE1 = 300;
-    public static final int MEDIUM_PHASE2 = 600;
-    public static final int LARGE_PHASE1 = 400;
-    public static final int LARGE_PHASE2 = 800;
-    public static final int HUGE_PHASE1 = 500;
-    public static final int HUGE_PHASE2 = 800;
     // -------------- Action/Interest score related variables -------------
     // NAME CONSTANTS AFTER THE FILE
     // "Score" suffix indicates a fixed scores for an action
@@ -16,8 +8,6 @@ public class Constants {
 
     // Unit Interest variables
     // ALL
-    public static final int MarkTilesScore = 11;
-    public static final int UnmarkTilesScore = 4;
     public static final int ExploreScore = 2;
 
     // SOLDIER

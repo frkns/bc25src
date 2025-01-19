@@ -1,15 +1,10 @@
 package e.interests.unit;
 
-import battlecode.common.Direction;
-import battlecode.common.GameActionException;
-import battlecode.common.MapLocation;
-import battlecode.common.RobotController;
+import battlecode.common.*;
 import e.Robot;
 import e.interests.Interest;
-import e.knowledge._Info;
-import e.knowledge.Constants;
-import e.utils.Debug;
-import e.utils.Pathfinder;
+import e.knowledge.*;
+import e.utils.*;
 
 public class Explore extends Interest {
     public RobotController rc;
@@ -31,7 +26,7 @@ public class Explore extends Interest {
     public void updateDirectionScores() throws GameActionException {
         Debug.print(3, Debug.UPDATE_DIR_SCORES + name, debugInterest);
 
-        if (target == null || rc.getLocation().distanceSquaredTo(target) < 3 || outOfExplorationBounds(rc.getLocation())) {
+        if (target == null || outOfExplorationBounds(rc.getLocation())) {
             target = getRandomInBoundLocation();
         }
         Direction dir = Pathfinder.getMoveDir(target);

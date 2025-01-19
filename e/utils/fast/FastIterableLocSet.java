@@ -11,7 +11,7 @@ public class FastIterableLocSet {
     private int earliestRemoved;
 
     public FastIterableLocSet() {
-        this(125);
+        this(100);
     }
 
     public FastIterableLocSet(int len) {

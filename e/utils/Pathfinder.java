@@ -2,6 +2,7 @@
 package e.utils;
 
 import battlecode.common.*;
+import e.knowledge._Info;
 import e.utils.fast.FastLocSet;
 import e.utils.fast.FastMath;
 
@@ -16,8 +17,8 @@ public class Pathfinder{
     static MapLocation stayawayFrom = null;
     static int stuckCnt;
 
-    public static void init(RobotController r) {
-        rc = r;
+    public static void init() {
+        rc = _Info.rc;
     }
 
     public static void tryMove(Direction dir) throws GameActionException {

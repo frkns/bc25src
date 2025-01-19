@@ -23,7 +23,7 @@ public class Debug {
     }
 
     /**
-     * Prints the bytecode used to calculate directionScores for each action and execute action
+     * Prints the bytecode used to calculate scores for each action and execute action
      * Example: https://discord.com/channels/1316447035242709032/1323051422819815486/1327037155956228146
      */
     public static void print(String text){

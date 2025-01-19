@@ -33,8 +33,8 @@ public class Communication {
     static final int MASK_LOCATION_INFO = 0b1111111111111111 << 12;
 
     // ---------- Instantiates and utils ----------
-    public static void init(RobotController r){
-        rc = r;
+    public static void init(){
+        rc = _Info.rc;
         reverseID = "\0".repeat(20000).toCharArray();
     }
 
@@ -80,8 +80,6 @@ public class Communication {
         MapLocation loc = getLocation(unitID);
         if(loc != null && rc.canSendMessage(loc)){
             rc.sendMessage(loc, HEADER_LOCATION + (info << 12) + locToInt(target));
-        }else{
-            Debug.print(0, "Can't send location message. Did we have a path of paint between sender and receiver ?");
         }
     }
 
@@ -97,22 +95,18 @@ public class Communication {
                     readMessageLocation(mes);
                     break;
                 default:
-                    Debug.print(0, "Unable to read message " + mes);
+                    
             }
         }
     }
 
     public static void readMessageClass(Message message){
         int classType = message.getBytes() & MASK_CLASS;
-
-        Debug.print(0, "I have received a message telling me the class " + classType);
     }
 
     public static void readMessageLocation(Message message){
         int info = (message.getBytes() & MASK_LOCATION_INFO) >> 12;
         MapLocation target = intToLoc(message.getBytes() & MASK_LOCATION);
-
-        Debug.print(0, "I have received a message telling me location " + target + " and " + info);
     }
 
 }
