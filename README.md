@@ -57,9 +57,9 @@ Finished items are ~~struckthrough~~, they could maybe be improved.
 * reactionary tower spawn
 * not getting suck on gears map
 * build towers before rushing?
-* better soldier spawning away from walls
 * stop attacking tower on low health
 * leave when there is enemy paint on ruin (already done but logic needs improvement)
+* only build defense towers near enemies
 
 
 ### Random Ideas
