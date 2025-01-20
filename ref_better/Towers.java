@@ -54,6 +54,9 @@ public class Towers extends RobotPlayer {
             if (r < 20) {
                 spawn = UnitType.MOPPER;
             }
+            if (r < 40) {
+                spawn = UnitType.SPLASHER;
+            }
         }
 
         if (turnsAlive > 2 && rc.getRoundNum() > firstMopper && !spawnedFirstMopper && rc.getMoney() > reserveChips) {

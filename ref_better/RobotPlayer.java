@@ -172,14 +172,17 @@ public class RobotPlayer {
         }
 
         switch (rc.getType()) {
-            case SOLDIER: {
+            case SOLDIER:
                 switch (role) {
                     case 1:
                         AttackBase.init();
                         break;
                 }
                 break;
-            }
+
+            case SPLASHER:
+                Splashers.init();
+                break;
         }
 
         while (true) {
@@ -208,7 +211,7 @@ public class RobotPlayer {
                         break;
                     }
                     case MOPPER: runMopper(); break;
-                    // case SPLASHER: runSplasher();
+                    case SPLASHER: runSplasher(); break;
                     default: runTower(); break;
                 }
 
@@ -227,10 +230,7 @@ public class RobotPlayer {
                 }
                 Clock.yield();
             }
-            // End of loop: go back to the top. Clock.yield() has ended, so it's time for another turn!
         }
-
-        // Your code should never reach here (unless it's intentional)! Self-destruction imminent...
     }
 
     public static void runTower() throws GameActionException {
@@ -245,7 +245,7 @@ public class RobotPlayer {
         Moppers.run();
     }
 
-    // public static void runSplasher(RobotController rc) throws GameActionException{
-    //     Splashers.run();
-    // }
+    public static void runSplasher() throws GameActionException{
+        Splashers.run();
+    }
 }
