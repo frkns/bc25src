@@ -156,20 +156,6 @@ public class Communication extends RobotPlayer {
     public static void readMessageLocation(Message message){
         int info = (message.getBytes() & MASK_LOCATION_INFO) >> 12;
         MapLocation target = intToLoc(message.getBytes() & MASK_LOCATION);
-
-        if (rc.getType().isRobotType()){ // IF UNIT
-            switch (info) {
-                case 0: // Enemy tower location
-                    Debug.println(Debug.COMMS, "Unit received enemy tower location: " + target);
-                    towerTargetEnemyTower = target;     
-            }
-        } else { // IF TOWER
-            switch (info) {
-                case 0: // Enemy tower location
-                    Debug.println(Debug.COMMS, "Tower received enemy tower location: " + target);
-                    targetEnemyTower = target;
-            }
-        }
     }
 
 }
