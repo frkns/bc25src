@@ -105,7 +105,7 @@ public class Towers extends RobotPlayer {
         int splasherSpawnPercent = 0;
         int mopperSpawnPercent = 0;
         if (rc.getRoundNum() >= splasherPhase) {
-            splasherSpawnPercent = 0;
+            splasherSpawnPercent = 20;
         }
         if (rc.getRoundNum() >= mopperPhase) {
             if (rc.getRoundNum() >= siegePhase){

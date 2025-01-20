@@ -14,14 +14,14 @@ public class RobotPlayer {
 
     static final Random rng = new Random();
     static final Direction[] directions = {
-        Direction.NORTH,
-        Direction.NORTHEAST,
-        Direction.EAST,
-        Direction.SOUTHEAST,
-        Direction.SOUTH,
-        Direction.SOUTHWEST,
-        Direction.WEST,
-        Direction.NORTHWEST,
+            Direction.NORTH,
+            Direction.NORTHEAST,
+            Direction.EAST,
+            Direction.SOUTHEAST,
+            Direction.SOUTH,
+            Direction.SOUTHWEST,
+            Direction.WEST,
+            Direction.NORTHWEST,
     };
 
     // ------ Robot state ------
@@ -44,12 +44,12 @@ public class RobotPlayer {
 
     // ------ Tower specific ------
     static MapLocation targetEnemyTower; // Which enemy tower we are telling the bunnies to attack
-    
+
     // ------ Spawn and Base Information ------
     static MapLocation spawnTowerLocation;
     static UnitType spawnTowerType;
     static MapLocation avgClump;  // will eventually get rid of this one, in favor of 5x5 bool map
-    
+
     // ------ Sensing State ------
     static RobotInfo[] nearbyRobots;
     static MapInfo[] nearbyTiles;
@@ -95,39 +95,38 @@ public class RobotPlayer {
     static int selfDestructPaintThreshold = 50;
 
 
-
     public static void run(RobotController r) throws GameActionException {
         // ---- Init infos ----
         rc = r;
         mapHeight = rc.getMapHeight();
         mapWidth = rc.getMapWidth();
-        mapCenter = new MapLocation(mapWidth/2, mapHeight/2);
-        quadrantCenters[0] = new MapLocation(3*mapWidth/4, 3*mapHeight/4);
-        quadrantCenters[1] = new MapLocation(1*mapWidth/4, 3*mapHeight/4);
-        quadrantCenters[2] = new MapLocation(1*mapWidth/4, 1*mapHeight/4);
-        quadrantCenters[3] = new MapLocation(3*mapWidth/4, 1*mapHeight/4);
-        quadrantCorners[0] = new MapLocation(mapWidth-1, mapHeight-1);
-        quadrantCorners[1] = new MapLocation(0, mapHeight-1);
+        mapCenter = new MapLocation(mapWidth / 2, mapHeight / 2);
+        quadrantCenters[0] = new MapLocation(3 * mapWidth / 4, 3 * mapHeight / 4);
+        quadrantCenters[1] = new MapLocation(1 * mapWidth / 4, 3 * mapHeight / 4);
+        quadrantCenters[2] = new MapLocation(1 * mapWidth / 4, 1 * mapHeight / 4);
+        quadrantCenters[3] = new MapLocation(3 * mapWidth / 4, 1 * mapHeight / 4);
+        quadrantCorners[0] = new MapLocation(mapWidth - 1, mapHeight - 1);
+        quadrantCorners[1] = new MapLocation(0, mapHeight - 1);
         quadrantCorners[2] = new MapLocation(0, 0);
-        quadrantCorners[3] = new MapLocation(mapWidth-1, 0);
+        quadrantCorners[3] = new MapLocation(mapWidth - 1, 0);
 
         mx = Math.max(mapWidth, mapHeight);  // ~60 for huge ~35 for medium
 
-        firstMopper = (int)(mx * 2);
-        splasherPhase = (int)(mx * 1.5);  // Start spawning splashers earlier than moppers
-        mopperPhase = (int)(mx * 4);
+        firstMopper = (int) (mx * 2);
+        splasherPhase = (int) (mx * 1.5);  // Start spawning splashers earlier than moppers
+        mopperPhase = (int) (mx * 4);
 
-        nonGreedyPhase = (int)(mx * 2);  // allow other units to complete ruins / upgrade towers if money capped
-        siegePhase = (int)(mx * 3);  // cast to int, will be useful for tuning later
-        fullFillPhase = (int)(mx * 3);
-        attackBasePhase = (int)(mx * 3);
-        reservePaintPhase = (int)(mx * 1.5);
+        nonGreedyPhase = (int) (mx * 2);  // allow other units to complete ruins / upgrade towers if money capped
+        siegePhase = (int) (mx * 3);  // cast to int, will be useful for tuning later
+        fullFillPhase = (int) (mx * 3);
+        attackBasePhase = (int) (mx * 3);
+        reservePaintPhase = (int) (mx * 1.5);
         if (mx < 30) {
             attackBasePhase = 0;  // may be beneficial to send immediately on small maps
         }
 
 
-        if (rc.getType().isRobotType()){
+        if (rc.getType().isRobotType()) {
             spawnTowerLocation = rc.senseNearbyRuins(4)[0]; // Only 1 ruin within a squaredRadius of 4 from the robot's spawn, and that ruin must be in the same location of the spawn tower
             if (rc.canSenseRobotAtLocation(spawnTowerLocation)) { // Either it is our tower, or the enemy destroyed and built on it in the same turn
                 RobotInfo robot = rc.senseRobotAtLocation(spawnTowerLocation);
@@ -146,12 +145,14 @@ public class RobotPlayer {
 
         // ---- Init role ----
         switch (rc.getType()) {
-            case SOLDIER: {
+            case SOLDIER:
                 if (role == 1) {
                     AttackBase.init();
                 }
                 break;
-            }
+            case UnitType.SPLASHER:
+                Splashers.init();
+                break;
         }
 
         nearbyRobots = rc.senseNearbyRobots();
@@ -179,13 +180,20 @@ public class RobotPlayer {
                             case 1:
                                 AttackBase.run();
                                 break;
-                            default: runSoldier();
+                            default:
+                                runSoldier();
                         }
                         break;
                     }
-                    case MOPPER: runMopper(); break;
-                    case SPLASHER: runSplasher(); break;
-                    default: runTower(); break;
+                    case MOPPER:
+                        runMopper();
+                        break;
+                    case SPLASHER:
+                        runSplasher();
+                        break;
+                    default:
+                        runTower();
+                        break;
                 }
 
             } catch (GameActionException e) {
@@ -221,7 +229,7 @@ public class RobotPlayer {
         Moppers.run();
     }
 
-    public static void runSplasher() throws GameActionException{
+    public static void runSplasher() throws GameActionException {
         Splashers.run();
     }
 }
