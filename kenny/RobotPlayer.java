@@ -22,6 +22,12 @@ public class RobotPlayer {
         Direction.WEST,
         Direction.NORTHWEST,
     };
+    static final Direction[] directions4 = {
+        Direction.NORTH,
+        Direction.EAST,
+        Direction.SOUTH,
+        Direction.WEST,
+    };
 
     static MapLocation spawnTowerLocation;
     static UnitType spawnTowerType;
@@ -38,12 +44,19 @@ public class RobotPlayer {
 
     static RobotInfo[] nearbyRobots;
     static MapInfo[] nearbyTiles;
+    static MapLocation[] nearbyRuins;
     static boolean nearestPaintTowerIsPaintTower = false;
     static MapLocation nearestPaintTower;  // misnomer, can be money/defense tower if we haven't see a paint tower yet
-    static MapLocation nearestEnemyTower;
     static MapLocation nearestEmptyTile;  // not used (update: we use it now for full fill)
     static MapLocation nearestEnemyPaint;
     static MapLocation nearestEnemyRobot;  // non-tower
+    static RobotInfo nearestEnemyRobotInfo;
+
+    static MapLocation nearestEnemyTower;
+    static UnitType nearestEnemyTowerType;  // base type
+
+    static MapLocation sndNearestEnemyTower;  // if there is a second one
+    static UnitType sndNearestEnemyTowerType;
 
     static MapInfo curRuin;
     static boolean isFillingRuin = false;
@@ -76,21 +89,27 @@ public class RobotPlayer {
 
     static MapLocation avgClump;  // will eventually get rid of this one, in favor of 5x5 bool map
 
-    static boolean[][] nearbyAlliesMask = new boolean[5][5];  // 5x5 area centered around robot
-    static boolean[][] nearbyEnemiesMask = new boolean[5][5];
+    static boolean[][] nearbyAlliesMask;  // 5x5 area centered around robot
+    static boolean[][] nearbyEnemiesMask;
 
     // some of these are unused
     static MapLocation[] quadrantCenters = new MapLocation[4];
-    static MapLocation[] quadrantCorners = new MapLocation[4];
-    static int[] roundsSpentInQuadrant = new int[4];
+    // static MapLocation[] quadrantCorners = new MapLocation[4];
+    // static int[] roundsSpentInQuadrant = new int[4];
 
     static int reservePaintPhase;  // it is really bad to reserve paint in the first few rounds because we'll fall behind
     static int reservePaint = 100;
-    static int reserveChips = 1700;
+    static int reserveChips = 1800;
 
     static int mx;  // max of mapWidth and mapHeight
 
+    static boolean[][] paintPattern;
+    static boolean[][] moneyPattern;
+    static boolean[][] defensePattern;
 
+    static boolean wallAdjacent = false;  // might not use this maybe bugnav potential
+    static int wallRounds = 0;
+    static int sqDistanceToTargetOnWallTouch = (int) 2e9;
 
     public static void run(RobotController r) throws GameActionException {
         rc = r;
@@ -101,10 +120,14 @@ public class RobotPlayer {
         quadrantCenters[1] = new MapLocation(1*mapWidth/4, 3*mapHeight/4);
         quadrantCenters[2] = new MapLocation(1*mapWidth/4, 1*mapHeight/4);
         quadrantCenters[3] = new MapLocation(3*mapWidth/4, 1*mapHeight/4);
-        quadrantCorners[0] = new MapLocation(mapWidth-1, mapHeight-1);
-        quadrantCorners[1] = new MapLocation(0, mapHeight-1);
-        quadrantCorners[2] = new MapLocation(0, 0);
-        quadrantCorners[3] = new MapLocation(mapWidth-1, 0);
+        // quadrantCorners[0] = new MapLocation(mapWidth-1, mapHeight-1);
+        // quadrantCorners[1] = new MapLocation(0, mapHeight-1);
+        // quadrantCorners[2] = new MapLocation(0, 0);
+        // quadrantCorners[3] = new MapLocation(mapWidth-1, 0);
+
+        paintPattern = rc.getTowerPattern(UnitType.LEVEL_ONE_PAINT_TOWER);
+        moneyPattern = rc.getTowerPattern(UnitType.LEVEL_ONE_MONEY_TOWER);
+        defensePattern = rc.getTowerPattern(UnitType.LEVEL_ONE_DEFENSE_TOWER);
 
         nearbyRobots = rc.senseNearbyRobots();
         for (RobotInfo robot : nearbyRobots) {
@@ -118,8 +141,9 @@ public class RobotPlayer {
             }
         }
 
-        if (spawnTowerLocation == null)  // it is possible that is spawn tower is destroyed in the middle of the turn
-            spawnTowerLocation = new MapLocation(0, 0);
+        if (spawnTowerLocation == null)  // it is possible that spawn tower is destroyed in the middle of the turn
+            spawnTowerLocation = rc.getLocation();
+
 
         mx = Math.max(mapWidth, mapHeight);  // ~60 for huge ~35 for medium
         siegePhase = (int)(mx * 3);  // cast to int, will be useful for tuning later
@@ -127,11 +151,19 @@ public class RobotPlayer {
         mopperPhase = (int)(mx * 4);
         attackBasePhase = (int)(mx * 3);
         reservePaintPhase = (int)(mx * 1.5);
-        alwaysBuildDefenseTowerPhase = (int)(mx * 6);
+        alwaysBuildDefenseTowerPhase = (int)(mx * 8);
 
-        if (mx < 30) {
-            attackBasePhase = 0;  // may be beneficial to send immediately on small maps
+        if (rc.getRoundNum() <= 3 && mx < 30) {
+            if (spawnTowerType == UnitType.LEVEL_ONE_PAINT_TOWER) {
+                role = 1;  // on small maps send 2 to their paint tower
+            } else {
+            }
         }
+
+        // if (mx < 30) {
+        //     attackBasePhase = 0;  // may be beneficial to send immediately on small maps
+        // }
+
         if (rc.getType() == UnitType.SOLDIER && rc.getRoundNum() >= attackBasePhase) {
             // we do divison by ~10 first because we want to send the attackers in "waves"
             if ((rc.getRoundNum() / 10) % 3 == 0) {
@@ -155,7 +187,7 @@ public class RobotPlayer {
                 turnsAlive++;
                 roundNum = rc.getRoundNum();
 
-                roundsSpentInQuadrant[Utils.currentQuadrant()]++;
+                // roundsSpentInQuadrant[Utils.currentQuadrant()]++;
 
                 // update stuff
                 locationHistory[rc.getRoundNum() % locationHistory.length] = rc.getLocation();

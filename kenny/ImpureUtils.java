@@ -63,8 +63,6 @@ public class ImpureUtils extends RobotPlayer {
         for (RobotInfo robot : nearbyTiles5x5) {
             int i = robot.getLocation().x - rc.getLocation().x + 2;
             int j = robot.getLocation().y - rc.getLocation().y + 2;
-            if (i < 0 || i > 4 || j < 0 || j > 4)  // pending deletion if assert is fine
-                assert(false);  // shouldn't get here now
             if (rc.getTeam() == robot.getTeam()) {
                 nearbyFriendlyRobots++;
                 nearbyAlliesMask[i][j] = true;
@@ -105,23 +103,52 @@ public class ImpureUtils extends RobotPlayer {
 
     static void updateNearestEnemyRobot() throws GameActionException {
         nearestEnemyRobot = null;
-        for (RobotInfo robot : nearbyRobots) {  // assumes non-defense tower
-            if (robot.getTeam() != rc.getTeam() && robot.getType().isTowerType()) {
+        for (RobotInfo robot : nearbyRobots) {
+            if (robot.getTeam() != rc.getTeam() && !robot.getType().isTowerType()) {
                 MapLocation robotLoc = robot.getLocation();
                 if (nearestEnemyRobot == null || rc.getLocation().distanceSquaredTo(robotLoc) < rc.getLocation().distanceSquaredTo(nearestEnemyRobot)) {
                     nearestEnemyRobot = robot.getLocation();
+                    nearestEnemyRobotInfo = robot;
                 }
             }
         }
     }
 
+    // static void updateNearestEnemyTower() throws GameActionException {
+    //     nearestEnemyTower = null;
+    //     for (RobotInfo robot : nearbyRobots) {  // assumes non-defense tower
+    //         if (robot.getTeam() != rc.getTeam() && robot.getType().isTowerType()) {
+    //             MapLocation robotLoc = robot.getLocation();
+    //             if (nearestEnemyTower == null || rc.getLocation().distanceSquaredTo(robotLoc) < rc.getLocation().distanceSquaredTo(nearestEnemyTower)) {
+    //                 nearestEnemyTower = robot.getLocation();
+    //                 nearestEnemyTowerType = robot.getType().getBaseType();
+    //             }
+    //         }
+    //     }
+    // }
+
+    // updates two towers now!
     static void updateNearestEnemyTower() throws GameActionException {
         nearestEnemyTower = null;
+        sndNearestEnemyTower = null;
         for (RobotInfo robot : nearbyRobots) {  // assumes non-defense tower
             if (robot.getTeam() != rc.getTeam() && robot.getType().isTowerType()) {
                 MapLocation robotLoc = robot.getLocation();
-                if (nearestEnemyTower == null || rc.getLocation().distanceSquaredTo(robotLoc) < rc.getLocation().distanceSquaredTo(nearestEnemyTower)) {
-                    nearestEnemyTower = robot.getLocation();
+                int distanceSquared = rc.getLocation().distanceSquaredTo(robotLoc);
+                // Check if this tower is closer than the current nearest tower
+                if (nearestEnemyTower == null || distanceSquared < rc.getLocation().distanceSquaredTo(nearestEnemyTower)) {
+                    // Update the second nearest tower to be the current nearest tower
+                    sndNearestEnemyTower = nearestEnemyTower;
+                    sndNearestEnemyTowerType = nearestEnemyTowerType;
+                    // Update the nearest tower to be this tower
+                    nearestEnemyTower = robotLoc;
+                    nearestEnemyTowerType = robot.getType().getBaseType();
+                }
+                // Check if this tower is closer than the current second nearest tower but not closer than the nearest tower
+                else if (sndNearestEnemyTower == null || distanceSquared < rc.getLocation().distanceSquaredTo(sndNearestEnemyTower)) {
+                    // Update the second nearest tower to be this tower
+                    sndNearestEnemyTower = robotLoc;
+                    sndNearestEnemyTowerType = robot.getType().getBaseType();
                 }
             }
         }
@@ -164,8 +191,8 @@ public class ImpureUtils extends RobotPlayer {
                 return;
             int paintTowerPaintAmt = paintTower.getPaintAmount();
             int transferAmt = Math.min(paintTowerPaintAmt, rc.getType().paintCapacity - rc.getPaint());
-            if (rc.canTransferPaint(withdrawTarget, -1 * transferAmt))
-                rc.transferPaint(withdrawTarget, -1 * transferAmt);
+            if (rc.canTransferPaint(withdrawTarget, -transferAmt))
+                rc.transferPaint(withdrawTarget, -transferAmt);
         }
     }
 
