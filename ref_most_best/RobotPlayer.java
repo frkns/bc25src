@@ -111,6 +111,11 @@ public class RobotPlayer {
     static int wallRounds = 0;
     static int sqDistanceToTargetOnWallTouch = (int) 2e9;
 
+    static MapLocation fstTowerTarget;  // what tower is our tower telling us to attack?
+    static boolean fstTowerTargetIsDefense;
+    static MapLocation sndTowerTarget;  // what tower is our tower telling us to attack?
+    static boolean sndTowerTargetIsDefense;
+
     public static void run(RobotController r) throws GameActionException {
         rc = r;
         mapHeight = rc.getMapHeight();
@@ -182,8 +187,12 @@ public class RobotPlayer {
             }
         }
 
+
         while (true) {
             try {
+                Comms.readAndUpdateTowerTargets(rc.getRoundNum() - 1);
+                Comms.readAndUpdateTowerTargets(rc.getRoundNum());
+
                 turnsAlive++;
                 roundNum = rc.getRoundNum();
 
@@ -211,6 +220,16 @@ public class RobotPlayer {
                     // case SPLASHER: runSplasher();
                     default: runTower(); break;
                 }
+
+                // should be ok not to update nearbyRobots because we only do one nearest enemy tower update anyways
+                for (RobotInfo robot : nearbyRobots) {
+                    if (robot.getType().isTowerType() && robot.getTeam() == rc.getTeam()
+                            && rc.canSendMessage(robot.getLocation())) {
+                        Comms.reportToTower(robot.getLocation());
+                        break;
+                    }
+                }
+
 
             } catch (GameActionException e) {
                 System.out.println("GameActionException");

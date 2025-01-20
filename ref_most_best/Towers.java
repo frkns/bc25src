@@ -14,12 +14,90 @@ public class Towers extends RobotPlayer {
     // force the spawning of a unit if possible, bypassing reserve checks, resets to false end of round
     static boolean forceSpawn = false;
 
+    static MapLocation fstEnemyTower;  // first target
+    static boolean fstIsDefense;
+
+    static MapLocation sndEnemyTower;
+    static boolean sndIsDefense;
+
+    static int msgUpdateRoundNum = -99;
+
+    public static void readMessages(int round) throws GameActionException {
+        Message[] receivedMsgs = rc.readMessages(round);
+        for (Message msg : receivedMsgs) {
+            int bits = msg.getBytes();
+
+            int fst = (bits >> (21 - 1)) & 0xFFF;
+            int snd = (bits >> (21 - 14)) & 0xFFF;
+            MapLocation fstLoc = fst == 0 ? null : Comms.intToLoc(fst);
+            MapLocation sndLoc = snd == 0 ? null : Comms.intToLoc(snd);
+            boolean fstType = ((bits >> (32 - 13)) & 1) == 1;
+            boolean sndType = ((bits >> (32 - 26)) & 1) == 1;
+
+            // replace if greater distance, always update if old messages - actually since we're reading past 2 rounds, not required
+            if (fstLoc != null)
+            if (rc.getRoundNum() >= msgUpdateRoundNum + 11 || fstEnemyTower == null /*|| rc.getLocation().distanceSquaredTo(fstLoc) > rc.getLocation().distanceSquaredTo(fstEnemyTower) */&& fstLoc != sndEnemyTower) {
+                fstEnemyTower = fstLoc;
+                fstIsDefense = fstType;
+                // msgUpdateRoundNum = rc.getRoundNum();
+            }
+            if (sndLoc != null)
+            if (rc.getRoundNum() >= msgUpdateRoundNum + 11 || sndEnemyTower == null /*|| rc.getLocation().distanceSquaredTo(sndLoc) > rc.getLocation().distanceSquaredTo(sndEnemyTower) */&& sndLoc != fstEnemyTower) {
+                sndEnemyTower = sndLoc;
+                sndIsDefense = sndType;
+                // msgUpdateRoundNum = rc.getRoundNum();
+            }
+        }
+    }
+
+    public static void sendMessages() throws GameActionException {
+        assert(rc.canBroadcastMessage());
+
+        // Comms
+        // remake the message to include additional information if necessary
+        int outgoingMsg = 0;
+
+        if (fstEnemyTower == null) {
+            // outgoingMsg |= 0xFFF << (21 - 1);  // sentinel value, just leave it to be 0
+        } else {
+            outgoingMsg |= Comms.locToInt(fstEnemyTower) << (21 - 1);
+            outgoingMsg |= (fstIsDefense ? 1 : 0) << (32 - 13);
+        }
+        if (sndEnemyTower == null) {
+            // outgoingMsg |= 0xFFF << (21 - 14);  // sentinel value
+        } else {
+            outgoingMsg |= Comms.locToInt(sndEnemyTower) << (21 - 14);
+            outgoingMsg |= (sndIsDefense ? 1 : 0) << (32 - 26);
+        }
+
+        rc.broadcastMessage(outgoingMsg);
+        for (RobotInfo robot : nearbyRobots) {
+            if (robot.getTeam() == rc.getTeam()) {
+                assert(robot.getType().isRobotType());
+
+                MapLocation tileLoc = robot.getLocation();
+                if (rc.canSendMessage(tileLoc)) {
+                    rc.sendMessage(tileLoc, outgoingMsg);
+                }
+            }
+        }
+    }
+
     public static void run() throws GameActionException {
+        readMessages(rc.getRoundNum() - 1);  // read last round's messages
+        readMessages(rc.getRoundNum());      // read this round's messages
+
         // debugging stuff
         if (rc.getRoundNum() <= 1 && rc.getType() == UnitType.LEVEL_ONE_PAINT_TOWER) {
             System.out.println("Number of towers " + rc.getNumberTowers());
             System.out.println("Siege phase " + siegePhase);
             System.out.println("Mopper phase " + mopperPhase);
+        }
+        if (fstEnemyTower != null) {
+            rc.setIndicatorLine(rc.getLocation(), fstEnemyTower, 255, 255, 255);
+        }
+        if (sndEnemyTower != null) {
+            rc.setIndicatorLine(rc.getLocation(), sndEnemyTower, 199, 199, 199);
         }
         /* */
 
@@ -41,6 +119,8 @@ public class Towers extends RobotPlayer {
                 }
             }
         }
+
+
 
         ImpureUtils.updateNearestEnemyPaint();
         ImpureUtils.updateNearestEnemyRobot();
@@ -152,7 +232,8 @@ public class Towers extends RobotPlayer {
             }
         }
 
-    forceSpawn = false;
+        sendMessages();
 
+        forceSpawn = false;
     }
 }
