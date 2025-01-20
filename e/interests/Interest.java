@@ -13,22 +13,17 @@ public abstract class Interest {
     public String name = "ABSTRACT Int.";
     public boolean debugInterest = true;
 
-    public static int [] directionScores = new int[9]; // TODO use cheap hash map instead
+    public static int [] directionScores = new int[9];
     public static int bestDirScore;
     public static Direction bestDir = null;
 
-    public Interest(){
-        rc = Robot.rc;
-    }
 
     public abstract void initUnit() throws GameActionException;
     public abstract void updateDirectionScores() throws GameActionException;
     public static void resetDirectionScores() throws GameActionException {
         directionScores = new int[]{500, 500, 500, 500, 500, 500, 500, 500, 500};
     }
-    public static void adjustDirectionScore(Direction dir, int score){
-        directionScores[dir.ordinal()] += score;
-    }
+    
     // TODO replace with a movementReady check + isPassable(Does this account for other robots??)
     public static void maskIllegalMoves(){
         if (!Robot.rc.canMove(_Info.directions[0])) directionScores[0] = 0;

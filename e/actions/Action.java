@@ -16,10 +16,6 @@ public abstract class Action {
     public boolean[] possibleDirs = new boolean[9];
     public boolean debugAction = true;
 
-    public Action(){
-        rc = Robot.rc;
-    }
-
     public abstract void initUnit() throws GameActionException;
     public abstract void calcScore() throws GameActionException;
     public abstract void play() throws GameActionException;

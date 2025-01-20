@@ -11,6 +11,8 @@ public class Soldier extends Robot {
     public Soldier(RobotController rc) throws GameActionException {
         super(rc);
 
+        interests.add(new Explore());
+
         initUnit();
     }
 }

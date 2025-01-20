@@ -8,8 +8,6 @@ import e.utils.Debug;
 
 public class _Template extends Action {
     public RobotController rc;
-
-    // Initialize any variables needed for the action here
     
 
     public _Template(){
