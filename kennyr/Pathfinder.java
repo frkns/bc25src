@@ -1,16 +1,18 @@
 // Adapted from https://github.com/chenyx512/battlecode24/blob/main/src/bot1/PathFinder.java
-package ref_most_best;
+package kennyr;
 
 import battlecode.common.*;
 
-import ref_most_best.fast.*;
+import kennyr.fast.*;
 
+//TODO track total paint loss
+//TODO treat options enemy paint/empty paint as walls.
+//Check simulation to see whether distance gained is substantial enough. Otherwise go straight through
 public class Pathfinder extends RobotPlayer{
 
     static MapLocation target = null;
     static MapLocation stayawayFrom = null;
     static int stuckCnt;
-    static boolean ignoreTowers = false;
 
 
     public static void tryMove(Direction dir) throws GameActionException {
@@ -22,12 +24,6 @@ public class Pathfinder extends RobotPlayer{
     }
 
     public static void move(MapLocation loc) throws GameActionException {
-        move(loc, false);
-        return;
-    }
-
-    public static void move(MapLocation loc, boolean _ignoreTowers) throws GameActionException {
-        ignoreTowers = _ignoreTowers;
         if (!rc.isMovementReady() || loc == null)
             return;
         target = loc;
@@ -58,7 +54,7 @@ public class Pathfinder extends RobotPlayer{
         static int currentTurnDir = 0;
         static int stackDepthCutoff = 8;
         static final int MAX_DEPTH = 20;
-        static final int BYTECODE_CUTOFF = 1000;
+        static final int BYTECODE_CUTOFF = 3000;
         static int lastMoveRound = -1;
 
         static Direction turn(Direction dir) {
@@ -321,21 +317,9 @@ public class Pathfinder extends RobotPlayer{
         }
 
         static boolean canMoveOrFill(Direction dir) throws GameActionException {
-            MapLocation loc = rc.adjacentLocation(dir);
+            MapLocation loc = rc.getLocation().add(dir);
             if (stayawayFrom != null && loc.isAdjacentTo(stayawayFrom))
                 return false;
-
-            if (!ignoreTowers) {
-                if (nearestEnemyTower != null && loc.isWithinDistanceSquared(nearestEnemyTower,
-                        nearestEnemyTowerType == UnitType.LEVEL_ONE_DEFENSE_TOWER ? 16 : 9)) {
-                    return false;
-                }
-                if (sndNearestEnemyTower != null && loc.isWithinDistanceSquared(sndNearestEnemyTower,
-                        sndNearestEnemyTowerType == UnitType.LEVEL_ONE_DEFENSE_TOWER ? 16 : 9)) {
-                    return false;
-                }
-            }
-
             if (rc.canMove(dir)) {
                 return true;
             }
@@ -343,10 +327,8 @@ public class Pathfinder extends RobotPlayer{
             // EXTRA
             if (!rc.canSenseLocation(loc))
                 return false;
-
-            RobotInfo robot = rc.senseRobotAtLocation(loc);
-            if (robot != null && robot.getType().isRobotType()) {
-                return FastMath.rand256() % 5 == 0; // small chance robot might be gone by the time duck reaches location
+            if (rc.senseRobotAtLocation(loc) != null) {
+                return FastMath.rand256() % 10 == 0; // small chance robot might be gone by the time duck reaches location
             }
             return false;
         }
@@ -358,8 +340,7 @@ public class Pathfinder extends RobotPlayer{
             if (rc.canSenseLocation(newLoc)) {
                 return rc.senseMapInfo(newLoc).isPassable();
             } else {
-                return false;
-                // return MapRecorder.getPassible(newLoc);
+                return MapRecorder.getPassible(newLoc);
             }
         }
     }

@@ -22,6 +22,9 @@ public class Towers extends RobotPlayer {
 
     static int msgUpdateRoundNum = -99;
 
+    static UnitType spawn = UnitType.SOLDIER;
+    static boolean canSpawnSplasher = false;
+
     public static void readMessages(int round) throws GameActionException {
         Message[] receivedMsgs = rc.readMessages(round);
         for (Message msg : receivedMsgs) {
@@ -87,6 +90,42 @@ public class Towers extends RobotPlayer {
         }
     }
 
+    public static boolean canSpawnSplasherFn() throws GameActionException {
+        if (forceSpawn || rc.getRoundNum() < 3 || numSpawnedUnits < 1)
+            return true;
+        if (rc.getType().getBaseType() != UnitType.LEVEL_ONE_PAINT_TOWER)
+            return true;
+        if (rc.getMoney() - UnitType.SPLASHER.moneyCost >= reserveChips) {
+            if (rc.getRoundNum() < reservePaintPhase)
+                return true;
+            if (rc.getPaint() - UnitType.SPLASHER.paintCost >= reservePaint && rc.getRoundNum() < reserveMorePaintPhase)
+                return true;
+            if (rc.getPaint() - UnitType.SPLASHER.paintCost >= reserveMorePaint)
+                return true;
+
+        }
+
+        return false;
+    }
+
+    public static boolean hasEnoughResources() throws GameActionException {
+        if (forceSpawn || rc.getRoundNum() < 3 || numSpawnedUnits < 1)
+            return true;
+        if (rc.getType().getBaseType() != UnitType.LEVEL_ONE_PAINT_TOWER)
+            return true;
+        if (rc.getMoney() - spawn.moneyCost >= reserveChips && (canSpawnSplasher || rc.getRoundNum() < splasherPhase)) {
+            if (rc.getRoundNum() < reservePaintPhase)
+                return true;
+            if (rc.getPaint() - spawn.paintCost >= reservePaint && rc.getRoundNum() < reserveMorePaintPhase)
+                return true;
+            if (rc.getPaint() - spawn.paintCost >= reserveMorePaint)
+                return true;
+
+        }
+
+        return false;
+    }
+
     public static void run() throws GameActionException {
         assert(rc.getType().isTowerType());
 
@@ -103,11 +142,11 @@ public class Towers extends RobotPlayer {
             if (rc.getTeam() == Team.A)
                 rc.setIndicatorLine(rc.getLocation(), fstEnemyTower, 0, 0, 0);
             else
-                rc.setIndicatorLine(rc.getLocation(), fstEnemyTower, 255, 255, 150);
+                rc.setIndicatorLine(rc.getLocation(), fstEnemyTower, 255, 255, 200);
         }
         if (sndEnemyTower != null) {
             if (rc.getTeam() == Team.A)
-                rc.setIndicatorLine(rc.getLocation(), sndEnemyTower, 50, 50, 50);
+                rc.setIndicatorLine(rc.getLocation(), sndEnemyTower, 70, 70, 70);
             else
                 rc.setIndicatorLine(rc.getLocation(), sndEnemyTower, 255, 255, 0);
         }
@@ -140,17 +179,18 @@ public class Towers extends RobotPlayer {
         int r = rng.nextInt(100);
         // rc.setIndicatorString("RNG: " + r);
 
-        UnitType spawn = UnitType.SOLDIER;
+        canSpawnSplasher = canSpawnSplasherFn();
 
+        spawn = UnitType.SOLDIER;
         if (rc.getRoundNum() >= mopperPhase) {
             // if (rc.getRoundNum() % 5 == 0) {
-            if (r < 60) {
+            if (r < 20) {
                 spawn = UnitType.MOPPER;
             }
         }
 
         if(rc.getRoundNum() >= splasherPhase) {
-            if(r < 40) {
+            if (20 <= r && r < 50) {
                 spawn = UnitType.SPLASHER;
             }
         }
@@ -214,11 +254,7 @@ public class Towers extends RobotPlayer {
         MapLocation nextLoc = bestLoc;
 
         if (nextLoc != null)
-        if (forceSpawn || rc.getRoundNum() < 3 || numSpawnedUnits < 1 ||  // don't conserve resources if we haven't spawned one units yet
-            true // (rc.getRoundNum() < nonGreedyPhase || rc.getMoney() > 2000)
-            && rc.getMoney() - spawn.moneyCost >= reserveChips
-            && (rc.getPaint() - spawn.paintCost >= reservePaint || rc.getRoundNum() < reservePaintPhase || rc.getType().getBaseType() != UnitType.LEVEL_ONE_PAINT_TOWER))
-            // only reserve paint if we are a paint tower ^
+        if (hasEnoughResources())
         if (rc.canBuildRobot(spawn, nextLoc)) {
             rc.buildRobot(spawn, nextLoc);
             if (spawn == UnitType.MOPPER)

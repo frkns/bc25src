@@ -6,8 +6,6 @@ import java.util.Comparator;
 
 public class AttackBase extends RobotPlayer {
 
-    // create an array of the 3 possible symetries for enemy spawn location
-    static MapLocation[] potentialEnemySpawnLocations = new MapLocation[3];
 
     static MapLocation target;
 
@@ -18,11 +16,6 @@ public class AttackBase extends RobotPlayer {
         potentialEnemySpawnLocations[0] = Utils.mirror(spawnTowerLocation);
         potentialEnemySpawnLocations[1] = Utils.verticalMirror(spawnTowerLocation);
         potentialEnemySpawnLocations[2] = Utils.horizontalMirror(spawnTowerLocation);
-
-        if (spawnTowerLocation == null) {
-            System.out.println("Spawn tower location not found? This should not happen.");
-            return;
-        }
 
         // Sort potentialEnemySpawnLocations based on distance to current location
         // Arrays.sort(potentialEnemySpawnLocations, Comparator.comparingInt(loc -> rc.getLocation().distanceSquaredTo(loc)));
@@ -59,13 +52,13 @@ public class AttackBase extends RobotPlayer {
         potentialEnemySpawnLocations[0] = loc1;
         potentialEnemySpawnLocations[1] = loc2;
         potentialEnemySpawnLocations[2] = loc3;
+        totalManDist = Utils.manhattanDistance(rc.getLocation(), loc1) + Utils.manhattanDistance(loc1, loc2) + Utils.manhattanDistance(loc2, loc3);
     }
 
     static boolean[] visited = new boolean[3];
     static MapLocation foundLoc = null;
     static MapInfo foundLocInfo = null;
 
-    static boolean visFstTowerTarget = false;
 
     static void run() throws GameActionException {
 
@@ -75,6 +68,15 @@ public class AttackBase extends RobotPlayer {
         // ImpureUtils.updateNearbyUnits();
         ImpureUtils.updateNearestEnemyTower();
         ImpureUtils.updateNearbyMask(false);
+
+        // if (rc.getRoundNum() >= fullAttackBasePhase && rc.getRoundNum() >= fullFillPhase) {
+        //     ImpureUtils.updateNearestEnemyPaint();
+        //     if (nearestEnemyPaint != null) {
+        //         role = 0;
+        //         Soldiers.run();
+        //         return;
+        //     }
+        // }
 
         if (nearestEnemyTower != null) {
             if (rc.canAttack(nearestEnemyTower)) {
@@ -122,6 +124,12 @@ public class AttackBase extends RobotPlayer {
                 visFstTowerTarget = true;
             }
         }
+        if (sndTowerTarget != null) {
+            MapLocation tileLoc = sndTowerTarget;
+            if (rc.getLocation().isWithinDistanceSquared(tileLoc, 20)) {
+                visSndTowerTarget = true;
+            }
+        }
 
 
         // // * needed if using attackBaseMove
@@ -143,10 +151,10 @@ public class AttackBase extends RobotPlayer {
         // }
         // /*  */
 
-
-        // if (fstTowerTarget == null && !visFstTowerTarget) {
-        //     target = fstTowerTarget;
-        // } else
+        MapLocation tentativeTarget = Utils.chooseTowerTarget();
+        if (tentativeTarget != null && rc.getID() % 3 != 0) {
+            target = tentativeTarget;
+        } else
         if (foundLoc == null) {
             // System.out.println("No enemy tower found");
             for (int i = 0; i < 3; i++) {
@@ -163,21 +171,27 @@ public class AttackBase extends RobotPlayer {
                 Soldiers.run();
                 return;
             }
-        }
-        Pathfinder.move(target);
-        // HeuristicPath.attackBaseMove(target);
 
+        }
+
+        assert(target != null);
+
+        // if (rc.getLocation().isWithinDistanceSquared(target, 20))
+        //     HeuristicPath.attackBaseMove(target);
+        // else
+            Pathfinder.move(target, true);
+
+        rc.setIndicatorLine(rc.getLocation(), target, 255, 255, 255);
 
         // dot nearby empty/ enemy ruins
+        nearbyRuins = rc.senseNearbyRuins(-1);
         if (rc.isActionReady()) {
             MapLocation closestDot = null;
-            for (MapInfo tile : nearbyTiles) {
-                if (tile.hasRuin()) {
-                    MapLocation tentativeDot = Utils.nearestEmptyOnRuinIfEnemyOrIsUndotted(tile.getMapLocation());
-                    if (tentativeDot != null) {
-                        if (closestDot == null || rc.getLocation().distanceSquaredTo(tentativeDot) < rc.getLocation().distanceSquaredTo(closestDot)) {
-                            closestDot = tentativeDot;
-                        }
+            for (MapLocation tileLoc : nearbyRuins) {
+                MapLocation tentativeDot = Utils.nearestEmptyOnRuinIfEnemyOrIsUndotted(tileLoc);
+                if (tentativeDot != null) {
+                    if (closestDot == null || rc.getLocation().distanceSquaredTo(tentativeDot) < rc.getLocation().distanceSquaredTo(closestDot)) {
+                        closestDot = tentativeDot;
                     }
                 }
             }
@@ -203,7 +217,7 @@ public class AttackBase extends RobotPlayer {
             role = 0;
             // Soldiers.run();
             return;
-        } else if (visited[0] && visited[1] && visited[2] && visFstTowerTarget && nearestEnemyTower == null) {  // visited everything
+        } else if (visited[0] && visited[1] && visited[2] && nearestEnemyTower == null) {  // visited everything
             role = 0;
             // Soldiers.run();
             return;

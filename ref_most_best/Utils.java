@@ -6,6 +6,36 @@ import battlecode.common.*;
 
 public class Utils extends RobotPlayer {
 
+    static MapLocation chooseTowerTarget() throws GameActionException {  // choose a target for robot to move towards/ attack
+        if (rc.getID() % 2 == 1) {
+            if (fstTowerTarget != null && !visFstTowerTarget) {
+                return fstTowerTarget;
+            } else
+            if (sndTowerTarget != null && !visSndTowerTarget) {
+                return sndTowerTarget;
+            }
+        } else {
+            if (sndTowerTarget != null && !visSndTowerTarget) {
+                return sndTowerTarget;
+            } else
+            if (fstTowerTarget != null && !visFstTowerTarget) {
+                return fstTowerTarget;
+            }
+        }
+
+        return null;
+    }
+
+    static boolean isSendingWave() throws GameActionException {
+        return (rc.getRoundNum() / 20) % 3 == 0;
+    }
+    static boolean isAttackingBase() throws GameActionException {
+        if (isSendingWave() && rc.getRoundNum() >= attackBasePhase)
+            return true;
+
+        return false;
+    }
+
     static UnitType getBuildType() throws GameActionException {
 
         MapLocation ruinLoc = curRuin.getMapLocation();
@@ -43,29 +73,16 @@ public class Utils extends RobotPlayer {
                     if (defensePattern[i][j])
                         numWrongInDefense++;
                 }
-
-                // if (paint == PaintType.EMPTY
-                //         || (paint == PaintType.ALLY_SECONDARY && !paintPattern[i][j])
-                //         || (paint == PaintType.ALLY_PRIMARY && paintPattern[i][j])) {
-                //     numWrongInPaint++;
-                // }
-                // if (paint == PaintType.EMPTY
-                //         || (paint == PaintType.ALLY_SECONDARY && !moneyPattern[i][j])
-                //         || (paint == PaintType.ALLY_PRIMARY && moneyPattern[i][j])) {
-                //     numWrongInMoney++;
-                // }
-                // if (paint == PaintType.EMPTY
-                //         || (paint == PaintType.ALLY_SECONDARY && !defensePattern[i][j])
-                //         || (paint == PaintType.ALLY_PRIMARY && defensePattern[i][j])) {
-                //     numWrongInDefense++;
-                // }
-
             }
         }
 
         // do not early return so we can return null if there is enemy paint
-        if (rc.getNumberTowers() <= Soldiers.strictFollowBuildOrderNumTowers)
+        if (rc.getNumberTowers() <= Soldiers.strictFollowBuildOrderNumTowers) {
+            if (Soldiers.bypassIfPaint && numWrongInPaint < numWrongInMoney && numWrongInPaint < numWrongInDefense) {
+                return UnitType.LEVEL_ONE_PAINT_TOWER;
+            }
             return AuxConstants.buildOrder[rc.getNumberTowers()];  // follow the build order
+        }
         if (rc.getRoundNum() >= alwaysBuildDefenseTowerPhase)
             return UnitType.LEVEL_ONE_DEFENSE_TOWER;
 

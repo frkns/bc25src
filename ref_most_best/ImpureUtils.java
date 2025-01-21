@@ -137,7 +137,10 @@ public class ImpureUtils extends RobotPlayer {
         if (sndNearestEnemyTower != null && rc.getLocation().isWithinDistanceSquared(sndNearestEnemyTower, 20) && (!rc.canSenseRobotAtLocation(sndNearestEnemyTower) || rc.senseRobotAtLocation(sndNearestEnemyTower).getTeam() == rc.getTeam())) {
             sndNearestEnemyTower = null;  // invalidation
         }
-        for (RobotInfo robot : nearbyRobots) {  // assumes non-defense tower
+        for (MapLocation tileLoc : rc.senseNearbyRuins(-1)) {  // assumes non-defense tower
+            if (!rc.canSenseRobotAtLocation(tileLoc))
+                continue;
+            RobotInfo robot = rc.senseRobotAtLocation(tileLoc);
             if (robot.getTeam() != rc.getTeam() && robot.getType().isTowerType()) {
                 MapLocation robotLoc = robot.getLocation();
                 int distanceSquared = rc.getLocation().distanceSquaredTo(robotLoc);
