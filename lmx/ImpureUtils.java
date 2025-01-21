@@ -4,27 +4,16 @@ import battlecode.common.*;
 // these Utils are NOT pure functions (i.e. they modify state / change global variables, etc.)
 
 public class ImpureUtils extends RobotPlayer {
+    static void updateNearestEmptyRuins() throws GameActionException{
+        nearestEmptyRuin = null;
+        int minDistance = 36000;
 
-    // currently exclusively used for moppers
-    static void updateNearestEnemyPaintOnRuin() throws GameActionException {
-        Moppers.nearestEnemyPaintOnRuin = null;
-        for (MapInfo tile : nearbyTiles) {
-            MapLocation tileLoc = tile.getMapLocation();
-            if (tile.hasRuin() && !rc.canSenseRobotAtLocation(tileLoc)) {
-                // check all of the sensible tiles on the ruin
-                for (int i = 0; i < 5; i++) {
-                    for (int j = 0; j < 5; j++) {
-                        if (i == 2 && j == 2)
-                            continue;
-                        MapLocation loc = new MapLocation(tileLoc.x + i - 2, tileLoc.y + j - 2);
-                        if (!rc.canSenseLocation(loc))
-                            continue;
-                        if (rc.senseMapInfo(loc).getPaint().isEnemy()) {
-                            if (Moppers.nearestEnemyPaintOnRuin == null || rc.getLocation().distanceSquaredTo(loc) < rc.getLocation().distanceSquaredTo(Moppers.nearestEnemyPaintOnRuin)) {
-                                Moppers.nearestEnemyPaintOnRuin = loc;
-                            }
-                        }
-                    }
+        for(MapLocation ruin: nearbyRuins){
+            if(!rc.canSenseRobotAtLocation(ruin)){
+                int distance = rc.getLocation().distanceSquaredTo(ruin);
+                if(distance < minDistance){
+                    minDistance = distance;
+                    nearestEmptyRuin = ruin;
                 }
             }
         }
@@ -101,6 +90,7 @@ public class ImpureUtils extends RobotPlayer {
         }
     }
 
+
     static void updateNearestEnemyRobot() throws GameActionException {
         nearestEnemyRobot = null;
         for (RobotInfo robot : nearbyRobots) {
@@ -114,20 +104,7 @@ public class ImpureUtils extends RobotPlayer {
         }
     }
 
-    // static void updateNearestEnemyTower() throws GameActionException {
-    //     nearestEnemyTower = null;
-    //     for (RobotInfo robot : nearbyRobots) {  // assumes non-defense tower
-    //         if (robot.getTeam() != rc.getTeam() && robot.getType().isTowerType()) {
-    //             MapLocation robotLoc = robot.getLocation();
-    //             if (nearestEnemyTower == null || rc.getLocation().distanceSquaredTo(robotLoc) < rc.getLocation().distanceSquaredTo(nearestEnemyTower)) {
-    //                 nearestEnemyTower = robot.getLocation();
-    //                 nearestEnemyTowerType = robot.getType().getBaseType();
-    //             }
-    //         }
-    //     }
-    // }
 
-    // updates two towers now!
     static void updateNearestEnemyTower() throws GameActionException {
         // nearestEnemyTower = null;
         // sndNearestEnemyTower = null;
@@ -160,6 +137,7 @@ public class ImpureUtils extends RobotPlayer {
         }
     }
 
+
     static void updateNearestEmptyTile() throws GameActionException {
         nearestEmptyTile = null;
         for (MapInfo tile : nearbyTiles) {
@@ -169,6 +147,7 @@ public class ImpureUtils extends RobotPlayer {
             }
         }
     }
+
 
     static void updateNearestEnemyPaint() throws GameActionException {
         nearestEnemyPaint = null;
@@ -180,6 +159,7 @@ public class ImpureUtils extends RobotPlayer {
         }
     }
 
+
     static void paintFloor() throws GameActionException {
         MapLocation floorTile = rc.getLocation();
 
@@ -189,6 +169,7 @@ public class ImpureUtils extends RobotPlayer {
             // rc.attack(floorTile, true);  // secondary
         }
     }
+
 
     public static void withdrawPaintIfPossible(MapLocation withdrawTarget) throws GameActionException {
         if (rc.getLocation().isWithinDistanceSquared(withdrawTarget, 2)) {
@@ -201,6 +182,7 @@ public class ImpureUtils extends RobotPlayer {
                 rc.transferPaint(withdrawTarget, -transferAmt);
         }
     }
+
 
     public static void tryMarkSRP() throws GameActionException {
         int cx = rc.getLocation().x;
@@ -236,6 +218,7 @@ public class ImpureUtils extends RobotPlayer {
         }
     }
 
+
     public static void updateNearbyUnits() throws GameActionException {
         // pending deletion
         // // post Sprint 1 balance change: avoid clumping of units
@@ -260,22 +243,5 @@ public class ImpureUtils extends RobotPlayer {
         // }
         // avgClump = new MapLocation(sumx / nearbyFriendlyRobots, sumy / nearbyFriendlyRobots);
         // rc.setIndicatorDot(avgClump, 0, 0, 255);
-    }
-
-    public static void checkAndCompleteNearbySRPs() throws GameActionException {
-        // actually don't need this --
-        // CAN BE REACHED can be reached because it might complete *another* robot's SRP
-        // that they would've completed anyway on their turn
-
-        // for (MapInfo tile : nearbyTiles) {
-        //     // if (tile.isResourcePatternCenter()) {
-        //     if (tile.getMark() == PaintType.ALLY_PRIMARY) {
-        //         if (rc.canCompleteResourcePattern(tile.getMapLocation())) {
-                       // CAN BE REACHED
-        //             rc.completeResourcePattern(tile.getMapLocation());
-        //             assert(rc.getLocation().distanceSquaredTo(tile.getMapLocation()) <= 9);
-        //         }
-        //     }
-        // }
     }
 }

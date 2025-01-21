@@ -9,9 +9,7 @@ import battlecode.common.UnitType;
 
 public class Utils extends RobotPlayer {
 
-    static UnitType getBuildType() throws GameActionException {
-
-        MapLocation ruinLoc = curRuin.getMapLocation();
+    static UnitType getBuildType(MapLocation ruinLoc) throws GameActionException {
         int numWrongInPaint = 0; // *relative counting* empty tiles are skipped
         int numWrongInMoney = 0;
         int numWrongInDefense = 0;
@@ -67,7 +65,7 @@ public class Utils extends RobotPlayer {
         }
 
         // do not early return so we can return null if there is enemy paint
-        if (rc.getNumberTowers() <= Soldiers.strictFollowBuildOrderNumTowers)
+        if (rc.getNumberTowers() <= strictFollowBuildOrderNumTowers)
             return AuxConstants.buildOrder[rc.getNumberTowers()];  // follow the build order
         if (nearbyEnemyRobots > 0)
             return UnitType.LEVEL_ONE_DEFENSE_TOWER;
