@@ -45,7 +45,7 @@ public class Soldiers extends RobotPlayer {
     static int strictFollowBuildOrderNumTowers = 3;  // strictly follow build order if we have not exceeded this number of towers
 
     public static void run() throws GameActionException {
-
+        MapRecorder.initTurn();
 
 
         if (lastRuinLocWithEnemyPaintCounter++ > 10) {  // reset ruin avoidance after some time has passed
@@ -283,12 +283,12 @@ public class Soldiers extends RobotPlayer {
             // 2. is guaranteed to make it but could take longer and make it die of paint loss also does not taking into clumping penalties
 
             // 1.
-            HeuristicPath.refill(target);
+            HeuristicPath.move(target);
 
             // 2.
             // Pathfinder.move(paintTarget);
 
-            rc.setIndicatorLine(rc.getLocation(), paintTarget, 131, 252, 131);
+
         } else {
             // wallAdjacent = false;
             // for (MapInfo tile : rc.senseNearbyMapInfos(1)) {
@@ -359,7 +359,6 @@ public class Soldiers extends RobotPlayer {
         // rc.setIndicatorDot(target, 200, 200, 200);
         if (rc.isMovementReady()) {
             HeuristicPath.fullFill = fullFilling;
-            HeuristicPath.targetIncentive = 500;
             HeuristicPath.move(target);
             // nearbyTiles = rc.senseNearbyMapInfos();
         }
@@ -380,6 +379,7 @@ public class Soldiers extends RobotPlayer {
         //     consecutiveRoundsFillingSRP++;
         // }
         // wasFillingSRPlastRound = isFillingSRP;
+        MapRecorder.recordSym(1000);
     }
 
 }

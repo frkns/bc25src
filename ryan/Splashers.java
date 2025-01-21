@@ -56,7 +56,7 @@ public class Splashers extends RobotPlayer {
 
                 int score = PAINT_SCORE_IF_RECOVER[info.getPaint().ordinal()] - PAINT_SCORE_IF_RECOVER[paints[id]];
                 paints[id] = (char) info.getPaint().ordinal();
-                System.out.println("Adding score " + score + "(" + (int) scores[id] + " / " + (int)scoreTargetSplash + ")");
+                
 
                 for(int shift: SHIFTS){
                     // int cast because score can be negative
@@ -65,7 +65,7 @@ public class Splashers extends RobotPlayer {
             }
 
             if(scoreTargetSplash < scores[id]){
-                System.out.println("Max score was : " + (int)scoreTargetSplash + " and is now " + (int)scores[id]);
+                
                 targetSplash = info.getMapLocation();
                 scoreTargetSplash = scores[id];
             }
