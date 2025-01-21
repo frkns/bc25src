@@ -1,4 +1,4 @@
-package lmx;
+package architecture;
 
 import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;

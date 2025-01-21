@@ -1,9 +1,9 @@
 // Adapted from https://github.com/chenyx512/battlecode24/blob/main/src/bot1/PathFinder.java
-package lmx;
+package architecture;
 
 import battlecode.common.*;
-import lmx.fast.FastLocSet;
-import lmx.fast.FastMath;
+import architecture.fast.FastLocSet;
+import architecture.fast.FastMath;
 
 class Pathfinder extends RobotPlayer {
     static MapLocation target = null;

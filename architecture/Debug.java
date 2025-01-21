@@ -1,5 +1,5 @@
 // https://github.com/maxwelljones14/BattleCode2023/blob/main/src/MPWorking/Debug.java
-package lmx;
+package architecture;
 
 import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
