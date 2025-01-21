@@ -12,7 +12,6 @@ public class HeuristicPath extends RobotPlayer {
 
     // these are only for soldier explore and refill?
     static int enemyTowerPenalty = 1_000_000;
-    static int enemyPaintPenalty = 3000;
     static int neutralPaintPenalty = 3000;
     static boolean fullFill = false; // do we want to prioritize starting to paint everything
     /* */
@@ -59,7 +58,20 @@ public class HeuristicPath extends RobotPlayer {
             MapInfo tileInfo = rc.senseMapInfo(newLoc);
             // add a cost if the tile is enemy paint
             if (tileInfo.getPaint().isEnemy()) {
-                directionCost[i] += enemyPaintPenalty;
+                MapInfo nextnext = null;
+                if (rc.canSenseLocation(newLoc.add(dir)))
+                    nextnext = rc.senseMapInfo(newLoc.add(dir));
+                if (nextnext != null && nextnext.isPassable() && !nextnext.getPaint().isEnemy()) { // don't add the big
+                                                                                                   // cost if it's only
+                                                                                                   // 1 layer
+
+                    directionCost[i] += 1000;
+                } else {
+                    directionCost[i] += 3000;
+                }
+                if (rc.getRoundNum() < mx) {
+                    directionCost[i] -= 1000;  // lessen the cost early game
+                }
             }
             // add a cost if the tile is neutral paint
             else if (tileInfo.getPaint() == PaintType.EMPTY) {

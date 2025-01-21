@@ -2,7 +2,8 @@
 package ref_best;
 
 import battlecode.common.*;
-import ref_best.fast.*;
+import ref_best.fast.FastLocSet;
+import ref_best.fast.FastMath;
 
 class Pathfinder extends RobotPlayer {
     static MapLocation target = null;

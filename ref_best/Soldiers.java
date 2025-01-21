@@ -47,7 +47,6 @@ public class Soldiers extends RobotPlayer {
     public static void run() throws GameActionException {
 
 
-
         if (lastRuinLocWithEnemyPaintCounter++ > 10) {  // reset ruin avoidance after some time has passed
             lastRuinLocWithEnemyPaint = null;
         }
@@ -376,10 +375,23 @@ public class Soldiers extends RobotPlayer {
             }
         }
 
-        // if (isFillingSRP == wasFillingSRPlastRound) {
-        //     consecutiveRoundsFillingSRP++;
-        // }
-        // wasFillingSRPlastRound = isFillingSRP;
+        if (rc.isActionReady()) {
+            MapLocation closestDot = null;
+            for (MapInfo tile : nearbyTiles) {
+                if (tile.hasRuin()) {
+                    MapLocation tentativeDot = Utils.nearestEmptyOnRuinIfEnemyOrIsUndotted(tile.getMapLocation());
+                    if (tentativeDot != null) {
+                        if (closestDot == null || rc.getLocation().distanceSquaredTo(tentativeDot) < rc.getLocation().distanceSquaredTo(closestDot)) {
+                            closestDot = tentativeDot;
+                        }
+                    }
+                }
+            }
+            if (rc.canAttack(closestDot)) {
+                rc.attack(closestDot);
+            }
+        }
+
     }
 
 }
