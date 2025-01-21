@@ -614,8 +614,13 @@ public class HeuristicPath extends RobotPlayer {
                 }
             }
 
-            if (nearestEnemyRobot != null && nearestEnemyRobotInfo.getPaintAmount() > 0)
-                directionCost[i] += Utils.manhattanDistance(newLoc, nearestEnemyRobot) * 1500;  // add a cost for moving away from nearest enemy
+            if (nearestEnemyRobot != null && nearestEnemyRobotInfo.getPaintAmount() > 0) {
+                int x = Utils.manhattanDistance(newLoc, nearestEnemyRobot);
+                directionCost[i] += x * 1500;  // add a cost for moving away from nearest enemy
+                if (rc.getRoundNum() < 70) {
+                    directionCost[i] += x * 2500;  // should really stick to enemies early game
+                }
+            }
 
             if (nearestEnemyPaint == null)
                 assert (Moppers.nearestEnemyPaintOnRuin == null);

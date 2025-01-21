@@ -68,6 +68,7 @@ public class RobotPlayer {
 
     static int siegePhase;
     static int mopperPhase;
+    static int splasherPhase;
     static int fullFillPhase;
     static int attackBasePhase;
     static int alwaysBuildDefenseTowerPhase;
@@ -154,13 +155,14 @@ public class RobotPlayer {
         siegePhase = (int)(mx * 3);  // cast to int, will be useful for tuning later
         fullFillPhase = (int)(mx * 3);
         mopperPhase = (int)(mx * 4);
+        splasherPhase = (int)(mx * 2000);
         attackBasePhase = (int)(mx * 3);
         reservePaintPhase = (int)(mx * 1.5);
         alwaysBuildDefenseTowerPhase = (int)(mx * 8);
 
-        if (rc.getRoundNum() <= 3 && mx < 30) {
+        if (rc.getRoundNum() <= 3 && mx < 42) {
             if (spawnTowerType == UnitType.LEVEL_ONE_PAINT_TOWER) {
-                role = 1;  // on small maps send 2 to their paint tower
+                role = 1;  // on small/med maps send 2 to their paint tower
             } else {
             }
         }
@@ -187,11 +189,14 @@ public class RobotPlayer {
             }
         }
 
+        if(mx < 36) {
+            AuxConstants.buildOrder[3] = UnitType.LEVEL_ONE_PAINT_TOWER;
+        }
 
         while (true) {
             try {
                 Comms.readAndUpdateTowerTargets(rc.getRoundNum() - 1);
-                Comms.readAndUpdateTowerTargets(rc.getRoundNum());
+                // Comms.readAndUpdateTowerTargets(rc.getRoundNum());
 
                 turnsAlive++;
                 roundNum = rc.getRoundNum();

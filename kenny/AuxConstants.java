@@ -12,9 +12,10 @@ public class AuxConstants extends RobotPlayer {
         UnitType.LEVEL_ONE_MONEY_TOWER,  // try to have contiguous blocks to avoid repainting of patterns
         UnitType.LEVEL_ONE_MONEY_TOWER,
         UnitType.LEVEL_ONE_MONEY_TOWER,
-        UnitType.LEVEL_ONE_PAINT_TOWER,
-        UnitType.LEVEL_ONE_PAINT_TOWER,
         UnitType.LEVEL_ONE_MONEY_TOWER,
+        UnitType.LEVEL_ONE_PAINT_TOWER,
+        UnitType.LEVEL_ONE_PAINT_TOWER,
+        UnitType.LEVEL_ONE_PAINT_TOWER,
         UnitType.LEVEL_ONE_MONEY_TOWER,
         UnitType.LEVEL_ONE_MONEY_TOWER,
         UnitType.LEVEL_ONE_MONEY_TOWER,

@@ -35,11 +35,11 @@ public class Comms extends RobotPlayer {
             boolean fstType = ((bits >> (32 - 13)) & 1) == 1;
             boolean sndType = ((bits >> (32 - 26)) & 1) == 1;
 
-            if (fstTowerTarget == null || fstLoc != null && rc.getLocation().distanceSquaredTo(fstLoc) > rc.getLocation().distanceSquaredTo(fstTowerTarget) && fstLoc != fstTowerTarget) {
+            if (fstTowerTarget != null) {
                 fstTowerTarget = fstLoc;
                 fstTowerTargetIsDefense = fstType;
             }
-            if (sndTowerTarget == null || sndLoc != null && rc.getLocation().distanceSquaredTo(sndLoc) > rc.getLocation().distanceSquaredTo(sndTowerTarget) && sndLoc != sndTowerTarget) {
+            if (sndTowerTarget != null) {
                 sndTowerTarget = sndLoc;
                 sndTowerTargetIsDefense = sndType;
             }
