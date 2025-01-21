@@ -31,8 +31,7 @@ public class RobotPlayer {
     enum Action {
         ACTION_SRP,
         ACTION_RUINS,
-        ACTION_ATTACK,
-        ACTION_REFILL,
+        ACTION_ATTACK_MICRO,
         ACTION_EXPLORE,
         ACTION_SPLASH, ACTION_COMPLETE_TOWER, ACTION_COMPLETE_SRP, ACTION_GET_PAINT, ACTION_ATTACK_RUSH, ACTION_WAITING_FOR_ACTION
     }
@@ -213,11 +212,13 @@ public class RobotPlayer {
             }
         }
 
-        Debug.println("Init Actions.");
+
         // Init actions
+        Debug.println("Init Actions.");
+        ActionAttackRush.initRush();
         switch (role) {
             case Role.ROLE_SOLDIER_ATTACK:
-                ActionAttackRush.init();
+                ActionAttackRush.initRush();
                 break;
 
             case Role.ROLE_SPLASHER:
@@ -236,13 +237,17 @@ public class RobotPlayer {
                 turnsAlive++;
                 roundNum = rc.getRoundNum();
 
+                // Update sensing
                 locationHistory[rc.getRoundNum() % locationHistory.length] = rc.getLocation();
                 nearbyRobots = rc.senseNearbyRobots();
                 nearbyTiles = rc.senseNearbyMapInfos();
                 nearbyRuins = rc.senseNearbyRuins(-1);
 
+                // Update impure
+                ImpureUtils.updateNearestEnemyTower();
                 ImpureUtils.updateNearestPaintTower();
                 ImpureUtils.updateNearbyMask(true); // true -> Also update enemie mask
+                ImpureUtils.updateNearestEmptyRuins();
 
                 if (!rc.getType().isTowerType())
                     ImpureUtils.updateNearestPaintTower();
@@ -252,8 +257,9 @@ public class RobotPlayer {
                 Debug.println("Start of actions   : as " + role.name() + " " + action.name());
                 switch (role) {
                     case Role.ROLE_SOLDIER_ATTACK:
-                        ActionAttackRush.run();
+                        ActionAttackRush.run();   // Explore map to rush tower
                         ActionCompleteTower.run();
+                        ActionAttackMicro.run();  // Just attack when see a tower
                         ActionFillRuin.run();
                         ActionFillSRP.run();
                         ActionGetPaintWhenLow.run();
@@ -263,8 +269,16 @@ public class RobotPlayer {
                         ActionCompleteTower.run();
                         ActionFillRuin.run();
                         ActionFillSRP.run();
-                        ActionAttackRush.run();   // Go for towers
-                        ActionAttackMicro.run();  // Just attack when see a tower
+
+                        if(rc.getRoundNum() > siegePhase && turnsAlive > 10){
+                            ActionAttackRush.run();
+
+                            // We don't want soldier to stay in attackrush mode.
+                            switch (action){case Action.ACTION_ATTACK_RUSH: action = Action.ACTION_WAITING_FOR_ACTION;}
+                        }
+
+
+                        ActionAttackMicro.run();
                         ActionGetPaintWhenLow.run();
                         break;
 
@@ -293,6 +307,8 @@ public class RobotPlayer {
                 if(action == Action.ACTION_WAITING_FOR_ACTION){
                     ActionExplore.run();
                 }
+                rc.setIndicatorString(role.name() + " - " + action.name());
+                Debug.println("End of turn. " + Clock.getBytecodeNum() + " bytecodes used.\n\n\n");
 
 
 

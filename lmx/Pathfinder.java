@@ -38,6 +38,7 @@ class Pathfinder extends RobotPlayer {
 
     // let's try to keep functions as pure as possible. so no attack by default
     static void move(MapLocation loc) throws GameActionException {
+        System.out.println("\t\tMove to " + loc);
         move(loc, false);
     }
 

@@ -22,7 +22,8 @@ public class Utils extends RobotPlayer {
                     continue;
                 PaintType paint = rc.senseMapInfo(loc).getPaint();
                 if (paint.isEnemy()) {
-                    return null;
+                    // return null;
+                    continue;
                 }
                 if (paint == PaintType.EMPTY) {
                     continue;

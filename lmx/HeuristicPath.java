@@ -23,8 +23,7 @@ public class HeuristicPath extends RobotPlayer {
     }
 
     public static void move(MapLocation targetLoc, Heuristic moveHeuristic) throws GameActionException {
-        Debug.println("\tMove to " + targetLoc + " with " + moveHeuristic.name());
-        rc.setIndicatorString("behaviorMove.move(" + targetLoc + ", " + moveHeuristic.name() + ")");
+        Debug.println("\t\tMove to " + targetLoc + " with " + moveHeuristic.name());
         int[] directionCost = new int[8];
         int cost = 0;
         int score;

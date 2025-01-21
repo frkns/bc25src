@@ -17,14 +17,14 @@ public class ActionAttackRush extends RobotPlayer {
     static boolean visFstTowerTarget = false;
 
 
-    static void init() throws GameActionException {
+    static void initRush() throws GameActionException {
         potentialEnemySpawnLocations[0] = Utils.mirror(spawnTowerLocation);
         potentialEnemySpawnLocations[1] = Utils.verticalMirror(spawnTowerLocation);
         potentialEnemySpawnLocations[2] = Utils.horizontalMirror(spawnTowerLocation);
 
+
         if (spawnTowerLocation == null) {
             System.out.println("Spawn tower location not found? This should not happen.");
-            return;
         }
     }
 
@@ -42,17 +42,13 @@ public class ActionAttackRush extends RobotPlayer {
         //------------------------------------------------------------------------------//
         // Init
         //------------------------------------------------------------------------------//
-        rc.setIndicatorString("Action Attack");
-
-        ImpureUtils.updateNearestEnemyTower();
-        ImpureUtils.updateNearbyMask(false);
-
         // Update nextLocToExplore to the nearest unvisited location
         nextLocToExplore = null; // Check if robots are not oscillating
         int minDistance = 3600;
 
         for (int i = 0; i < 3; i++) {
             MapLocation potentialLoc = potentialEnemySpawnLocations[i];
+
             if (visited[i]) {
                 continue;
             }
@@ -69,7 +65,7 @@ public class ActionAttackRush extends RobotPlayer {
             }
         }
 
-        RobotPlayer.action = Action.ACTION_ATTACK;
+        RobotPlayer.action = Action.ACTION_ATTACK_MICRO;
 
         //------------------------------------------------------------------------------//
         // Check if can play action

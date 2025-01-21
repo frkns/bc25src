@@ -40,11 +40,15 @@ public class ActionFillRuin extends RobotPlayer {
 
         // Get tower for this ruins
         UnitType towerType = Utils.getBuildType(nearestEmptyRuin);
+        if(towerType == null){
+            Debug.println("\tE - ACTION_FILL_RUIN     : Can't build null tower type");
+            action = Action.ACTION_WAITING_FOR_ACTION;
+            return;
+        }
         updateNearestWrongInRuin(towerType);
 
-
         // Check if I can help
-        if(canHelp()){
+        if(canHelp() == false){
             Debug.println("\tX - ACTION_FILL_RUIN     : Can't help");
             action = Action.ACTION_WAITING_FOR_ACTION;
             return;
@@ -94,7 +98,7 @@ public class ActionFillRuin extends RobotPlayer {
             rc.completeTowerPattern(towerType, nearestEmptyRuin);
 
             if (rc.getPaint() < 150) {
-                action = Action.ACTION_REFILL;
+                action = Action.ACTION_GET_PAINT;
             }else{
                 action = Action.ACTION_WAITING_FOR_ACTION;
             }

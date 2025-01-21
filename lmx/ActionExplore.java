@@ -18,6 +18,12 @@ public class ActionExplore extends RobotPlayer {
                 return;
         }
 
+        if(!rc.isMovementReady()){
+            Debug.println("\tX - ACTION_EXPLORE       : Not movement ready");
+            action = Action.ACTION_WAITING_FOR_ACTION;
+            return;
+        }
+
         Debug.println("\t0 - ACTION_EXPLORE       : Playing!");
 
 
@@ -34,6 +40,7 @@ public class ActionExplore extends RobotPlayer {
             lastTargetChangeRound = rc.getRoundNum();
         }
 
-        HeuristicPath.move(target, Heuristic.EXPLORE);
+        Pathfinder.move(target);
+        // Todo: change to use heuristic, but seems bugged.
     }
 }

@@ -5,7 +5,7 @@ import battlecode.common.GameActionException;
 public class ActionAttackMicro extends RobotPlayer {
     static void run() throws GameActionException {
         switch (RobotPlayer.action) {
-            case Action.ACTION_ATTACK:
+            case Action.ACTION_ATTACK_MICRO:
             case Action.ACTION_WAITING_FOR_ACTION:
                 break;
             default:
@@ -18,6 +18,7 @@ public class ActionAttackMicro extends RobotPlayer {
         //------------------------------------------------------------------------------//
 
         ImpureUtils.updateNearestEnemyTower();
+
         if (nearestEnemyTower == null && rc.getRoundNum() < siegePhase) {
             Debug.println("\tX - ACTION_ATTACK_MICRO  : No enemy tower or siege phase");
             action = Action.ACTION_WAITING_FOR_ACTION;
@@ -41,10 +42,12 @@ public class ActionAttackMicro extends RobotPlayer {
         // Play action
         //------------------------------------------------------------------------------//
         Debug.println("\tO - ACTION_ATTACK_MICRO  : Playing!");
-        RobotPlayer.action = Action.ACTION_ATTACK;
+        RobotPlayer.action = Action.ACTION_ATTACK_MICRO;
 
+        Pathfinder.move(nearestEnemyTower);
 
-        HeuristicPath.move(nearestEnemyTower, Heuristic.HEURISTIC_TOWER_MICRO);
+        // Todo: use heuristic path
+        // HeuristicPath.move(nearestEnemyTower, Heuristic.HEURISTIC_TOWER_MICRO);
         if (rc.canAttack(nearestEnemyTower)) {
             rc.attack(nearestEnemyTower);
         }

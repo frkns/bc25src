@@ -172,6 +172,7 @@ public class ImpureUtils extends RobotPlayer {
 
 
     public static void withdrawPaintIfPossible(MapLocation withdrawTarget) throws GameActionException {
+        Debug.println("Withdraw from " + withdrawTarget);
         if (rc.getLocation().isWithinDistanceSquared(withdrawTarget, 2)) {
             RobotInfo paintTower = rc.senseRobotAtLocation(withdrawTarget);
             if (paintTower == null)
