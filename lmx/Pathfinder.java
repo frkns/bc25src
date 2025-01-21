@@ -2,7 +2,8 @@
 package lmx;
 
 import battlecode.common.*;
-import lmx.fast.*;
+import lmx.fast.FastLocSet;
+import lmx.fast.FastMath;
 
 class Pathfinder extends RobotPlayer {
     static MapLocation target = null;
