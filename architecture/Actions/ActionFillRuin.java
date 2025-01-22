@@ -1,24 +1,23 @@
-package architecture;
+package architecture.Actions;
 
+import architecture.RobotPlayer;
+import architecture.Tools.*;
 import battlecode.common.*;
-import scala.Unit;
 
 public class ActionFillRuin extends RobotPlayer {
-    static int numWrongTilesInRuin; // Number of missed paint
-    static MapLocation nearestWrongInRuin;
-    static MapLocation nearestWrongInRuinEnemie;
+    static PatternReport repport;
 
     static boolean canHelp() {
         return switch (rc.getType()) {
-            case UnitType.SOLDIER -> nearestWrongInRuin != null && rc.getPaint() >= 5;
-            case UnitType.MOPPER -> nearestWrongInRuinEnemie != null;
+            case UnitType.SOLDIER -> repport.nearestWrongPaint != null && rc.getPaint() >= 5;
+            case UnitType.MOPPER -> repport.nearestWrongEnemie != null;
             default -> false;
         };
     }
 
-    static void run() throws GameActionException {
+    public static void run() throws GameActionException {
         switch (RobotPlayer.action) {
-            case Action.ACTION_RUINS:
+            case Action.ACTION_FILL_RUINS:
             case Action.ACTION_WAITING_FOR_ACTION:
                 break;
             default:
@@ -40,12 +39,14 @@ public class ActionFillRuin extends RobotPlayer {
 
         // Get tower for this ruins
         UnitType towerType = Utils.getBuildType(nearestEmptyRuin);
+
         if(towerType == null){
             Debug.println("\tE - ACTION_FILL_RUIN     : Can't build null tower type");
             action = Action.ACTION_WAITING_FOR_ACTION;
             return;
         }
-        updateNearestWrongInRuin(towerType);
+
+        repport = CheckPattern.analyseTowerPatern(nearestEmptyRuin, towerType);
 
         // Check if I can help
         if(canHelp() == false){
@@ -59,12 +60,12 @@ public class ActionFillRuin extends RobotPlayer {
         // Play action
         //------------------------------------------------------------------------------//
         Debug.println("\t0 - ACTION_FILL_RUIN     : Playing!");
-        RobotPlayer.action = Action.ACTION_RUINS;
+        RobotPlayer.action = Action.ACTION_FILL_RUINS;
 
         Pathfinder.move(nearestEmptyRuin);
         MapLocation target = switch (rc.getType()){
-            case UnitType.SOLDIER -> nearestWrongInRuin;
-            case UnitType.MOPPER -> nearestWrongInRuinEnemie;
+            case UnitType.SOLDIER -> repport.nearestWrongPaint;
+            case UnitType.MOPPER -> repport.nearestWrongEnemie;
             default -> null;
         };
 
@@ -76,7 +77,7 @@ public class ActionFillRuin extends RobotPlayer {
         int mask_y = 2 - delta_y;
 
         if (mask_x < 0 || mask_x > 4 || mask_y < 0 || mask_y > 4) {
-            System.out.println("ruin deltas are off. curRuin: " + nearestEmptyRuin + ", nearestWrongInRuin: " + nearestWrongInRuin);
+            System.out.println("ruin deltas are off. curRuin: " + nearestEmptyRuin + ", nearestWrongInRuin: " + target);
             return;
         }
         boolean useSecondary = towerPattern[mask_x][mask_y];
@@ -84,12 +85,12 @@ public class ActionFillRuin extends RobotPlayer {
         // Paint incorrect tile
         if (rc.canAttack(target)) {
             rc.attack(target, useSecondary);
-            numWrongTilesInRuin--;
+            repport.numWrongTiles--;
 
-            if (numWrongTilesInRuin == 0) {
-                action = Action.ACTION_WAITING_FOR_ACTION;
+            if (repport.numWrongTiles == 0) {
+                action = Action.ACTION_COMPLETE_TOWER;
             }else{
-                action = Action.ACTION_RUINS;
+                action = Action.ACTION_FILL_RUINS;
             }
         }
 
@@ -101,50 +102,6 @@ public class ActionFillRuin extends RobotPlayer {
                 action = Action.ACTION_GET_PAINT;
             }else{
                 action = Action.ACTION_WAITING_FOR_ACTION;
-            }
-        }
-    }
-
-
-    //------------------------------------------------------------------------------//
-    // updateNearestWrongInRuin
-    //------------------------------------------------------------------------------//
-
-    public static void updateNearestWrongInRuin(UnitType towerType) throws GameActionException {
-        numWrongTilesInRuin = 0;
-        nearestWrongInRuin = null;
-        nearestWrongInRuinEnemie = null;
-
-        boolean[][] towerPattern = rc.getTowerPattern(towerType);
-
-        // Check each cells of the pattern
-        for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < 5; j++) {
-                if (i == 2 && j == 2)
-                    continue;
-
-                MapLocation loc = new MapLocation(nearestEmptyRuin.x + i - 2, nearestEmptyRuin.y + j - 2);
-                if (!rc.canSenseLocation(loc))
-                    continue;
-
-                PaintType paint = rc.senseMapInfo(loc).getPaint();
-                if (paint.isEnemy()) {
-
-                    numWrongTilesInRuin++;
-                    if(nearestWrongInRuinEnemie == null || rc.getLocation().distanceSquaredTo(loc) < rc.getLocation().distanceSquaredTo(nearestWrongInRuinEnemie)){
-                        nearestWrongInRuinEnemie = loc;
-                    }
-                }
-
-                if (paint == PaintType.EMPTY
-                        || (paint == PaintType.ALLY_SECONDARY && !towerPattern[i][j])
-                        || (paint == PaintType.ALLY_PRIMARY && towerPattern[i][j])) {
-
-                    numWrongTilesInRuin++;
-                    if (nearestWrongInRuin == null || rc.getLocation().distanceSquaredTo(loc) < rc.getLocation().distanceSquaredTo(nearestWrongInRuin)) {
-                        nearestWrongInRuin = loc;
-                    }
-                }
             }
         }
     }

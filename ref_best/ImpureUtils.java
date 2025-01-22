@@ -211,6 +211,7 @@ public class ImpureUtils extends RobotPlayer {
         if (cx - 2 < 0 || cy - 2 < 0 || cx + 2 >= mapWidth || cy + 2 >= mapHeight) {
             return;
         }
+
         boolean possibleSRP = true;
         for (MapInfo tile : nearbyTiles) {
             MapLocation tileLoc = tile.getMapLocation();

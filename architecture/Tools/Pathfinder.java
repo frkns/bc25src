@@ -1,11 +1,12 @@
 // Adapted from https://github.com/chenyx512/battlecode24/blob/main/src/bot1/PathFinder.java
-package architecture;
+package architecture.Tools;
 
+import architecture.RobotPlayer;
 import battlecode.common.*;
 import architecture.fast.FastLocSet;
 import architecture.fast.FastMath;
 
-class Pathfinder extends RobotPlayer {
+public class Pathfinder extends RobotPlayer {
     static MapLocation target = null;
     static MapLocation stayawayFrom = null;
     static int stuckCnt;
@@ -37,7 +38,7 @@ class Pathfinder extends RobotPlayer {
     }
 
     // let's try to keep functions as pure as possible. so no attack by default
-    static void move(MapLocation loc) throws GameActionException {
+    public static void move(MapLocation loc) throws GameActionException {
         System.out.println("\t\tMove to " + loc);
         move(loc, false);
     }

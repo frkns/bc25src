@@ -1,5 +1,6 @@
-package architecture;
+package architecture.Tools;
 
+import architecture.RobotPlayer;
 import battlecode.common.*;
 
 public class HeuristicPath extends RobotPlayer {
@@ -174,7 +175,7 @@ public class HeuristicPath extends RobotPlayer {
             // add a cost for moving in range of an enemy tower
             cost = switch (moveHeuristic) {
                 case Heuristic.HEURISTIC_WRONG_RUINS -> 10;
-                case Heuristic.HEURISTIC_TOWER_MICRO -> (inTowerRange) ? 9000 : -9000; // If in rang, move out, if too far, move in
+                case Heuristic.HEURISTIC_TOWER_MICRO -> (rc.getLocation().isWithinDistanceSquared(nearestEnemyTower, 9)) ? 9000 : -9000; // If in rang, move out, if too far, move in
                 default -> enemyTowerPenalty;
             };
             if (cost != 0) {
@@ -218,7 +219,7 @@ public class HeuristicPath extends RobotPlayer {
             }
 
             Debug.println("\t\t\tBy other behaviors    + " + (directionCost[i] - lastScore));
-            Debug.println("\t\tTotal                 = " + directionCost[i] );
+            Debug.println("\t\tTotal                     = " + directionCost[i] );
             //------------------------------------------------------------------------------//
             // End for each direction
             //------------------------------------------------------------------------------//

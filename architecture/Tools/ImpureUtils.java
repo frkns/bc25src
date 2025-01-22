@@ -1,10 +1,11 @@
-package architecture;
+package architecture.Tools;
+import architecture.RobotPlayer;
 import battlecode.common.*;
 
 // these Utils are NOT pure functions (i.e. they modify state / change global variables, etc.)
 
 public class ImpureUtils extends RobotPlayer {
-    static void updateNearestEmptyRuins() throws GameActionException{
+    public static void updateNearestEmptyRuins() throws GameActionException{
         nearestEmptyRuin = null;
         int minDistance = 36000;
 
@@ -40,7 +41,7 @@ public class ImpureUtils extends RobotPlayer {
         }
     }
 
-    static void updateNearbyMask(boolean alsoUpdateEnemies) throws GameActionException {
+    public static void updateNearbyMask(boolean alsoUpdateEnemies) throws GameActionException {
         nearbyFriendlyRobots = 1;  // fixes div 0 error and also includes ourself in the count
         nearbyEnemyRobots = 0;
 
@@ -64,7 +65,7 @@ public class ImpureUtils extends RobotPlayer {
 
 
     // really, after the change, this should be called updateNearestPaintTarget, because moppers/money/defense towers are inlcuded
-    static void updateNearestPaintTower() throws GameActionException {
+    public static void updateNearestPaintTower() throws GameActionException {
         if (nearestPaintTower != null && rc.getLocation().distanceSquaredTo(nearestPaintTower) <= 20) {
             // if tower is destroyed or it's not a paint tower and there's no paint left
             if (!rc.canSenseRobotAtLocation(nearestPaintTower) || rc.senseRobotAtLocation(nearestPaintTower).getPaintAmount() == 0) {
@@ -91,7 +92,7 @@ public class ImpureUtils extends RobotPlayer {
     }
 
 
-    static void updateNearestEnemyRobot() throws GameActionException {
+    public static void updateNearestEnemyRobot() throws GameActionException {
         nearestEnemyRobot = null;
         for (RobotInfo robot : nearbyRobots) {
             if (robot.getTeam() != rc.getTeam() && !robot.getType().isTowerType()) {
@@ -105,7 +106,7 @@ public class ImpureUtils extends RobotPlayer {
     }
 
 
-    static void updateNearestEnemyTower() throws GameActionException {
+    public static void updateNearestEnemyTower() throws GameActionException {
         // nearestEnemyTower = null;
         // sndNearestEnemyTower = null;
         if (nearestEnemyTower != null && rc.getLocation().isWithinDistanceSquared(nearestEnemyTower, 20) && (!rc.canSenseRobotAtLocation(nearestEnemyTower) || rc.senseRobotAtLocation(nearestEnemyTower).getTeam() == rc.getTeam())) {
@@ -149,7 +150,7 @@ public class ImpureUtils extends RobotPlayer {
     }
 
 
-    static void updateNearestEnemyPaint() throws GameActionException {
+    public static void updateNearestEnemyPaint() throws GameActionException {
         nearestEnemyPaint = null;
         for (MapInfo tile : nearbyTiles) {
             MapLocation tileLoc = tile.getMapLocation();

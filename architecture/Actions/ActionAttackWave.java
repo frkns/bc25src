@@ -1,10 +1,15 @@
-package architecture;
+package architecture.Actions;
 
+import architecture.RobotPlayer;
+import architecture.Tools.Debug;
+import architecture.Tools.HeuristicPath;
+import architecture.Tools.Pathfinder;
+import architecture.Tools.Utils;
 import battlecode.common.GameActionException;
 import battlecode.common.MapInfo;
 import battlecode.common.MapLocation;
 
-public class ActionAttackRush extends RobotPlayer {
+public class ActionAttackWave extends RobotPlayer {
 
     static MapInfo[] _attackableNearbyTiles;  // var names that start with an underscore are set static to save bytecode
     static MapLocation target;
@@ -17,7 +22,7 @@ public class ActionAttackRush extends RobotPlayer {
     static boolean visFstTowerTarget = false;
 
 
-    static void initRush() throws GameActionException {
+    public static void init() throws GameActionException {
         potentialEnemySpawnLocations[0] = Utils.mirror(spawnTowerLocation);
         potentialEnemySpawnLocations[1] = Utils.verticalMirror(spawnTowerLocation);
         potentialEnemySpawnLocations[2] = Utils.horizontalMirror(spawnTowerLocation);
@@ -29,9 +34,9 @@ public class ActionAttackRush extends RobotPlayer {
     }
 
 
-    static void run() throws GameActionException {
+    public static void run() throws GameActionException {
         switch (RobotPlayer.action) {
-            case Action.ACTION_ATTACK_RUSH:
+            case Action.ACTION_ATTACK_WAVE:
             case Action.ACTION_WAITING_FOR_ACTION:
                 break;
             default:
@@ -65,26 +70,24 @@ public class ActionAttackRush extends RobotPlayer {
             }
         }
 
-        RobotPlayer.action = Action.ACTION_ATTACK_MICRO;
-
         //------------------------------------------------------------------------------//
         // Check if can play action
         //------------------------------------------------------------------------------//
         if (nearestEnemyTower == null && nextLocToExplore == null) {
-            Debug.println("\tX - ACTION_ATTACK_RUSH   : No towers or exploration");
+            Debug.println("\tX - ACTION_ATTACK_WAVE   : No towers or exploration");
             RobotPlayer.action = Action.ACTION_WAITING_FOR_ACTION;
             return;
         }
 
         // Attack if in range
         if (rc.canAttack(nearestEnemyTower)) {
-            Debug.println("\t0 - ACTION_ATTACK_RUSH   : Attacking !");
+            Debug.println("\t0 - ACTION_ATTACK_WAVE   : Attacking !");
             rc.attack(nearestEnemyTower);
         }
 
         // stop attacking if low health, 30 or less means we die to level 1 paint/money tower shot + AoE
         if (rc.getHealth() < 31) {
-            Debug.println("\tX - ACTION_ATTACK_RUSH   : Low on health");
+            Debug.println("\tX - ACTION_ATTACK_WAVE   : Low on health");
             RobotPlayer.action = Action.ACTION_WAITING_FOR_ACTION;
             return;
         }
@@ -92,8 +95,8 @@ public class ActionAttackRush extends RobotPlayer {
         //------------------------------------------------------------------------------//
         // Play action
         //------------------------------------------------------------------------------//
-        Debug.println("\t0 - ACTION_ATTACK_RUSH   : Playing!");
-        action = Action.ACTION_ATTACK_RUSH;
+        Debug.println("\t0 - ACTION_ATTACK_WAVE   : Playing!");
+        action = Action.ACTION_ATTACK_WAVE;
 
         if (nearestEnemyTower != null) {
             // Play micro

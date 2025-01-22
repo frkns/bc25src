@@ -1,6 +1,11 @@
-package architecture;
+package architecture.Actions;
 
+import architecture.RobotPlayer;
+import architecture.Tools.Debug;
+import architecture.Tools.ImpureUtils;
+import architecture.Tools.Pathfinder;
 import battlecode.common.*;
+import scala.Char;
 
 //phase 1 for soldiers
 //spread out and build cash towers
@@ -69,22 +74,33 @@ public class ActionSplash extends RobotPlayer {
 
             // Check if paint have changed
             if(paints[id] != info.getPaint().ordinal()){
-                int score = PAINT_SCORE_IF_RECOVER[info.getPaint().ordinal()] - PAINT_SCORE_IF_RECOVER[paints[id]];
+                int score = PAINT_SCORE_IF_RECOVER[info.getPaint().ordinal()] - PAINT_SCORE_IF_RECOVER[paints[id]] - 10;
+                char score_c;
+                if(score < 0){
+                    score_c = (char)(65536 + score); // 65536 = Max char + 1 for char overflow equivalent to an substraction
+                }else{
+                    score_c = (char)score;
+                }
+
                 paints[id] = (char) info.getPaint().ordinal();
 
                 for(int shift: SHIFTS){
-                    // int cast because score can be negative, and it's impossible to have negative with char.
-                    scores[id + shift] = (char)((int) scores[id + shift] + score);
+                    scores[id + shift] += score_c;
                 }
-            }
-
-            // Update best score
-            if(scoreTargetSplash < scores[id]){
-                targetSplash = info.getMapLocation();
-                scoreTargetSplash = scores[id];
             }
         }
 
+        // Get Max
+        for(MapInfo info: nearbyTiles){
+            MapLocation locCenter = info.getMapLocation();
+            int id = 128 + 2 + locCenter.x + 70 * locCenter.y;
+            if(scoreTargetSplash < scores[id]){
+                if(!info.isWall() && !info.hasRuin()) {
+                    targetSplash = locCenter;
+                    scoreTargetSplash = scores[id];
+                }
+            }
+        }
 
         if(targetSplash == null){
             Debug.println("\tX - ACTION_SPLASH        : No target to splash");
@@ -99,8 +115,8 @@ public class ActionSplash extends RobotPlayer {
         action = Action.ACTION_SPLASH;
 
         // Attack without moving
-        if(!rc.canAttack(targetSplash)){
-            Pathfinder.move(targetSplash);
+        if(rc.canAttack(targetSplash)){
+            rc.attack(targetSplash);
             action = Action.ACTION_WAITING_FOR_ACTION;
             return;
         }
@@ -108,7 +124,7 @@ public class ActionSplash extends RobotPlayer {
         // Move
         Pathfinder.move(targetSplash);
 
-        // Re-try attack
+        // Attack after move
         if(rc.canAttack(targetSplash)){
             rc.attack(targetSplash);
             action = Action.ACTION_WAITING_FOR_ACTION;

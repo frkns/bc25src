@@ -1,6 +1,7 @@
 // https://github.com/maxwelljones14/BattleCode2023/blob/main/src/MPWorking/Debug.java
-package architecture;
+package architecture.Tools;
 
+import architecture.RobotPlayer;
 import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 
@@ -74,6 +75,12 @@ public class Debug extends RobotPlayer {
     public static void println(boolean cond, String s) {
         if (VERBOSE && cond) {
             System.out.println(s);
+        }
+    }
+
+    public static void printl(String s) {
+        if (VERBOSE) {
+            System.out.print(s);
         }
     }
 

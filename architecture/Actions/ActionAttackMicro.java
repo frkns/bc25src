@@ -1,9 +1,13 @@
-package architecture;
+package architecture.Actions;
 
+import architecture.RobotPlayer;
+import architecture.Tools.Debug;
+import architecture.Tools.ImpureUtils;
+import architecture.Tools.Pathfinder;
 import battlecode.common.GameActionException;
 
 public class ActionAttackMicro extends RobotPlayer {
-    static void run() throws GameActionException {
+    public static void run() throws GameActionException {
         switch (RobotPlayer.action) {
             case Action.ACTION_ATTACK_MICRO:
             case Action.ACTION_WAITING_FOR_ACTION:

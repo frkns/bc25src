@@ -1,5 +1,6 @@
-package architecture;
+package architecture.Tools;
 
+import architecture.RobotPlayer;
 import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 import battlecode.common.PaintType;
@@ -9,10 +10,11 @@ import battlecode.common.UnitType;
 
 public class Utils extends RobotPlayer {
 
-    static UnitType getBuildType(MapLocation ruinLoc) throws GameActionException {
+    public static UnitType getBuildType(MapLocation ruinLoc) throws GameActionException {
         int numWrongInPaint = 0; // *relative counting* empty tiles are skipped
         int numWrongInMoney = 0;
         int numWrongInDefense = 0;
+
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 5; j++) {
                 if (i == 2 && j == 2)
@@ -70,6 +72,7 @@ public class Utils extends RobotPlayer {
             return AuxConstants.buildOrder[rc.getNumberTowers()];  // follow the build order
         if (nearbyEnemyRobots > 0)
             return UnitType.LEVEL_ONE_DEFENSE_TOWER;
+
         // if roughly same num of wrong tiles, follow the build order
         if (Math.abs(numWrongInPaint - numWrongInMoney) < 3 && Math.abs(numWrongInMoney - numWrongInDefense) < 3) {
             return AuxConstants.buildOrder[rc.getNumberTowers()];
@@ -137,7 +140,7 @@ public class Utils extends RobotPlayer {
             return 1;
         return 2;
     }
-    static MapLocation randomLocationInQuadrant(int Q) {  // 0-indexed
+    public static MapLocation randomLocationInQuadrant(int Q) {  // 0-indexed
         int offsetx = rng.nextInt(mapWidth/2) - mapWidth/4;
         int offsety = rng.nextInt(mapHeight/2) - mapHeight/4;
 
@@ -167,7 +170,7 @@ public class Utils extends RobotPlayer {
     //     return q;
     // }
 
-    static int chessDistance(MapLocation A, MapLocation B) {
+    public static int chessDistance(MapLocation A, MapLocation B) {
         return Math.max(Math.abs(A.x - B.x), Math.abs(A.y - B.y));
     }
     static int manhattanDistance(MapLocation A, MapLocation B) {
@@ -178,13 +181,13 @@ public class Utils extends RobotPlayer {
         return !(loc.x - 2 < 0 || loc.y - 2 < 0 || loc.x + 2 >= mapWidth || loc.y + 2 >= mapHeight);
     }
 
-    static MapLocation mirror(MapLocation loc) {  // rotational
+    public static MapLocation mirror(MapLocation loc) {  // rotational
         return new MapLocation(mapWidth - loc.x - 1, mapHeight - loc.y - 1);
     }
-    static MapLocation verticalMirror(MapLocation loc) {
+    public static MapLocation verticalMirror(MapLocation loc) {
         return new MapLocation(loc.x, mapHeight - loc.y - 1);
     }
-    static MapLocation horizontalMirror(MapLocation loc) {
+    public static MapLocation horizontalMirror(MapLocation loc) {
         return new MapLocation(mapWidth - loc.x - 1, loc.y);
     }
 

@@ -1,12 +1,14 @@
-package architecture;
+package architecture.Actions;
 
+import architecture.RobotPlayer;
+import architecture.Tools.Debug;
 import battlecode.common.*;
 
 import static java.lang.Math.max;
 
 public class ActionCompleteSRP extends RobotPlayer {
 
-    static void run() throws GameActionException {
+    public static void run() throws GameActionException {
         switch (RobotPlayer.action) {
             case Action.ACTION_COMPLETE_SRP:
             case Action.ACTION_WAITING_FOR_ACTION:
@@ -41,7 +43,12 @@ public class ActionCompleteSRP extends RobotPlayer {
             }
         }
 
-        // Todo: what is units is too far to complete patern ?
+        if(srp == null){
+            Debug.println("\tX - ACTION_COMPLETE_SRP  : No nearby SRP");
+            action = Action.ACTION_WAITING_FOR_ACTION;
+            return;
+        }
+
         if(!rc.canCompleteResourcePattern(srp)){
             Debug.println("\tX - ACTION_COMPLETE_SRP  : Can't complete");
             action = Action.ACTION_WAITING_FOR_ACTION;

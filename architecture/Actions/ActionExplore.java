@@ -1,5 +1,9 @@
-package architecture;
+package architecture.Actions;
 
+import architecture.RobotPlayer;
+import architecture.Tools.Debug;
+import architecture.Tools.Pathfinder;
+import architecture.Tools.Utils;
 import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 
@@ -8,7 +12,7 @@ public class ActionExplore extends RobotPlayer {
     static int lastTargetChangeRound;
     static int targetChangeWaitTime = 20;
 
-    static void run() throws GameActionException {
+    public static void run() throws GameActionException {
         switch (RobotPlayer.action) {
             case Action.ACTION_EXPLORE:
             case Action.ACTION_WAITING_FOR_ACTION:

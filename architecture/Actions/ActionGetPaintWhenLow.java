@@ -1,23 +1,20 @@
-package architecture;
+package architecture.Actions;
 
+import architecture.RobotPlayer;
+import architecture.Tools.Debug;
+import architecture.Tools.ImpureUtils;
+import architecture.Tools.Pathfinder;
 import battlecode.common.GameActionException;
 
 public class ActionGetPaintWhenLow extends RobotPlayer {
-    static void run() throws GameActionException {
-        switch (RobotPlayer.action) {
-            case Action.ACTION_GET_PAINT:
-            case Action.ACTION_WAITING_FOR_ACTION:
-                break;
-            default:
-                // We are already playing an action
-                return;
-        }
+    static int MIN_PAINT = 15;
 
+    public static void run() throws GameActionException {
         //------------------------------------------------------------------------------//
         // Init
         //------------------------------------------------------------------------------//
 
-        if (rc.getPaint() > 10 || nearestPaintTower == null) {
+        if (rc.getPaint() > MIN_PAINT || nearestPaintTower == null) {
             Debug.println("\tX - ACTION_GET_PAINT_LOW : No paint tower or no need for paint");
             action = Action.ACTION_WAITING_FOR_ACTION;
             return;
