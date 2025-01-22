@@ -1,8 +1,9 @@
-package lmx;
+package kennyr;
 
 import battlecode.common.*;
 
 public class FillRuin extends RobotPlayer {
+
 
     public static boolean updateNearestWrongInRuin(UnitType towerType) throws GameActionException {
         Soldiers.numWrongTilesInRuin = 0;
@@ -33,14 +34,44 @@ public class FillRuin extends RobotPlayer {
         return true;
     }
 
-    public static void tryToPaintRuin(UnitType towerType) throws GameActionException {
+    public static void tryToPaintRuin(UnitType towerType, boolean withdrawPaintOnFinish /* currently does nothing */) throws GameActionException {
         MapLocation ruinLoc = curRuin.getMapLocation();
 
         if (nearestWrongInRuin == null) {
             rc.setIndicatorString("complete: " + towerType);
             if (rc.canCompleteTowerPattern(towerType, ruinLoc)) {
                 rc.completeTowerPattern(towerType, ruinLoc);
+                Soldiers.lastCompletedTower = ruinLoc;
                 isFillingRuin = false;
+                if (withdrawPaintOnFinish && rc.getPaint() < 150) {
+                    Soldiers.inStasis = true;
+                }
+            } else {
+                // designate the lowest/higest paint soldier in range to complete it
+                // i.e. there is another soldier with lower/higher paint in the ruin, then leave the ruin
+                // it might be better for higher paint because repainting
+
+                // changed to if you are not adjacent, don't try to complete it
+                // changed again to if > ~4 dist, stop
+                // if (rc.getLocation().distanceSquaredTo(ruinLoc) > 7) {
+                //     isFillingRuin = false;
+                //     Soldiers.stayAwayRuin = ruinLoc;
+                //     return;
+                // }
+
+                // changed back, think it's fixed
+                for (RobotInfo robot : nearbyRobots) {
+                    if (robot.getType() != UnitType.SOLDIER)
+                        continue;
+                    if (Utils.chessDistance(robot.getLocation(), ruinLoc) <= 2) {
+                        if (robot.getPaintAmount() < rc.getPaint()) {
+                            isFillingRuin = false;
+                            Soldiers.alreadyTryingBuild = ruinLoc;
+                            Soldiers.alreadyTryingBuildCounter = 0;
+                            return;
+                        }
+                    }
+                }
             }
             return;
         }
@@ -52,7 +83,7 @@ public class FillRuin extends RobotPlayer {
         int mask_y = 2 - delta_y;
 
         if (mask_x < 0 || mask_x > 4 || mask_y < 0 || mask_y > 4) {
-            // why does this happen?
+            // why does this happen??
             // System.out.println("ruin deltas are off. curRuin: " + ruinLoc + ", nearestWrongInRuin: " + nearestWrongInRuin);
             return;
         }
@@ -66,7 +97,11 @@ public class FillRuin extends RobotPlayer {
         rc.setIndicatorString("complete: " + towerType);
         if (rc.canCompleteTowerPattern(towerType, ruinLoc)) {
             rc.completeTowerPattern(towerType, ruinLoc);
+            Soldiers.lastCompletedTower = ruinLoc;
             isFillingRuin = false;
+            if (withdrawPaintOnFinish && rc.getPaint() < 150) {
+                Soldiers.inStasis = true;
+            }
         }
     }
 }

@@ -1,57 +1,119 @@
+// https://github.com/maxwelljones14/BattleCode2023/blob/main/src/MPWorking/Debug.java
 package lmx;
 
-import battlecode.common.Clock;
-import battlecode.common.RobotController;
+import battlecode.common.GameActionException;
+import battlecode.common.MapLocation;
 
-public class Debug {
-    public static boolean debug = true;
-    private static final String[] indents = {"", "\t", "\t\t", "\t\t\t", "\t\t\t\t"};
-    private static final int[] lastBytecode = {0, 0, 0, 0, 0};
+/**
+ * Utilizes the robot's indicator string to display debug information
+ *
+ * The printString(cond, s) method:
+ * - Accumulates messages to be displayed at the end of the turn
+ * - Params:
+ * -     cond --> condition to print the message,
+ * -     s    --> message to print
+ *
+ * The flush() method:
+ * - Sets the robot's indicator string with accumulated messages from Debug.printString()
+ * - Clears the string builder for next turn
+ * - Resets bytecode debugging
+ * - Must be called at the end of each turn to display debug information
+ */
+public class Debug extends RobotPlayer {
+    public static final boolean VERBOSE = true;  // Set to true to enable debug messages
+    public static final boolean FAIL_FAST = false;
+    public static final boolean INDICATORS = true;
+    public static final boolean INFO = true;
+    public static final boolean TOWER = true;
+    public static final boolean COMMS = true;
 
-    private static RobotController rc;
+
+    public static String bytecodeDebug = new String();
+
+    private static StringBuilder sb;
 
     public static void init() {
-        rc = RobotPlayer.rc;
+        sb = new StringBuilder();
     }
 
-    public static void reset(){
-        lastBytecode[0] = 0;
-        lastBytecode[1] = 0;
-        lastBytecode[2] = 0;
-        lastBytecode[3] = 0;
-        lastBytecode[4] = 0;
+    public static void flush() {
+        rc.setIndicatorString(sb.toString());
+        sb = new StringBuilder();
+        bytecodeDebug = new String();
     }
 
-    /**
-     * Prints the bytecode used to calculate scores for each action and execute action
-     * Example: https://discord.com/channels/1316447035242709032/1323051422819815486/1327037155956228146
-     */
-    public static void print(String text){
-        print(0, text);
-    }
-
-    public static void print(int level, String text) {
-        if(!debug) return;
-
-        int cost = Clock.getBytecodeNum() - lastBytecode[level];
-        switch(level){
-            case 0:
-                lastBytecode[0] = Clock.getBytecodeNum();
-            case 1:
-                lastBytecode[1] = Clock.getBytecodeNum();
-            case 2:
-                lastBytecode[2] = Clock.getBytecodeNum();
-            case 3:
-                lastBytecode[3] = Clock.getBytecodeNum();
-            case 4:
-                lastBytecode[4] = Clock.getBytecodeNum();
-            default:
+    public static void printString(boolean cond, String s) {
+        if (VERBOSE && cond) {
+            sb.append(s);
+            sb.append(", ");
         }
+    }
 
-        if (cost > 500) {
-            System.out.println("%5d | + %5d | ".formatted(Clock.getBytecodeNum(), cost) + indents[level] + text);
-        } else {
-            System.out.println("%5d |         | ".formatted(Clock.getBytecodeNum()) + indents[level] + text);
+    public static void printString(String s) {
+        Debug.printString(Debug.INFO, s);
+    }
+
+    public static void failFast(GameActionException ex) {
+        if (Debug.FAIL_FAST) {
+            throw new IllegalStateException(ex);
         }
+    }
+
+    public static void failFast(String message) {
+        if (Debug.FAIL_FAST) {
+            throw new IllegalStateException(message);
+        }
+    }
+
+    public static void betterAssert(boolean cond, String msg) {
+        if (!cond) {
+            failFast(msg);
+        }
+    }
+
+    public static void println(boolean cond, String s) {
+        if (VERBOSE && cond) {
+            System.out.println(s);
+        }
+    }
+
+    public static void println(boolean cond, String s, int id) {
+        if (VERBOSE && cond && (id < 0 || rc.getID() == id)) {
+            System.out.println(s);
+        }
+    }
+
+    public static void println(String s) {
+        Debug.println(Debug.INFO, s);
+    }
+
+    public static void println(String s, int id) {
+        Debug.println(Debug.INFO, s, id);
+    }
+
+    public static void print(boolean cond, String s) {
+        if (VERBOSE && cond) {
+            System.out.print(s);
+        }
+    }
+
+    public static void setIndicatorDot(boolean cond, MapLocation loc, int r, int g, int b) throws GameActionException{
+        if (VERBOSE && INDICATORS && cond && loc != null) {
+            rc.setIndicatorDot(loc, r, g, b);
+        }
+    }
+
+    public static void setIndicatorLine(boolean cond, MapLocation startLoc, MapLocation endLoc, int r, int g, int b) throws GameActionException {
+        if (VERBOSE && INDICATORS && cond && startLoc != null && endLoc != null) {
+            rc.setIndicatorLine(startLoc, endLoc, r, g, b);
+        }
+    }
+
+    public static void setIndicatorDot(MapLocation loc, int r, int g, int b) throws GameActionException {
+        setIndicatorDot(INDICATORS, loc, r, g, b);
+    }
+
+    public static void setIndicatorLine(MapLocation startLoc, MapLocation endLoc, int r, int g, int b) throws GameActionException {
+        setIndicatorLine(INDICATORS, startLoc, endLoc, r, g, b);
     }
 }

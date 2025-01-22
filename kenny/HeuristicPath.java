@@ -113,11 +113,17 @@ public class HeuristicPath extends RobotPlayer {
 
             if (targetLoc != null) {
                 // add cost for moving in a direction that gets us further away from target
-                directionCost[i] += Utils.manhattanDistance(newLoc, targetLoc) * targetIncentive;
+                directionCost[i] += Utils.manhattanDistance(newLoc, targetLoc) * targetIncentive * 1.5;
             }
 
             if (fullFill && nearestEmptyTile != null) {
-                directionCost[i] += Utils.manhattanDistance(newLoc, nearestEmptyTile) * 500;
+                directionCost[i] += Utils.manhattanDistance(newLoc, nearestEmptyTile) * 700;
+            }
+
+            if (rc.getRoundNum() >= fullAttackBasePhase && rc.getID() % 3 == 0) {
+                MapLocation tentativeTarget = Utils.chooseTowerTarget();
+                if (tentativeTarget != null)
+                    directionCost[i] += Utils.manhattanDistance(newLoc, tentativeTarget) * 1000;
             }
 
             // clump avoidance
@@ -543,7 +549,7 @@ public class HeuristicPath extends RobotPlayer {
             // add a cost if the tile is enemy paint
             if (tileInfo.getPaint().isEnemy()) {
                 if (rc.getNumberTowers() >= startPaintingFloorTowerNum) {
-                    directionCost[i] += 6000;
+                    directionCost[i] += 5000;
                 } else {
                     directionCost[i] += 1500;
                 }
@@ -557,7 +563,7 @@ public class HeuristicPath extends RobotPlayer {
             // add a cost if the tile is neutral paint
             else if (tileInfo.getPaint() == PaintType.EMPTY) {
                 if (rc.getNumberTowers() >= startPaintingFloorTowerNum) {
-                    directionCost[i] += 5000;
+                    directionCost[i] += 4000;
                 } else {
                     directionCost[i] += 1400;
                 }
@@ -569,7 +575,7 @@ public class HeuristicPath extends RobotPlayer {
                 }
             }
             // add a cost for moving in range of an enemy tower
-            if (nearbyEnemyTowerLoc != null && newLoc.isWithinDistanceSquared(nearbyEnemyTowerLoc,
+            if (nearestEnemyTower != null && newLoc.isWithinDistanceSquared(nearestEnemyTower,
                     nearestEnemyTowerType == UnitType.LEVEL_ONE_DEFENSE_TOWER ? 16 : 9)) {  // account for defense tower range
                 directionCost[i] += 30000;
             }
@@ -614,8 +620,13 @@ public class HeuristicPath extends RobotPlayer {
                 }
             }
 
-            if (nearestEnemyRobot != null && nearestEnemyRobotInfo.getPaintAmount() > 0)
-                directionCost[i] += Utils.manhattanDistance(newLoc, nearestEnemyRobot) * 1500;  // add a cost for moving away from nearest enemy
+            if (nearestEnemyRobot != null && nearestEnemyRobotInfo.getPaintAmount() > 0) {
+                int x = Utils.manhattanDistance(newLoc, nearestEnemyRobot);
+                directionCost[i] += x * 1500;  // add a cost for moving away from nearest enemy
+                if (rc.getRoundNum() < 70) {
+                    directionCost[i] += x * 2500;  // should really stick to enemies early game
+                }
+            }
 
             if (nearestEnemyPaint == null)
                 assert (Moppers.nearestEnemyPaintOnRuin == null);
@@ -725,6 +736,139 @@ public class HeuristicPath extends RobotPlayer {
             }
             directionCost[i] += allyRobotsInNewLoc * 1000;
         }
+        // find the minimum cost Direction and move there
+        int minCost = INF;
+        Direction minDir = null;
+        for (int i = 8; i-- > 0;) {
+            if (directionCost[i] < minCost) {
+                minCost = directionCost[i];
+                minDir = directions[i];
+            }
+        }
+        if (minDir != null)
+            rc.move(minDir);
+
+    }
+
+
+
+    public static void splasherMove(MapLocation targetLoc) throws GameActionException {
+        int[] directionCost = new int[8];
+
+        int INF = (int) 2e9;
+        for (int i = 8; i-- > 0;) {
+            Direction dir = directions[i];
+            // if we can't move there, set the cost to infinity
+            if (!rc.canMove(dir)) {
+                directionCost[i] = INF;
+                continue;
+            }
+            // add a cost for moving in a direction that gets closer to the last 8 positions
+            for (MapLocation prevLoc : locationHistory) {
+                if (prevLoc == null)
+                    continue;
+                if (dir == rc.getLocation().directionTo(prevLoc)) {
+                    directionCost[i] += 500;
+                }
+            }
+
+            // add a cost for moving in a direction that gets closer to the tower that
+            // spawned us
+            if (dir == rc.getLocation().directionTo(spawnTowerLocation))
+                directionCost[i] += 200;
+
+            MapLocation newLoc = rc.adjacentLocation(dir);
+            MapInfo tileInfo = rc.senseMapInfo(newLoc);
+
+            // add a cost if the tile is enemy paint
+            if (!tileInfo.getPaint().isEnemy()) {
+                MapInfo nextnext = null;
+                if (rc.canSenseLocation(newLoc.add(dir)))
+                    nextnext = rc.senseMapInfo(newLoc.add(dir));
+                if (nextnext != null && nextnext.isPassable() && !nextnext.getPaint().isEnemy()) { // don't add the big
+                                                                                                   // cost if it's only
+                                                                                                   // 1 layer
+
+                    directionCost[i] += 100;
+                } else {
+                    directionCost[i] += 3000;
+                }
+                if (!rc.isActionReady()) {
+                    directionCost[i] += 3000;
+                }
+                if (rc.getPaint() < 100) {
+                    directionCost[i] += 1000;
+                }
+            }
+            // add a cost if the tile is neutral paint
+            else if (tileInfo.getPaint() == PaintType.EMPTY) {
+                if (rc.getNumberTowers() >= startPaintingFloorTowerNum) {
+                    directionCost[i] += 2000;
+                } else {
+                    directionCost[i] += 300;
+                }
+                if (!rc.isActionReady()) {  // increase penalty if we're not ready to make an action
+                    directionCost[i] += 3000;
+                }
+                if (rc.getPaint() < 100) {
+                    directionCost[i] += 1000;  // increase the penalty if we are low paint
+                }
+            }
+            // add a cost for moving in range of an enemy tower
+            if (nearestEnemyTower != null && newLoc.isWithinDistanceSquared(nearestEnemyTower,
+                    nearestEnemyTowerType == UnitType.LEVEL_ONE_DEFENSE_TOWER ? 16 : 9)) {  // account for defense tower range
+                directionCost[i] += 30000;
+            }
+            if (sndNearestEnemyTower != null && newLoc.isWithinDistanceSquared(sndNearestEnemyTower,
+                    sndNearestEnemyTowerType == UnitType.LEVEL_ONE_DEFENSE_TOWER ? 16 : 9)) {
+                directionCost[i] += 30000;
+            }
+
+            // bug nav?
+            if (wallAdjacent && rc.getLocation().distanceSquaredTo(targetLoc) > sqDistanceToTargetOnWallTouch) {
+                boolean newLocIsWallAdjacent = false;
+                for (Direction d : directions4) {
+                    if (rc.canSenseLocation(newLoc.add(d)))
+                    if (rc.senseMapInfo(newLoc.add(d)).isWall()) {
+                        newLocIsWallAdjacent = true;
+                        break;
+                    }
+                }
+                if (newLocIsWallAdjacent)
+                    directionCost[i] -= 10000;
+            } else {
+                // sqDistanceToTargetOnWallTouch = rc.getLocation().distanceSquaredTo(targetLoc);
+            }
+
+
+            // add cost for moving in a direction that gets us further away from target
+            directionCost[i] += Utils.manhattanDistance(newLoc, targetLoc) * 500;
+
+            // add cost for moving in a direction that gets us further away from enemyPaint,
+            if (nearestEnemyPaint != null) {
+                directionCost[i] += Math.max(1, Utils.manhattanDistance(newLoc, nearestEnemyPaint)) * 1000;
+            }
+
+            // try to attack the target our towers tell us to
+            if (rc.getRoundNum() >= fullAttackBasePhase && role == 1) {
+                MapLocation tentativeTarget = Utils.chooseTowerTarget();
+                if (tentativeTarget != null)
+                    directionCost[i] += Utils.manhattanDistance(newLoc, tentativeTarget) * 500;
+            }
+
+            // good anti clumping
+            int maskx = dir.dx + 2;
+            int masky = dir.dy + 2;
+            int allyRobotsInNewLoc = 0;
+            for (int d = 8; d-- > 0;) {
+                if (nearbyAlliesMask[maskx + dx8[d]][masky + dy8[d]]) {
+                    allyRobotsInNewLoc++;
+                }
+            }
+            directionCost[i] += allyRobotsInNewLoc * 300;
+
+        }
+
         // find the minimum cost Direction and move there
         int minCost = INF;
         Direction minDir = null;

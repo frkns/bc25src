@@ -1,5 +1,34 @@
 
 
+=== Results at 2025-01-21_09-20-34 ===
+ref_best wins: 21 (50.00% win rate)
+ryan wins: 21 (50.00% win rate)
+Tied maps (11):
+- DefaultSmall
+- Fossil
+- Justice
+- Mirage
+- MoneyTower
+- SaltyPepper
+- UglySweater
+- UnderTheSea
+- catface
+- gardenworld
+- memstore
+Maps ref_best wins on as both red and blue (5):
+- DefaultLarge
+- DefaultHuge
+- Gears
+- SMILE
+- TargetPractice
+Maps ryan wins on as both red and blue (5):
+- DefaultMedium
+- Money
+- Racetrack
+- Restart
+- Thirds
+
+
 === Results at 2025-01-18_09-50-56 ===
 lmx wins: 21 (50.00% win rate)
 ref_best wins: 21 (50.00% win rate)
