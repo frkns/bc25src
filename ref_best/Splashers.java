@@ -2,154 +2,6 @@ package ref_best;
 
 import battlecode.common.*;
 
-
-public class Splashers extends RobotPlayer {
-    //region Constants and Static Variables
-    static MapLocation target;
-    static int targetChangeWaitTime = mx;
-    static int lastTargetChangeRound = 0;
-
-    // not using these
-    static boolean wasFillingSRPlastRound = false;
-    static int consecutiveRoundsFillingSRP = 0;
-    static MapLocation avoidSRPloc;
-    static MapLocation lastSRPloc;
-    static int lastSRProundNum = 0;
-    /* */
-
-    static int stopQuadrantModifierPhase = mx * 2;
-    static int numWrongTilesInRuin;
-    static int numWrongTilesInSRP;
-    static int noSRPuntil = 5;
-    static int noFullFillUntil = 5;
-    static MapInfo[] _attackableNearbyTiles;
-    //endregion
-
-    public static void init() throws GameActionException {
-
-    }
-
-    public static void run() throws GameActionException {
-        //region Initialization and Updates
-
-        if (Utils.selfDestructRequirementsMet()) {
-            System.out.println("Self destructing...  Type: " + rc.getType() + ", Round: " + rc.getRoundNum() + ", Nearby Friend Robots: " + nearbyFriendlyRobots + ", Paint: " + rc.getPaint());
-            rc.disintegrate();
-        }
-        //endregion
-
-        //region read Messages
-        //Communication.readMessages();  // Communication code saves information to relevant variables (e.g. ruin locs, enemy tower locs)
-        //endregion
-
-        ImpureUtils.updateNearbyMask(false);
-
-        if (!rc.isMovementReady()) {
-            nearbyTiles = rc.senseNearbyMapInfos();
-            ImpureUtils.updateNearestEnemyTower();
-        }
-        ImpureUtils.tryMarkSRP();
-
-        boolean canRefill = true;
-        MapLocation paintTarget = nearestPaintTower;
-        if (paintTarget == null) {
-            paintTarget = spawnTowerLocation;
-            if (spawnTowerType == UnitType.LEVEL_ONE_DEFENSE_TOWER) {
-                canRefill = false;
-                isRefilling = false;
-            }
-        }
-        ImpureUtils.withdrawPaintIfPossible(paintTarget);
-
-        isRefilling = rc.getPaint() < 100 && canRefill;
-
-        if (isRefilling) {
-            HeuristicPath.fullFill = false;
-
-            // two options for paint refill :
-            // 1. is probably more efficient because it avoids non allied paint but is greedy so not guaranteed to make it
-            // 2. is guaranteed to make it but could take longer and make it die of paint loss also does not taking into clumping penalties
-
-            // 1.
-            // HeuristicPath.refill(paintTarget);
-
-            // 2.
-            Pathfinder.move(paintTarget);
-
-            rc.setIndicatorLine(rc.getLocation(), paintTarget, 131, 252, 131);
-        }
-        //endregion
-
-
-        int distance = Integer.MAX_VALUE;
-        MapLocation loc = null;
-        for(MapInfo tile : nearbyTiles) {
-            if(tile.getPaint().isEnemy()) {
-                if(tile.getMapLocation().distanceSquaredTo(target) < distance) {
-                    distance = tile.getMapLocation().distanceSquaredTo(target);
-                    loc = tile.getMapLocation();
-                }
-            }
-        }
-
-        if(loc != null && !isRefilling) {
-            HeuristicPath.move(loc);
-        }
-
-        for(MapInfo tile : rc.senseNearbyMapInfos(2)) {
-            if(tile.getPaint().isEnemy()) {
-                if(rc.canAttack(tile.getMapLocation()) && !isRefilling) {
-                    rc.attack(tile.getMapLocation());
-                    break;
-                }
-            }
-        }
-
-        //region Movement and Targeting
-        if (target == null
-                || rc.getLocation().isWithinDistanceSquared(target, 9)
-                || rc.getRoundNum() - lastTargetChangeRound > targetChangeWaitTime) {
-
-            if (rc.getRoundNum() % 2 == 0 && rc.getRoundNum() < stopQuadrantModifierPhase)
-                target = Utils.randomLocationInQuadrant(Utils.currentQuadrant());
-            else
-                target = new MapLocation(rng.nextInt(mapWidth), rng.nextInt(mapHeight));
-            lastTargetChangeRound = rc.getRoundNum();
-        }
-
-        boolean fullFilling = rc.getRoundNum() >= fullFillPhase && rc.getNumberTowers() >= noFullFillUntil;
-
-        if (fullFilling) {
-            ImpureUtils.updateNearestEmptyTile();
-        }
-
-        if (rc.isMovementReady()) {
-            HeuristicPath.fullFill = fullFilling;
-            HeuristicPath.targetIncentive = 500;
-            HeuristicPath.move(target);
-        }
-        //endregion
-
-        //region Send Messages
-        if (nearestEnemyTower != null) {
-            // Report to all allied towers in range
-            for (RobotInfo robot : nearbyRobots) {
-                if (robot.getTeam() == rc.getTeam() && robot.getType().isTowerType()) {
-                    Debug.println(Debug.COMMS, "Reporting to tower ID: " + robot.getID());
-                    //Communication.sendLocationMessage(robot.getID(), 0, nearestEnemyTower);
-                }
-            }
-        }
-        //endregion
-    }
-}
-
-/*
-Old code (Archived):
-package ref_best;
-
-import battlecode.common.*;
-
 //phase 1 for soldiers
 //spread out and build cash towers
 public class Splashers extends RobotPlayer {
@@ -204,7 +56,7 @@ public class Splashers extends RobotPlayer {
 
                 int score = PAINT_SCORE_IF_RECOVER[info.getPaint().ordinal()] - PAINT_SCORE_IF_RECOVER[paints[id]];
                 paints[id] = (char) info.getPaint().ordinal();
-                System.out.println("Adding score " + score + "(" + (int) scores[id] + " / " + (int)scoreTargetSplash + ")");
+                
 
                 for(int shift: SHIFTS){
                     // int cast because score can be negative
@@ -213,7 +65,7 @@ public class Splashers extends RobotPlayer {
             }
 
             if(scoreTargetSplash < scores[id]){
-                System.out.println("Max score was : " + (int)scoreTargetSplash + " and is now " + (int)scores[id]);
+                
                 targetSplash = info.getMapLocation();
                 scoreTargetSplash = scores[id];
             }
@@ -247,39 +99,34 @@ public class Splashers extends RobotPlayer {
             return;
         }
         */
-/*
-//------------------------------------------------------------------------------//
-// Splash or move to splash target
-//------------------------------------------------------------------------------//
+
+        //------------------------------------------------------------------------------//
+        // Splash or move to splash target
+        //------------------------------------------------------------------------------//
         if(targetSplash != null){
-        if(!rc.canAttack(targetSplash)){
-        Pathfinder.move(targetSplash);
+            if(!rc.canAttack(targetSplash)){
+                Pathfinder.move(targetSplash);
             }
 
-                    if(rc.canAttack(targetSplash)){
-        rc.attack(targetSplash);
+            if(rc.canAttack(targetSplash)){
+                rc.attack(targetSplash);
             }
-                    return;
-                    }
+            return;
+        }
 
-                    //------------------------------------------------------------------------------//
-                    // Explore
-                    //------------------------------------------------------------------------------//
-                    if (targetExplore == null
-        || rc.getLocation().isWithinDistanceSquared(targetExplore, 9)
+        //------------------------------------------------------------------------------//
+        // Explore
+        //------------------------------------------------------------------------------//
+        if (targetExplore == null
+                || rc.getLocation().isWithinDistanceSquared(targetExplore, 9)
                 || rc.getRoundNum() - lastTargetChangeRound > targetChangeWaitTime) {
 
-        if (rng.nextInt(2) == 0)
-targetExplore = Utils.randomLocationInQuadrant(ref_best.Utils.currentQuadrant());
-        else
-targetExplore = new MapLocation(rng.nextInt(mapWidth), rng.nextInt(mapHeight));
-lastTargetChangeRound = rc.getRoundNum();
+            if (rng.nextInt(2) == 0)
+                targetExplore = Utils.randomLocationInQuadrant(Utils.currentQuadrant());
+            else
+                targetExplore = new MapLocation(rng.nextInt(mapWidth), rng.nextInt(mapHeight));
+            lastTargetChangeRound = rc.getRoundNum();
         }
-                Pathfinder.move(targetExplore);
+        Pathfinder.move(targetExplore);
     }
-            }
-
-
-
-
- */
+}

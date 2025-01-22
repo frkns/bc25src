@@ -68,7 +68,6 @@ public class RobotPlayer {
 
     static int siegePhase;
     static int mopperPhase;
-    static int splasherPhase;
     static int fullFillPhase;
     static int attackBasePhase;
     static int alwaysBuildDefenseTowerPhase;
@@ -112,11 +111,6 @@ public class RobotPlayer {
     static int wallRounds = 0;
     static int sqDistanceToTargetOnWallTouch = (int) 2e9;
 
-    static MapLocation fstTowerTarget;  // what tower is our tower telling us to attack?
-    static boolean fstTowerTargetIsDefense;
-    static MapLocation sndTowerTarget;  // what tower is our tower telling us to attack?
-    static boolean sndTowerTargetIsDefense;
-
     public static void run(RobotController r) throws GameActionException {
         rc = r;
         mapHeight = rc.getMapHeight();
@@ -154,7 +148,6 @@ public class RobotPlayer {
         mx = Math.max(mapWidth, mapHeight);  // ~60 for huge ~35 for medium
         siegePhase = (int)(mx * 3);  // cast to int, will be useful for tuning later
         fullFillPhase = (int)(mx * 3);
-        splasherPhase = (int)(mx * 2);
         mopperPhase = (int)(mx * 4);
         attackBasePhase = (int)(mx * 3);
         reservePaintPhase = (int)(mx * 1.5);
@@ -179,25 +172,21 @@ public class RobotPlayer {
         }
 
         switch (rc.getType()) {
-            case SOLDIER: {
+            case SOLDIER:
                 switch (role) {
                     case 1:
                         AttackBase.init();
                         break;
                 }
                 break;
-            }
-        }
 
-        if(mx < 36) {
-            AuxConstants.buildOrder[3] = UnitType.LEVEL_ONE_PAINT_TOWER;
+            case SPLASHER:
+                Splashers.init();
+                break;
         }
 
         while (true) {
             try {
-                Comms.readAndUpdateTowerTargets(rc.getRoundNum() - 1);
-                Comms.readAndUpdateTowerTargets(rc.getRoundNum());
-
                 turnsAlive++;
                 roundNum = rc.getRoundNum();
 
@@ -222,19 +211,9 @@ public class RobotPlayer {
                         break;
                     }
                     case MOPPER: runMopper(); break;
-                    case SPLASHER: runSplasher();
+                    case SPLASHER: runSplasher(); break;
                     default: runTower(); break;
                 }
-
-                // should be ok not to update nearbyRobots because we only do one nearest enemy tower update anyways
-                for (RobotInfo robot : nearbyRobots) {
-                    if (robot.getType().isTowerType() && robot.getTeam() == rc.getTeam()
-                            && rc.canSendMessage(robot.getLocation())) {
-                        Comms.reportToTower(robot.getLocation());
-                        break;
-                    }
-                }
-
 
             } catch (GameActionException e) {
                 System.out.println("GameActionException");
@@ -251,10 +230,7 @@ public class RobotPlayer {
                 }
                 Clock.yield();
             }
-            // End of loop: go back to the top. Clock.yield() has ended, so it's time for another turn!
         }
-
-        // Your code should never reach here (unless it's intentional)! Self-destruction imminent...
     }
 
     public static void runTower() throws GameActionException {

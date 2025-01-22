@@ -2,30 +2,28 @@
 package ref_best;
 
 import battlecode.common.*;
-import ref_best.fast.FastLocSet;
-import ref_best.fast.FastMath;
 
-class Pathfinder extends RobotPlayer {
+import ref_best.fast.*;
+
+//TODO track total paint loss
+//TODO treat options enemy paint/empty paint as walls.
+//Check simulation to see whether distance gained is substantial enough. Otherwise go straight through
+public class Pathfinder extends RobotPlayer{
+
     static MapLocation target = null;
     static MapLocation stayawayFrom = null;
     static int stuckCnt;
 
 
-    static void tryMove(Direction dir, boolean allowAttack) throws GameActionException {
+    public static void tryMove(Direction dir) throws GameActionException {
         if (dir == Direction.CENTER)
             return;
         if (rc.canMove(dir)) {
             rc.move(dir);
         }
-        MapLocation myLoc = rc.getLocation();
-        if (allowAttack && rc.senseMapInfo(myLoc).getPaint() == PaintType.EMPTY){
-            if (rc.canAttack(myLoc)){
-                rc.attack(myLoc);
-            }
-        }
     }
 
-    static void move(MapLocation loc, boolean allowAttack) throws GameActionException {
+    public static void move(MapLocation loc) throws GameActionException {
         if (!rc.isMovementReady() || loc == null)
             return;
         target = loc;
@@ -33,22 +31,30 @@ class Pathfinder extends RobotPlayer {
         Direction dir = BugNav.getMoveDir();
         if (dir == null)
             return;
-        tryMove(dir, allowAttack);
+        tryMove(dir);
     }
 
-    // let's try to keep functions as pure as possible. so no attack by default
-    static void move(MapLocation loc) throws GameActionException {
-        move(loc, false);
+    public static Direction getMoveDir(MapLocation loc) throws GameActionException {
+        if (!rc.isMovementReady() || loc == null)
+            return null;
+        target = loc;
+        stayawayFrom = null;
+        Direction dir = BugNav.getMoveDir();
+        if (dir == null) {
+            return null;
+        }
+        return dir;
     }
 
-    static class BugNav {
+
+    public static class BugNav {
         static DirectionStack dirStack = new DirectionStack();
         static MapLocation prevTarget = null; // previous target
         static FastLocSet visitedLocs = new FastLocSet();
         static int currentTurnDir = 0;
         static int stackDepthCutoff = 8;
         static final int MAX_DEPTH = 20;
-        static final int BYTECODE_CUTOFF = 5000;
+        static final int BYTECODE_CUTOFF = 500;
         static int lastMoveRound = -1;
 
         static Direction turn(Direction dir) {
@@ -62,6 +68,7 @@ class Pathfinder extends RobotPlayer {
         static Direction getMoveDir() throws GameActionException {
             //EXTRA
             if (rc.getRoundNum() == lastMoveRound) {
+                System.out.println("Null return: Already moved this round");
                 return null;
             } else {
                 lastMoveRound = rc.getRoundNum();
@@ -85,8 +92,31 @@ class Pathfinder extends RobotPlayer {
                 if (canMoveOrFill(dir)) {
                     return dir;
                 }
+                
                 // If robot cannot move
                 MapLocation loc = rc.getLocation().add(dir);
+                // Try to sidestep enemy or empty paint
+                if (rc.canSenseLocation(loc) && !rc.senseMapInfo(loc).getPaint().isAlly()) {
+                    Direction dirL = dir.rotateLeft();
+                    MapLocation locL = rc.getLocation().add(dirL);
+                    Direction dirR = dir.rotateRight();
+                    MapLocation locR = rc.getLocation().add(dirR);
+                    if (target.distanceSquaredTo(locL) < target.distanceSquaredTo(locR)) {
+                        if (canMoveOrFill(dirL)) {
+                            return dirL;
+                        }
+                        if (canMoveOrFill(dirR)) {
+                            return dirR;
+                        }
+                    } else {
+                        if (canMoveOrFill(dirR)) {
+                            return dirR;
+                        }
+                        if (canMoveOrFill(dirL)) {
+                            return dirL;
+                        }
+                    }
+                }
 
                 // ADAPT bot 1 code that starts with: if there is water and sideway passage...
                 currentTurnDir = getTurnDir(dir);
@@ -95,6 +125,7 @@ class Pathfinder extends RobotPlayer {
                     if (!rc.onTheMap(rc.getLocation().add(dir))) {
                         currentTurnDir ^= 1;
                         dirStack.clear();
+                        System.out.println("Null return: Hit map boundary");
                         return null; // do not move
                     }
                     dirStack.push(dir);
@@ -145,11 +176,13 @@ class Pathfinder extends RobotPlayer {
                     if (!rc.onTheMap(rc.getLocation().add(curDir))) {
                         currentTurnDir ^= 1;
                         dirStack.clear();
+                        System.out.println("Null return: Hit map boundary");
                         return null; // do not move
                     }
                     dirStack.push(curDir);
                     if (dirStack.size == stackSizeLimit) {
                         dirStack.clear();
+                        System.out.println("Null return: Stack size limit reached");
                         return null;
                     }
                 }
@@ -157,12 +190,14 @@ class Pathfinder extends RobotPlayer {
                     int cutoff = stackDepthCutoff + 8;
                     dirStack.clear();
                     stackDepthCutoff = cutoff;
+                    System.out.println("Null return: Stack depth cutoff reached, new cutoff: " + cutoff);
                 }
                 Direction moveDir = dirStack.size == 0 ? dirStack.dirs[0] : turn(dirStack.top());
                 if (canMoveOrFill(moveDir)) {
                     return moveDir;
                 }
             }
+            System.out.println("Null return: Final moveDir cannot be moved to");
             return null;
         }
 
@@ -180,6 +215,9 @@ class Pathfinder extends RobotPlayer {
             while (!now.isAdjacentTo(target)) {
                 if (ans > MAX_DEPTH || Clock.getBytecodesLeft() < BYTECODE_CUTOFF) {
                     break;
+                }
+                if (now != null) {
+                    rc.setIndicatorDot(now, originalTurnDir == 0? 255 : 0, 0, originalTurnDir == 0? 0 : 255);
                 }
                 Direction moveDir = now.directionTo(target);
                 if (dirStack.size == 0) {
@@ -271,7 +309,7 @@ class Pathfinder extends RobotPlayer {
         }
 
         // clear some of the previous data
-        static void resetPathfinding() {
+        public static void resetPathfinding() {
             stackDepthCutoff = 8;
             dirStack.clear();
             stuckCnt = 0;
@@ -301,15 +339,8 @@ class Pathfinder extends RobotPlayer {
                 return false;
             if (rc.canSenseLocation(newLoc)) {
                 return rc.senseMapInfo(newLoc).isPassable();
-                // ADAPT code for paint
-                // if (rc.hasFlag() || rc.getCrumbs() < 30) {
-                //     return rc.sensePassability(newLoc);
-                // } else {
-                //     return !rc.senseMapInfo(newLoc).isWall();
-                // }
             } else {
-                return false;
-                // return MapRecorder.getPassible(newLoc);
+                return MapRecorder.getPassible(newLoc);
             }
         }
     }
@@ -334,8 +365,6 @@ class DirectionStack {
 
     /**
      * Returns the top n element of the stack
-     * @param n
-     * @return
      */
     final Direction top(int n) {
         return dirs[size - n];

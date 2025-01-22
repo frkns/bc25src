@@ -1,9 +1,6 @@
 package ref_best;
-
-import battlecode.common.GameActionException;
-import battlecode.common.MapLocation;
-import battlecode.common.PaintType;
-import battlecode.common.UnitType;
+import java.util.Random;
+import battlecode.common.*;
 
 // these Utils are pure functions - no side-effects, they don't change variables or modify game state in any way
 
@@ -69,8 +66,9 @@ public class Utils extends RobotPlayer {
         // do not early return so we can return null if there is enemy paint
         if (rc.getNumberTowers() <= Soldiers.strictFollowBuildOrderNumTowers)
             return AuxConstants.buildOrder[rc.getNumberTowers()];  // follow the build order
-        if (nearbyEnemyRobots > 0)
+        if (rc.getRoundNum() >= alwaysBuildDefenseTowerPhase)
             return UnitType.LEVEL_ONE_DEFENSE_TOWER;
+
         // if roughly same num of wrong tiles, follow the build order
         if (Math.abs(numWrongInPaint - numWrongInMoney) < 3 && Math.abs(numWrongInMoney - numWrongInDefense) < 3) {
             return AuxConstants.buildOrder[rc.getNumberTowers()];
@@ -200,5 +198,19 @@ public class Utils extends RobotPlayer {
             return false;
 
         return true;
+    }
+
+    static MapLocation int2loc(int val) {
+        if (val == 0) {
+            return null;
+        }
+        val -= 1;
+        return new MapLocation(val / 64, val % 64);
+    }
+
+    static int loc2int(MapLocation loc) {
+        if (loc == null)
+            return 0;
+        return loc.x * 64 + loc.y + 1;
     }
 }

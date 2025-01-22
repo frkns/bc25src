@@ -1,8 +1,8 @@
 // modified from our 2023 code
-package ryan;
+package ref_best;
 
 import battlecode.common.*;
-import ryan.fast.*;
+import ref_best.fast.*;
 
 
 public class MapRecorder extends RobotPlayer {

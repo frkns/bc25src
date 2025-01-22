@@ -1,18 +1,17 @@
 // https://github.com/maxwelljones14/BattleCode2023/blob/main/src/MPWorking/Debug.java
 package ref_best;
 
-import battlecode.common.GameActionException;
-import battlecode.common.MapLocation;
+import battlecode.common.*;
 
 /**
  * Utilizes the robot's indicator string to display debug information
- *
+ * 
  * The printString(cond, s) method:
  * - Accumulates messages to be displayed at the end of the turn
- * - Params:
+ * - Params: 
  * -     cond --> condition to print the message,
  * -     s    --> message to print
- *
+ * 
  * The flush() method:
  * - Sets the robot's indicator string with accumulated messages from Debug.printString()
  * - Clears the string builder for next turn

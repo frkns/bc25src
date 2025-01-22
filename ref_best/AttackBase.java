@@ -1,9 +1,8 @@
 package ref_best;
 
-import battlecode.common.GameActionException;
-import battlecode.common.MapInfo;
-import battlecode.common.MapLocation;
-import battlecode.common.RobotInfo;
+import battlecode.common.*;
+import java.util.Arrays;
+import java.util.Comparator;
 
 public class AttackBase extends RobotPlayer {
 
@@ -26,47 +25,13 @@ public class AttackBase extends RobotPlayer {
         }
 
         // Sort potentialEnemySpawnLocations based on distance to current location
-        // Arrays.sort(potentialEnemySpawnLocations, Comparator.comparingInt(loc -> rc.getLocation().distanceSquaredTo(loc)));
-        MapLocation loc1 = potentialEnemySpawnLocations[0];
-        MapLocation loc2 = potentialEnemySpawnLocations[1];
-        MapLocation loc3 = potentialEnemySpawnLocations[2];
-        int dist1 = rc.getLocation().distanceSquaredTo(loc1);
-        int dist2 = rc.getLocation().distanceSquaredTo(loc2);
-        int dist3 = rc.getLocation().distanceSquaredTo(loc3);
-        if (dist1 > dist2) {
-            MapLocation temp = loc1;
-            loc1 = loc2;
-            loc2 = temp;
-            int tempDist = dist1;
-            dist1 = dist2;
-            dist2 = tempDist;
-        }
-        if (dist2 > dist3) {
-            MapLocation temp = loc2;
-            loc2 = loc3;
-            loc3 = temp;
-            int tempDist = dist2;
-            dist2 = dist3;
-            dist3 = tempDist;
-        }
-        if (dist1 > dist2) {
-            MapLocation temp = loc1;
-            loc1 = loc2;
-            loc2 = temp;
-            int tempDist = dist1;
-            dist1 = dist2;
-            dist2 = tempDist;
-        }
-        potentialEnemySpawnLocations[0] = loc1;
-        potentialEnemySpawnLocations[1] = loc2;
-        potentialEnemySpawnLocations[2] = loc3;
+        Arrays.sort(potentialEnemySpawnLocations, Comparator.comparingInt(loc -> rc.getLocation().distanceSquaredTo(loc)));
     }
 
     static boolean[] visited = new boolean[3];
     static MapLocation foundLoc = null;
     static MapInfo foundLocInfo = null;
 
-    static boolean visFstTowerTarget = false;
 
     static void run() throws GameActionException {
 
@@ -93,34 +58,27 @@ public class AttackBase extends RobotPlayer {
                 rc.attack(nearestEnemyTower);
                 inTowerRange = true;
             }
-            return;
         }
 
         if (foundLoc == null)
-        for (int i = 0; i < 3; i++) {
-            MapLocation tileLoc = potentialEnemySpawnLocations[i];
-            if (rc.getLocation().isWithinDistanceSquared(tileLoc, 20)) {
-                // System.out.println("Found **potential** enemy spawn location");
-                visited[i] = true;
-                RobotInfo robot = null;
-                if (rc.canSenseRobotAtLocation(tileLoc))
-                    robot = rc.senseRobotAtLocation(tileLoc);
-                else {
-                    // System.out.println("Haha I destroyed the enemy tower");
-                    // role = 0;
+        for (MapInfo tile : nearbyTiles) {
+            for (int i = 0; i < 3; i++) {
+                if (tile.getMapLocation().equals(potentialEnemySpawnLocations[i])) {
+                    // System.out.println("Found **potential** enemy spawn location");
+                    visited[i] = true;
+                    RobotInfo robot = null;
+                    if (rc.canSenseRobotAtLocation(tile.getMapLocation()))
+                        robot = rc.senseRobotAtLocation(tile.getMapLocation());
+                    else {
+                        // System.out.println("Haha I destroyed the enemy tower");
+                        // role = 0;
+                    }
+                    if (robot != null && robot.getTeam() != rc.getTeam() && robot.getType() == spawnTowerType) {
+                        // System.out.println("Found enemy tower @ " + tile.getMapLocation());
+                        foundLocInfo = tile;
+                        foundLoc = tile.getMapLocation();
+                    }
                 }
-                if (robot != null && robot.getTeam() != rc.getTeam() && robot.getType() == spawnTowerType) {
-                    // System.out.println("Found enemy tower @ " + tile.getMapLocation());
-                    // foundLocInfo = tile;
-                    foundLoc = tileLoc;
-                }
-            }
-        }
-
-        if (fstTowerTarget != null) {
-            MapLocation tileLoc = fstTowerTarget;
-            if (rc.getLocation().isWithinDistanceSquared(tileLoc, 20)) {
-                visFstTowerTarget = true;
             }
         }
 
@@ -144,10 +102,6 @@ public class AttackBase extends RobotPlayer {
         // }
         // /*  */
 
-
-        // if (fstTowerTarget == null && !visFstTowerTarget) {
-        //     target = fstTowerTarget;
-        // } else
         if (foundLoc == null) {
             // System.out.println("No enemy tower found");
             for (int i = 0; i < 3; i++) {
@@ -156,18 +110,18 @@ public class AttackBase extends RobotPlayer {
                     break;
                 }
             }
-        }
-
-        if (rc.isMovementReady()) {
-            if (target == null) {
-                role = 0;
-                Soldiers.run();
-                return;
+            if (rc.isMovementReady()) {
+                if (target == null) {
+                    role = 0;
+                    return;
+                }
+                Pathfinder.move(target);
+                // HeuristicPath.attackBaseMove(target);
             }
         }
-        Pathfinder.move(target);
-        // HeuristicPath.attackBaseMove(target);
 
+        // MapLocation loc = rc.getLocation();
+        // MapInfo locInfo = rc.senseMapInfo(loc);
 
         // dot nearby empty/ enemy ruins
         if (rc.isActionReady()) {
@@ -204,7 +158,7 @@ public class AttackBase extends RobotPlayer {
             role = 0;
             // Soldiers.run();
             return;
-        } else if (visited[0] && visited[1] && visited[2] && visFstTowerTarget && nearestEnemyTower == null) {  // visited everything
+        } else if (visited[0] && visited[1] && visited[2] && nearestEnemyTower == null) {  // visited everything
             role = 0;
             // Soldiers.run();
             return;
