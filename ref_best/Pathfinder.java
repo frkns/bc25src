@@ -190,7 +190,6 @@ public class Pathfinder extends RobotPlayer{
                     int cutoff = stackDepthCutoff + 8;
                     dirStack.clear();
                     stackDepthCutoff = cutoff;
-                    System.out.println("Null return: Stack depth cutoff reached, new cutoff: " + cutoff);
                 }
                 Direction moveDir = dirStack.size == 0 ? dirStack.dirs[0] : turn(dirStack.top());
                 if (canMoveOrFill(moveDir)) {
