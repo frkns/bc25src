@@ -1,4 +1,4 @@
-package ref_most_best;
+package ref_best;
 import java.util.Random;
 import battlecode.common.*;
 

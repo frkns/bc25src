@@ -179,7 +179,7 @@ public class AttackBase extends RobotPlayer {
         // if (rc.getLocation().isWithinDistanceSquared(target, 20))
         //     HeuristicPath.attackBaseMove(target);
         // else
-            Pathfinder.move(target, true);
+            Pathfinder.move(target);
 
         rc.setIndicatorLine(rc.getLocation(), target, 255, 255, 255);
 

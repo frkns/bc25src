@@ -43,6 +43,7 @@ public class Soldiers extends RobotPlayer {
     static int alreadyTryingBuildCounter = 0;
 
     static int strictFollowBuildOrderNumTowers = 3;  // strictly follow build order if we have not exceeded this number of towers
+    static boolean bypassIfPaint = false;  // however bypass strict build order if it is paint
 
     public static void run() throws GameActionException {
         MapRecorder.initTurn();
