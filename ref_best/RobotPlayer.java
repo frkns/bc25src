@@ -197,16 +197,14 @@ public class RobotPlayer {
         }
 
         switch (rc.getType()) {
-            case SOLDIER:
+            case SOLDIER: {
                 switch (role) {
                     case 1:
+                        // AttackBase.init();
                         break;
                 }
                 break;
-
-            case SPLASHER:
-                Splashers.init();
-                break;
+            }
         }
 
         if(mx < 36) {

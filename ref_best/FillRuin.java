@@ -3,6 +3,8 @@ package ref_best;
 import battlecode.common.*;
 
 public class FillRuin extends RobotPlayer {
+
+
     public static boolean updateNearestWrongInRuin(UnitType towerType) throws GameActionException {
         Soldiers.numWrongTilesInRuin = 0;
         MapLocation ruinLoc = curRuin.getMapLocation();

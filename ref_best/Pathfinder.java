@@ -5,14 +5,12 @@ import battlecode.common.*;
 
 import ref_best.fast.*;
 
-//TODO track total paint loss
-//TODO treat options enemy paint/empty paint as walls.
-//Check simulation to see whether distance gained is substantial enough. Otherwise go straight through
 public class Pathfinder extends RobotPlayer{
 
     static MapLocation target = null;
     static MapLocation stayawayFrom = null;
     static int stuckCnt;
+    static boolean ignoreTowers = false;
 
 
     public static void tryMove(Direction dir) throws GameActionException {
@@ -24,6 +22,12 @@ public class Pathfinder extends RobotPlayer{
     }
 
     public static void move(MapLocation loc) throws GameActionException {
+        move(loc, false);
+        return;
+    }
+
+    public static void move(MapLocation loc, boolean _ignoreTowers) throws GameActionException {
+        ignoreTowers = _ignoreTowers;
         if (!rc.isMovementReady() || loc == null)
             return;
         target = loc;
@@ -54,7 +58,7 @@ public class Pathfinder extends RobotPlayer{
         static int currentTurnDir = 0;
         static int stackDepthCutoff = 8;
         static final int MAX_DEPTH = 20;
-        static final int BYTECODE_CUTOFF = 500;
+        static final int BYTECODE_CUTOFF = 1000;
         static int lastMoveRound = -1;
 
         static Direction turn(Direction dir) {
@@ -92,7 +96,7 @@ public class Pathfinder extends RobotPlayer{
                 if (canMoveOrFill(dir)) {
                     return dir;
                 }
-                
+
                 // If robot cannot move
                 MapLocation loc = rc.getLocation().add(dir);
                 // Try to sidestep enemy or empty paint
@@ -190,6 +194,7 @@ public class Pathfinder extends RobotPlayer{
                     int cutoff = stackDepthCutoff + 8;
                     dirStack.clear();
                     stackDepthCutoff = cutoff;
+                    System.out.println("Null return: Stack depth cutoff reached, new cutoff: " + cutoff);
                 }
                 Direction moveDir = dirStack.size == 0 ? dirStack.dirs[0] : turn(dirStack.top());
                 if (canMoveOrFill(moveDir)) {
@@ -316,9 +321,21 @@ public class Pathfinder extends RobotPlayer{
         }
 
         static boolean canMoveOrFill(Direction dir) throws GameActionException {
-            MapLocation loc = rc.getLocation().add(dir);
+            MapLocation loc = rc.adjacentLocation(dir);
             if (stayawayFrom != null && loc.isAdjacentTo(stayawayFrom))
                 return false;
+
+            if (!ignoreTowers) {
+                if (nearestEnemyTower != null && loc.isWithinDistanceSquared(nearestEnemyTower,
+                        nearestEnemyTowerType == UnitType.LEVEL_ONE_DEFENSE_TOWER ? 16 : 9)) {
+                    return false;
+                }
+                if (sndNearestEnemyTower != null && loc.isWithinDistanceSquared(sndNearestEnemyTower,
+                        sndNearestEnemyTowerType == UnitType.LEVEL_ONE_DEFENSE_TOWER ? 16 : 9)) {
+                    return false;
+                }
+            }
+
             if (rc.canMove(dir)) {
                 return true;
             }
@@ -326,8 +343,10 @@ public class Pathfinder extends RobotPlayer{
             // EXTRA
             if (!rc.canSenseLocation(loc))
                 return false;
-            if (rc.senseRobotAtLocation(loc) != null) {
-                return FastMath.rand256() % 10 == 0; // small chance robot might be gone by the time duck reaches location
+
+            RobotInfo robot = rc.senseRobotAtLocation(loc);
+            if (robot != null && robot.getType().isRobotType()) {
+                return FastMath.rand256() % 5 == 0; // small chance robot might be gone by the time duck reaches location
             }
             return false;
         }
@@ -339,7 +358,8 @@ public class Pathfinder extends RobotPlayer{
             if (rc.canSenseLocation(newLoc)) {
                 return rc.senseMapInfo(newLoc).isPassable();
             } else {
-                return MapRecorder.getPassible(newLoc);
+                return false;
+                // return MapRecorder.getPassible(newLoc);
             }
         }
     }

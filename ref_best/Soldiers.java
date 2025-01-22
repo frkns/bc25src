@@ -23,7 +23,7 @@ public class Soldiers extends RobotPlayer {
     static int numWrongTilesInRuin;
     static int numWrongTilesInSRP;
 
-    static int noSRPuntil = 4;  // no SRPs until x towers have been built
+    static int noSRPuntil = 3;  // no SRPs until x towers have been built
     static int noFullFillUntil = 4;
 
     static MapInfo[] _attackableNearbyTiles;  // var names that start with an underscore are set static to save bytecode
@@ -46,7 +46,6 @@ public class Soldiers extends RobotPlayer {
     static boolean bypassIfPaint = false;  // however bypass strict build order if it is paint
 
     public static void run() throws GameActionException {
-        MapRecorder.initTurn();
 
 
         if (lastRuinLocWithEnemyPaintCounter++ > 10) {  // reset ruin avoidance after some time has passed
@@ -218,11 +217,10 @@ public class Soldiers extends RobotPlayer {
             }
         }
 
-        assert(!(isFillingRuin && isFillingSRP));
 
         if (!rc.isMovementReady()) {
             nearbyTiles = rc.senseNearbyMapInfos();
-            ImpureUtils.updateNearestEnemyTower();
+            ImpureUtils.updateNearestPaintTower();  // already updated at the start
         }
         ImpureUtils.tryMarkSRP();
 
@@ -236,8 +234,6 @@ public class Soldiers extends RobotPlayer {
             target = paintTarget;
             sqDistanceToTargetOnWallTouch = rc.getLocation().distanceSquaredTo(target);
         }
-
-
         wallAdjacent = false;
         for (MapInfo tile : rc.senseNearbyMapInfos(1)) {
             if (tile.isWall()) {
@@ -258,7 +254,7 @@ public class Soldiers extends RobotPlayer {
         // if (target != null)
         //     sqDistanceToTargetOnWallTouch = rc.getLocation().distanceSquaredTo(target);
 
-        if (isRefilling && paintTarget != null) {
+        if (isRefilling && target != null) {
             // target = paintTarget;
 
             // wallAdjacent = false;
@@ -283,13 +279,15 @@ public class Soldiers extends RobotPlayer {
             // 1. is probably more efficient because it avoids non allied paint but is greedy so not guaranteed to make it
             // 2. is guaranteed to make it but could take longer and make it die of paint loss also does not taking into clumping penalties
 
-            // 1.
-            HeuristicPath.move(target);
+            // if (rc.getLocation().isWithinDistanceSquared(target, 18)) {
+            //     HeuristicPath.refill(target);  // 1.
+            // } else {
+                // Pathfinder.move(target);  // 2.
+                Pathfinder.move(paintTarget);  // 2.
 
-            // 2.
-            // Pathfinder.move(paintTarget);
+            // }
 
-
+            rc.setIndicatorLine(rc.getLocation(), target, 131, 252, 131);
         } else {
             // wallAdjacent = false;
             // for (MapInfo tile : rc.senseNearbyMapInfos(1)) {
@@ -314,27 +312,36 @@ public class Soldiers extends RobotPlayer {
         // ImpureUtils.tryMarkSRP();
 
 
+
         // dot nearby empty/ enemy ruins
+        nearbyRuins = rc.senseNearbyRuins(-1);
         if (rc.isActionReady()) {
-            MapLocation closestRuinToDot = null;
-            int distance = (int)2e9;
-            for (MapInfo tile : nearbyTiles) {
-                if (tile.hasRuin()) {
-                    if (tile.getMapLocation().distanceSquaredTo(rc.getLocation()) < distance) {
-                        distance = tile.getMapLocation().distanceSquaredTo(rc.getLocation());
-                        closestRuinToDot = tile.getMapLocation();
+            MapLocation closestDot = null;
+            for (MapLocation tileLoc : nearbyRuins) {
+                MapLocation tentativeDot = Utils.nearestEmptyOnRuinIfEnemyOrIsUndotted(tileLoc);
+                if (tentativeDot != null) {
+                    if (closestDot == null || rc.getLocation().distanceSquaredTo(tentativeDot) < rc.getLocation().distanceSquaredTo(closestDot)) {
+                        closestDot = tentativeDot;
                     }
                 }
             }
-            if (closestRuinToDot != null) {
-                MapLocation locToDot = Utils.nearestEmptyOnRuinIfEnemyOrIsUndotted(closestRuinToDot);
-                if (locToDot != null && rc.canAttack(locToDot)) {
-                    // System.out.println("dotted a ruin");
-                    rc.attack(locToDot);
-                }
+            if (rc.canAttack(closestDot)) {
+                rc.attack(closestDot);
             }
         }
 
+        if (fstTowerTarget != null) {
+            MapLocation tileLoc = fstTowerTarget;
+            if (rc.getLocation().isWithinDistanceSquared(tileLoc, 20)) {
+                visFstTowerTarget = true;
+            }
+        }
+        if (sndTowerTarget != null) {
+            MapLocation tileLoc = sndTowerTarget;
+            if (rc.getLocation().isWithinDistanceSquared(tileLoc, 20)) {
+                visSndTowerTarget = true;
+            }
+        }
 
         if (target == null
                 || rc.getLocation().isWithinDistanceSquared(target, 9)
@@ -344,9 +351,15 @@ public class Soldiers extends RobotPlayer {
             // try to combat this but also instead sometimes selecting a location in our current quadrant
             /*if (rc.getRoundNum() % 2 == 0 && rc.getRoundNum() < stopQuadrantModifierPhase)
                 target = Utils.randomLocationInQuadrant(Utils.currentQuadrant());
-            else*/ {
+            else*/
+
+            MapLocation tentativeTarget = Utils.chooseTowerTarget();
+
+            if (rc.getRoundNum() >= fullAttackBasePhase && tentativeTarget != null && rc.getID() % 5 == 0) {
+                target = tentativeTarget;
+            } else
                 target = Utils.randomLocationInQuadrant(rng.nextInt(4));
-            }
+
             lastTargetChangeRound = rc.getRoundNum();
         }
 
@@ -360,6 +373,7 @@ public class Soldiers extends RobotPlayer {
         // rc.setIndicatorDot(target, 200, 200, 200);
         if (rc.isMovementReady()) {
             HeuristicPath.fullFill = fullFilling;
+            HeuristicPath.targetIncentive = 500;
             HeuristicPath.move(target);
             // nearbyTiles = rc.senseNearbyMapInfos();
         }
@@ -376,11 +390,10 @@ public class Soldiers extends RobotPlayer {
             }
         }
 
-        // if (isFillingSRP == wasFillingSRPlastRound) {
-        //     consecutiveRoundsFillingSRP++;
+        // if (rc.getRoundNum() >= fullAttackBasePhase) {
+        //     AttackBase.init();
+            // role = 1;
         // }
-        // wasFillingSRPlastRound = isFillingSRP;
-        MapRecorder.recordSym(1000);
-    }
 
+    }
 }
