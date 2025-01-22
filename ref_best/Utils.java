@@ -216,4 +216,18 @@ public class Utils extends RobotPlayer {
 
         return true;
     }
+
+    static MapLocation int2loc(int val) {
+        if (val == 0) {
+            return null;
+        }
+        val -= 1;
+        return new MapLocation(val / 64, val % 64);
+    }
+
+    static int loc2int(MapLocation loc) {
+        if (loc == null)
+            return 0;
+        return loc.x * 64 + loc.y + 1;
+    }
 }
