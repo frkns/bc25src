@@ -47,6 +47,10 @@ public class Splashers extends RobotPlayer{
             return;
         }
 
+        if (nearestPaintTower != null && Utils.manhattanDistance(rc.getLocation(), nearestPaintTower) > refillDistLimit) {
+            isRefilling = false;
+        }
+
         if (target == null
                 || rc.getLocation().isWithinDistanceSquared(target, 9)
                 || rc.getRoundNum() - lastTargetChangeRound > targetChangeWaitTime) {
@@ -54,8 +58,13 @@ public class Splashers extends RobotPlayer{
             lastTargetChangeRound = rc.getRoundNum();
         }
 
-        if (rc.isMovementReady())
-            HeuristicPath.splasherMove(target);
+        if (rc.isMovementReady()) {
+            // if (nearestEnemyTower != null) {
+                HeuristicPath.splasherMove(target);
+            // } else {
+                // Pathfinder.move(target);
+            // }
+        }
 
         // find best attack location
 

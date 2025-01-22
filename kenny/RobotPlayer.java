@@ -127,6 +127,8 @@ public class RobotPlayer {
     static MapLocation[] potentialEnemySpawnLocations = new MapLocation[3];
     static int totalManDist;
 
+    static int refillDistLimit = 20;  // don't refill if more than this number of manhattan units away from nearest paint tower
+
     public static void run(RobotController r) throws GameActionException {
         rc = r;
         mapHeight = rc.getMapHeight();

@@ -198,8 +198,8 @@ public class Moppers extends RobotPlayer {
         // assert (rc.canMopSwing(Direction.WEST));
         // }
 
-        // must be able to hit 2 robots with sweep for it to trigger
-        if (bestSwingScore >= 2 && rc.canMopSwing(bestSwingDir)) {
+        // must be able to hit ~2 robots with sweep for it to trigger
+        if (bestSwingScore >= 1 && rc.canMopSwing(bestSwingDir)) {
             rc.mopSwing(bestSwingDir);
             rc.setIndicatorDot(rc.getLocation().add(bestSwingDir), 255, 255, 255);
             rc.setIndicatorDot(rc.getLocation().add(bestSwingDir).add(bestSwingDir), 255, 255, 255);

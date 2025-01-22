@@ -204,12 +204,14 @@ public class AttackBase extends RobotPlayer {
         boolean fullFilling = rc.getRoundNum() >= fullFillPhase;
         if (rc.getPaint() > 150 && fullFilling) {
             ImpureUtils.paintFloor();
-            // _attackableNearbyTiles = rc.senseNearbyMapInfos(9);
-            // for (MapInfo tile : _attackableNearbyTiles) {
-            //     if (tile.getPaint() == PaintType.EMPTY && rc.canAttack(tile.getMapLocation())) {
-            //         rc.attack(tile.getMapLocation());
-            //     }
-            // }
+        }
+        if (rc.getPaint() > 150 && rc.getRoundNum() >= fullAttackBasePhase) {
+            _attackableNearbyTiles = rc.senseNearbyMapInfos(9);
+            for (MapInfo tile : _attackableNearbyTiles) {
+                if (tile.getPaint() == PaintType.EMPTY && rc.canAttack(tile.getMapLocation())) {
+                    rc.attack(tile.getMapLocation());
+                }
+            }
         }
 
         if (foundLoc != null && !rc.canSenseRobotAtLocation(foundLoc)) {

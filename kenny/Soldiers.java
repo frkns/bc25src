@@ -234,6 +234,11 @@ public class Soldiers extends RobotPlayer {
             target = paintTarget;
             sqDistanceToTargetOnWallTouch = rc.getLocation().distanceSquaredTo(target);
         }
+
+        if (nearestPaintTower != null && Utils.manhattanDistance(rc.getLocation(), nearestPaintTower) > refillDistLimit) {
+            isRefilling = false;
+        }
+
         wallAdjacent = false;
         for (MapInfo tile : rc.senseNearbyMapInfos(1)) {
             if (tile.isWall()) {
