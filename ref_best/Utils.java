@@ -1,10 +1,40 @@
-package ref_best;
+package ref_most_best;
 import java.util.Random;
 import battlecode.common.*;
 
 // these Utils are pure functions - no side-effects, they don't change variables or modify game state in any way
 
 public class Utils extends RobotPlayer {
+
+    static MapLocation chooseTowerTarget() throws GameActionException {  // choose a target for robot to move towards/ attack
+        if (rc.getID() % 2 == 1) {
+            if (fstTowerTarget != null && !visFstTowerTarget) {
+                return fstTowerTarget;
+            } else
+            if (sndTowerTarget != null && !visSndTowerTarget) {
+                return sndTowerTarget;
+            }
+        } else {
+            if (sndTowerTarget != null && !visSndTowerTarget) {
+                return sndTowerTarget;
+            } else
+            if (fstTowerTarget != null && !visFstTowerTarget) {
+                return fstTowerTarget;
+            }
+        }
+
+        return null;
+    }
+
+    static boolean isSendingWave() throws GameActionException {
+        return (rc.getRoundNum() / 20) % 3 == 0;
+    }
+    static boolean isAttackingBase() throws GameActionException {
+        if (isSendingWave() && rc.getRoundNum() >= attackBasePhase)
+            return true;
+
+        return false;
+    }
 
     static UnitType getBuildType() throws GameActionException {
 
@@ -43,29 +73,16 @@ public class Utils extends RobotPlayer {
                     if (defensePattern[i][j])
                         numWrongInDefense++;
                 }
-
-                // if (paint == PaintType.EMPTY
-                //         || (paint == PaintType.ALLY_SECONDARY && !paintPattern[i][j])
-                //         || (paint == PaintType.ALLY_PRIMARY && paintPattern[i][j])) {
-                //     numWrongInPaint++;
-                // }
-                // if (paint == PaintType.EMPTY
-                //         || (paint == PaintType.ALLY_SECONDARY && !moneyPattern[i][j])
-                //         || (paint == PaintType.ALLY_PRIMARY && moneyPattern[i][j])) {
-                //     numWrongInMoney++;
-                // }
-                // if (paint == PaintType.EMPTY
-                //         || (paint == PaintType.ALLY_SECONDARY && !defensePattern[i][j])
-                //         || (paint == PaintType.ALLY_PRIMARY && defensePattern[i][j])) {
-                //     numWrongInDefense++;
-                // }
-
             }
         }
 
         // do not early return so we can return null if there is enemy paint
-        if (rc.getNumberTowers() <= Soldiers.strictFollowBuildOrderNumTowers)
+        if (rc.getNumberTowers() <= Soldiers.strictFollowBuildOrderNumTowers) {
+            if (Soldiers.bypassIfPaint && numWrongInPaint < numWrongInMoney && numWrongInPaint < numWrongInDefense) {
+                return UnitType.LEVEL_ONE_PAINT_TOWER;
+            }
             return AuxConstants.buildOrder[rc.getNumberTowers()];  // follow the build order
+        }
         if (rc.getRoundNum() >= alwaysBuildDefenseTowerPhase)
             return UnitType.LEVEL_ONE_DEFENSE_TOWER;
 
@@ -200,17 +217,17 @@ public class Utils extends RobotPlayer {
         return true;
     }
 
-    static MapLocation int2loc(int val) {
+        static MapLocation int2loc(int val) {
         if (val == 0) {
             return null;
         }
         val -= 1;
-        return new MapLocation(val / 64, val % 64);
+        return new MapLocation(val / 60, val % 60);
     }
 
     static int loc2int(MapLocation loc) {
         if (loc == null)
             return 0;
-        return loc.x * 64 + loc.y + 1;
+        return loc.x * 60 + loc.y + 1;
     }
 }

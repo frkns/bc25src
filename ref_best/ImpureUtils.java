@@ -129,9 +129,18 @@ public class ImpureUtils extends RobotPlayer {
 
     // updates two towers now!
     static void updateNearestEnemyTower() throws GameActionException {
-        nearestEnemyTower = null;
-        sndNearestEnemyTower = null;
-        for (RobotInfo robot : nearbyRobots) {  // assumes non-defense tower
+        // nearestEnemyTower = null;
+        // sndNearestEnemyTower = null;
+        if (nearestEnemyTower != null && rc.getLocation().isWithinDistanceSquared(nearestEnemyTower, 20) && (!rc.canSenseRobotAtLocation(nearestEnemyTower) || rc.senseRobotAtLocation(nearestEnemyTower).getTeam() == rc.getTeam())) {
+            nearestEnemyTower = null;  // invalidation
+        }
+        if (sndNearestEnemyTower != null && rc.getLocation().isWithinDistanceSquared(sndNearestEnemyTower, 20) && (!rc.canSenseRobotAtLocation(sndNearestEnemyTower) || rc.senseRobotAtLocation(sndNearestEnemyTower).getTeam() == rc.getTeam())) {
+            sndNearestEnemyTower = null;  // invalidation
+        }
+        for (MapLocation tileLoc : rc.senseNearbyRuins(-1)) {  // assumes non-defense tower
+            if (!rc.canSenseRobotAtLocation(tileLoc))
+                continue;
+            RobotInfo robot = rc.senseRobotAtLocation(tileLoc);
             if (robot.getTeam() != rc.getTeam() && robot.getType().isTowerType()) {
                 MapLocation robotLoc = robot.getLocation();
                 int distanceSquared = rc.getLocation().distanceSquaredTo(robotLoc);

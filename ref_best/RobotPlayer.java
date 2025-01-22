@@ -1,4 +1,4 @@
-package ref_best;
+package ref_most_best;
 
 import battlecode.common.*;
 
@@ -68,8 +68,10 @@ public class RobotPlayer {
 
     static int siegePhase;
     static int mopperPhase;
+    static int splasherPhase;
     static int fullFillPhase;
     static int attackBasePhase;
+    static int fullAttackBasePhase;
     static int alwaysBuildDefenseTowerPhase;
 
     // not sure if self destructing is worth it, needs more testing
@@ -87,7 +89,7 @@ public class RobotPlayer {
 
     static int role = 0;  // default = 0. can assign different roles to a type e.g. 1 = base attacker
 
-    static MapLocation avgClump;  // will eventually get rid of this one, in favor of 5x5 bool map
+    // static MapLocation avgClump;  // will eventually get rid of this one, in favor of 5x5 bool map
 
     static boolean[][] nearbyAlliesMask;  // 5x5 area centered around robot
     static boolean[][] nearbyEnemiesMask;
@@ -100,6 +102,8 @@ public class RobotPlayer {
     static int reservePaintPhase;  // it is really bad to reserve paint in the first few rounds because we'll fall behind
     static int reservePaint = 100;
     static int reserveChips = 1800;
+    static int reserveMorePaintPhase;
+    static int reserveMorePaint = 500;
 
     static int mx;  // max of mapWidth and mapHeight
 
@@ -110,6 +114,18 @@ public class RobotPlayer {
     static boolean wallAdjacent = false;  // might not use this maybe bugnav potential
     static int wallRounds = 0;
     static int sqDistanceToTargetOnWallTouch = (int) 2e9;
+
+    static MapLocation fstTowerTarget;  // what tower is our tower telling us to attack?
+    static boolean fstTowerTargetIsDefense;
+    static MapLocation sndTowerTarget;  // what tower is our tower telling us to attack?
+    static boolean sndTowerTargetIsDefense;
+
+    static boolean visFstTowerTarget = false;
+    static boolean visSndTowerTarget = false;
+
+    // create an array of the 3 possible symetries for enemy spawn location
+    static MapLocation[] potentialEnemySpawnLocations = new MapLocation[3];
+    static int totalManDist;
 
     public static void run(RobotController r) throws GameActionException {
         rc = r;
@@ -144,49 +160,62 @@ public class RobotPlayer {
         if (spawnTowerLocation == null)  // it is possible that spawn tower is destroyed in the middle of the turn
             spawnTowerLocation = rc.getLocation();
 
+        AttackBase.init();
 
         mx = Math.max(mapWidth, mapHeight);  // ~60 for huge ~35 for medium
         siegePhase = (int)(mx * 3);  // cast to int, will be useful for tuning later
         fullFillPhase = (int)(mx * 3);
         mopperPhase = (int)(mx * 4);
+        splasherPhase = (int)(mx * 2.5);
         attackBasePhase = (int)(mx * 3);
+        fullAttackBasePhase = (int)(mx * 8);
         reservePaintPhase = (int)(mx * 1.5);
-        alwaysBuildDefenseTowerPhase = (int)(mx * 8);
+        reserveMorePaintPhase = (int)(mx * 10);
+        alwaysBuildDefenseTowerPhase = (int)(mx * 10);
 
-        if (rc.getRoundNum() <= 3 && mx < 30) {
-            if (spawnTowerType == UnitType.LEVEL_ONE_PAINT_TOWER) {
-                role = 1;  // on small maps send 2 to their paint tower
-            } else {
+        if (rc.getRoundNum() <= 3) {
+            System.out.println("total man distance for 3 syms : " + totalManDist);
+            if (totalManDist < 90 || mx < 33) {
+                if (spawnTowerType == UnitType.LEVEL_ONE_PAINT_TOWER) {
+                    role = 1;  // on small/med maps send 2 to their paint tower
+                } else if (totalManDist < 40) {
+                    role = 1;  // send from money tower if really close
+                }
             }
         }
+
 
         // if (mx < 30) {
         //     attackBasePhase = 0;  // may be beneficial to send immediately on small maps
         // }
 
-        if (rc.getType() == UnitType.SOLDIER && rc.getRoundNum() >= attackBasePhase) {
+        if (rc.getType() == UnitType.SOLDIER) {
             // we do divison by ~10 first because we want to send the attackers in "waves"
-            if ((rc.getRoundNum() / 10) % 3 == 0) {
+            if (Utils.isAttackingBase()) {
                 role = 1;
             }
         }
 
         switch (rc.getType()) {
-            case SOLDIER:
+            case SOLDIER: {
                 switch (role) {
                     case 1:
-                        AttackBase.init();
+                        // AttackBase.init();
                         break;
                 }
                 break;
+            }
+        }
 
-            case SPLASHER:
-                Splashers.init();
-                break;
+        if(mx < 36) {
+            AuxConstants.buildOrder[3] = UnitType.LEVEL_ONE_PAINT_TOWER;
         }
 
         while (true) {
             try {
+                Comms.readAndUpdateTowerTargets(rc.getRoundNum() - 1);
+                // Comms.readAndUpdateTowerTargets(rc.getRoundNum());
+
                 turnsAlive++;
                 roundNum = rc.getRoundNum();
 
@@ -215,6 +244,19 @@ public class RobotPlayer {
                     default: runTower(); break;
                 }
 
+                // should be ok not to update nearbyRobots because we only do one nearest enemy tower update anyways
+                for (MapLocation tileLoc : rc.senseNearbyRuins(-1)) {
+                    if (!rc.canSenseRobotAtLocation(tileLoc))
+                        continue;
+                    RobotInfo robot = rc.senseRobotAtLocation(tileLoc);
+                    if (robot.getType().isTowerType() && robot.getTeam() == rc.getTeam()
+                            && rc.canSendMessage(robot.getLocation())) {
+                        Comms.reportToTower(robot.getLocation());
+                        break;
+                    }
+                }
+
+
             } catch (GameActionException e) {
                 System.out.println("GameActionException");
                 e.printStackTrace();
@@ -230,7 +272,10 @@ public class RobotPlayer {
                 }
                 Clock.yield();
             }
+            // End of loop: go back to the top. Clock.yield() has ended, so it's time for another turn!
         }
+
+        // Your code should never reach here (unless it's intentional)! Self-destruction imminent...
     }
 
     public static void runTower() throws GameActionException {
