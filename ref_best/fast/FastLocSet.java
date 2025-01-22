@@ -1,5 +1,5 @@
 // https://github.com/chenyx512/battlecode24/blob/main/src/bot1/fast/FastLocSet.java
-package gavin.fast;
+package ref_best.fast;
 
 import battlecode.common.MapLocation;
 
