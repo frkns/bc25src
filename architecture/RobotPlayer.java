@@ -235,9 +235,9 @@ public class RobotPlayer {
                 nearbyRuins = rc.senseNearbyRuins(-1);
 
                 // Update impure
+                ImpureUtils.updateNearbyUnits();
                 ImpureUtils.updateNearestEnemyTower();
                 ImpureUtils.updateNearestPaintTower();
-                ImpureUtils.updateNearbyMask(true); // true -> Also update enemie mask
                 ImpureUtils.updateNearestEmptyRuins();
 
                 if (!rc.getType().isTowerType())
@@ -255,7 +255,7 @@ public class RobotPlayer {
                         // + ROLE_SOLDIER_ATTACK
 
                     case Role.ROLE_SOLDIER_ATTACK:
-                        ActionGetPaintWhenLow.run();
+                        ActionGetPaint.run();
 
                         // Main behavior
                         ActionCompleteTower.run();
@@ -275,7 +275,7 @@ public class RobotPlayer {
                     //------------------------------------------------------------------------------//
                     case Role.ROLE_SOLDIER:
                         // Survive
-                        ActionGetPaintWhenLow.run();
+                        ActionGetPaint.run();
 
                         // Build tower
                         ActionCompleteTower.run();
@@ -295,7 +295,7 @@ public class RobotPlayer {
                     // Mopper
                     //------------------------------------------------------------------------------//
                     case Role.ROLE_MOPPER:
-                        ActionGetPaintWhenLow.run();
+                        ActionGetPaint.run();
 
                         // Tower
                         ActionCompleteTower.run();
@@ -327,7 +327,7 @@ public class RobotPlayer {
                     // Splasher
                     //------------------------------------------------------------------------------//
                     case Role.ROLE_SPLASHER:
-                        ActionGetPaintWhenLow.run();
+                        ActionGetPaint.run();
 
                         // Can validate pattern but not complete
                         ActionCompleteTower.run();

@@ -26,7 +26,7 @@ public class Utils extends RobotPlayer {
 
             int cost = repport.numWrongTiles;
 
-            if(repport.nearestWrongEnemie != null && !isMopperNearby){
+            if(repport.nearestWrongEnemies != null && !isMopperNearby){
                 cost += 5;
             }
 
