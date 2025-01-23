@@ -42,7 +42,7 @@ public class RobotPlayer {
 
         ACTION_EXPLORE,
         ACTION_GET_PAINT,
-        ACTION_REMOVE_ENEMY_PAINT, ACTION_WAITING_FOR_ACTION
+        ACTION_REMOVE_ENEMY_PAINT, ACTION_ATTACK_SWING, ACTION_WAITING_FOR_ACTION
     }
 
     ;
@@ -210,9 +210,10 @@ public class RobotPlayer {
             }
         }
 
-        if (rc.getType() == UnitType.SOLDIER && spawnTowerType == UnitType.LEVEL_ONE_PAINT_TOWER && rc.getRoundNum() < 10) {
-            role = Role.ROLE_SOLDIER_ATTACK_RUSH;
-        }
+        // Rush early game : Harder since the spawn tower is level 2.
+        // if (rc.getType() == UnitType.SOLDIER && spawnTowerType == UnitType.LEVEL_ONE_PAINT_TOWER && rc.getRoundNum() < 10) {
+        //    role = Role.ROLE_SOLDIER_ATTACK_RUSH;
+        // }
 
 
         // Init actions
@@ -227,6 +228,13 @@ public class RobotPlayer {
 
             case Role.ROLE_SPLASHER:
                 ActionSplash.init();
+                break;
+
+            case Role.ROLE_MOPPER:
+                // Defend against rush
+                if(rc.senseNearbyRobots(-1, rc.getTeam().opponent()).length != 0){
+                    action = Action.ACTION_ATTACK_SWING;
+                }
                 break;
         }
 
@@ -328,6 +336,9 @@ public class RobotPlayer {
                         // Tower
                         ActionCompleteTower.run();
                         ActionFillRuin.run();
+
+                        // Swing
+                        ActionAttackSwing.run();
 
                         // SRP
                         ActionCompleteSRP.run();

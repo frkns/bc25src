@@ -185,15 +185,17 @@ public class Towers extends RobotPlayer {
         canSpawnSplasher = canSpawnSplasherFn();
 
         spawn = UnitType.SOLDIER;
-        if (rc.getRoundNum() >= mopperPhase) {
+        if (rc.getRoundNum() >= mopperPhase && rc.getPaint() < 700) {
             // if (rc.getRoundNum() % 5 == 0) {
             if (r < 20) {
                 spawn = UnitType.MOPPER;
             }
-        }
-
-        if(rc.getRoundNum() >= splasherPhase) {
-            if (20 <= r && r < 50) {
+        } else if (rc.getRoundNum() >= splasherPhase) {
+            if (r < 20) {
+                spawn = UnitType.MOPPER;
+            }
+            else
+            if (r < 70) {
                 spawn = UnitType.SPLASHER;
             }
         }
@@ -204,10 +206,13 @@ public class Towers extends RobotPlayer {
 
         if (nearestEnemyRobot != null && nearbyMoppers < 2) {
             // "clog will mog" reactionary mopper
-            rc.setIndicatorString("there is a enemy robot nearby, spawning mopper");
-            spawn = UnitType.MOPPER;
-            forceSpawn = true;
+            if (rc.getRoundNum() < mx * 2 || canSpawnSplasher) {
+                rc.setIndicatorString("there is a enemy robot nearby, spawning mopper");
+                spawn = UnitType.MOPPER;
+                forceSpawn = true;
+            }
         }
+
 
         // determine which tile to spawn this UnitType
         MapInfo[] nearbyDiamond = rc.senseNearbyMapInfos(4);

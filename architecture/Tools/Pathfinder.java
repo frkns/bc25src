@@ -15,6 +15,7 @@ public class Pathfinder extends RobotPlayer {
     static void tryMove(Direction dir, boolean allowAttack) throws GameActionException {
         if (dir == Direction.CENTER)
             return;
+
         if (rc.canMove(dir)) {
             rc.move(dir);
         }

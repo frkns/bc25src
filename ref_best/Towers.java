@@ -210,6 +210,7 @@ public class Towers extends RobotPlayer {
             }
         }
 
+
         // determine which tile to spawn this UnitType
         MapInfo[] nearbyDiamond = rc.senseNearbyMapInfos(4);
         int bestScore = (int) -2e9;
