@@ -1,7 +1,7 @@
 // https://github.com/chenyx512/battlecode24/blob/main/src/bot1/fast/FastLocSet.java
-package ref_best.fast;
+package gavin.fast;
 
-import battlecode.common.*;
+import battlecode.common.MapLocation;
 
 public class FastLocSet {
     public StringBuilder keys;

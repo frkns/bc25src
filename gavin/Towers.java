@@ -1,4 +1,4 @@
-package ref_best;
+package gavin;
 
 import battlecode.common.*;
 
@@ -182,17 +182,15 @@ public class Towers extends RobotPlayer {
         canSpawnSplasher = canSpawnSplasherFn();
 
         spawn = UnitType.SOLDIER;
-        if (rc.getRoundNum() >= mopperPhase && rc.getPaint() < 700) {
+        if (rc.getRoundNum() >= mopperPhase) {
             // if (rc.getRoundNum() % 5 == 0) {
             if (r < 20) {
                 spawn = UnitType.MOPPER;
             }
-        } else if (rc.getRoundNum() >= splasherPhase) {
-            if (r < 20) {
-                spawn = UnitType.MOPPER;
-            }
-            else
-            if (r < 70) {
+        }
+
+        if(rc.getRoundNum() >= splasherPhase) {
+            if (20 <= r && r < 50) {
                 spawn = UnitType.SPLASHER;
             }
         }
@@ -203,11 +201,9 @@ public class Towers extends RobotPlayer {
 
         if (nearestEnemyRobot != null && nearbyMoppers < 2) {
             // "clog will mog" reactionary mopper
-            if (rc.getRoundNum() < mx * 2 || canSpawnSplasher) {
-                rc.setIndicatorString("there is a enemy robot nearby, spawning mopper");
-                spawn = UnitType.MOPPER;
-                forceSpawn = true;
-            }
+            rc.setIndicatorString("there is a enemy robot nearby, spawning mopper");
+            spawn = UnitType.MOPPER;
+            forceSpawn = true;
         }
 
         // determine which tile to spawn this UnitType

@@ -1,9 +1,9 @@
 // Adapted from https://github.com/chenyx512/battlecode24/blob/main/src/bot1/PathFinder.java
-package ref_best;
+package gavin;
 
 import battlecode.common.*;
-
-import ref_best.fast.*;
+import gavin.fast.FastLocSet;
+import gavin.fast.FastMath;
 
 public class Pathfinder extends RobotPlayer{
 

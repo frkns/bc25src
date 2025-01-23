@@ -1,4 +1,6 @@
-package architecture;
+package architecture.Tools;
+
+import architecture.RobotPlayer;
 
 import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;

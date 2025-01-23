@@ -1,4 +1,4 @@
-package ref_best;
+package gavin;
 import battlecode.common.*;
 
 // these Utils are NOT pure functions (i.e. they modify state / change global variables, etc.)
@@ -31,7 +31,6 @@ public class ImpureUtils extends RobotPlayer {
     }
 
     static void tryUpgradeNearbyTowers() throws GameActionException {
-        if (rc.getMoney() > 3000)
         for (RobotInfo robot : nearbyRobots) {
             if (rc.canUpgradeTower(robot.getLocation())) {
                 if (rc.getMoney() < 6000) {
@@ -68,10 +67,8 @@ public class ImpureUtils extends RobotPlayer {
                 nearbyFriendlyRobots++;
                 nearbyAlliesMask[i][j] = true;
             } else if (alsoUpdateEnemies) {
-                if (robot.getPaintAmount() > 0) {  // only count enemy robots with positive paint. prevents moppers from swing at units with 0 paint
-                    nearbyEnemyRobots++;
-                    nearbyEnemiesMask[i][j] = true;
-                }
+                nearbyEnemyRobots++;
+                nearbyEnemiesMask[i][j] = true;
             }
         }
     }
@@ -86,10 +83,7 @@ public class ImpureUtils extends RobotPlayer {
                 nearestPaintTowerIsPaintTower = false;
             }
         }
-        for (MapLocation ruinLoc : rc.senseNearbyRuins(-1)) {
-            if (!rc.canSenseRobotAtLocation(ruinLoc))
-                continue;
-            RobotInfo robot = rc.senseRobotAtLocation(ruinLoc);
+        for (RobotInfo robot : nearbyRobots) {
             if (robot.getTeam() == rc.getTeam() && (robot.getType().isTowerType())) {
                 if (robot.getType().getBaseType() == UnitType.LEVEL_ONE_PAINT_TOWER) {
                     if (nearestPaintTower == null || rc.getLocation().distanceSquaredTo(robot.getLocation()) < rc
@@ -217,6 +211,7 @@ public class ImpureUtils extends RobotPlayer {
         if (cx - 2 < 0 || cy - 2 < 0 || cx + 2 >= mapWidth || cy + 2 >= mapHeight) {
             return;
         }
+
         boolean possibleSRP = true;
         for (MapInfo tile : nearbyTiles) {
             MapLocation tileLoc = tile.getMapLocation();

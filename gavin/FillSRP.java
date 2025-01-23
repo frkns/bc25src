@@ -1,6 +1,8 @@
-package ref_best;
+package gavin;
 
-import battlecode.common.*;
+import battlecode.common.GameActionException;
+import battlecode.common.MapLocation;
+import battlecode.common.PaintType;
 
 public class FillSRP extends RobotPlayer {
 

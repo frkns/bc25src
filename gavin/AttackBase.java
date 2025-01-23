@@ -1,6 +1,9 @@
-package ref_best;
+package gavin;
 
-import battlecode.common.*;
+import battlecode.common.GameActionException;
+import battlecode.common.MapInfo;
+import battlecode.common.MapLocation;
+import battlecode.common.RobotInfo;
 
 public class AttackBase extends RobotPlayer {
 
@@ -202,14 +205,12 @@ public class AttackBase extends RobotPlayer {
         boolean fullFilling = rc.getRoundNum() >= fullFillPhase;
         if (rc.getPaint() > 150 && fullFilling) {
             ImpureUtils.paintFloor();
-        }
-        if (rc.getPaint() > 150 && rc.getRoundNum() >= fullAttackBasePhase) {
-            _attackableNearbyTiles = rc.senseNearbyMapInfos(9);
-            for (MapInfo tile : _attackableNearbyTiles) {
-                if (tile.getPaint() == PaintType.EMPTY && rc.canAttack(tile.getMapLocation())) {
-                    rc.attack(tile.getMapLocation());
-                }
-            }
+            // _attackableNearbyTiles = rc.senseNearbyMapInfos(9);
+            // for (MapInfo tile : _attackableNearbyTiles) {
+            //     if (tile.getPaint() == PaintType.EMPTY && rc.canAttack(tile.getMapLocation())) {
+            //         rc.attack(tile.getMapLocation());
+            //     }
+            // }
         }
 
         if (foundLoc != null && !rc.canSenseRobotAtLocation(foundLoc)) {

@@ -1,6 +1,9 @@
-package ref_best;
+package gavin;
 
-import battlecode.common.*;
+import battlecode.common.GameActionException;
+import battlecode.common.MapLocation;
+import battlecode.common.Message;
+import battlecode.common.UnitType;
 
 
 public class Comms extends RobotPlayer {
@@ -49,8 +52,6 @@ public class Comms extends RobotPlayer {
                 sndTowerTarget = sndLoc;
                 sndTowerTargetIsDefense = sndType;
             }
-
-            break;
         }
     }
 

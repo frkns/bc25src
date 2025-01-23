@@ -1,5 +1,9 @@
-package ref_best;
-import battlecode.common.*;
+package gavin;
+
+import battlecode.common.GameActionException;
+import battlecode.common.MapLocation;
+import battlecode.common.PaintType;
+import battlecode.common.UnitType;
 
 // these Utils are pure functions - no side-effects, they don't change variables or modify game state in any way
 

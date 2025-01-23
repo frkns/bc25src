@@ -1,4 +1,4 @@
-package ref_best;
+package gavin;
 
 import battlecode.common.*;
 
@@ -167,7 +167,6 @@ public class Soldiers extends RobotPlayer {
 
             boolean noEnemyPaint = buildTowerType != null;
             if (noEnemyPaint) {
-                FillRuin.updateNearestWrongInRuin(buildTowerType);
                 HeuristicPath.moveToWrongInRuin();
                 FillRuin.updateNearestWrongInRuin(buildTowerType);
 
@@ -221,7 +220,7 @@ public class Soldiers extends RobotPlayer {
 
         if (!rc.isMovementReady()) {
             nearbyTiles = rc.senseNearbyMapInfos();
-            // ImpureUtils.updateNearestPaintTower();  // already updated at the start
+            ImpureUtils.updateNearestPaintTower();  // already updated at the start
         }
         ImpureUtils.tryMarkSRP();
 
@@ -235,27 +234,6 @@ public class Soldiers extends RobotPlayer {
             target = paintTarget;
             sqDistanceToTargetOnWallTouch = rc.getLocation().distanceSquaredTo(target);
         }
-        if (paintTarget != null && Utils.manhattanDistance(rc.getLocation(), paintTarget) > refillDistLimit && rc.getRoundNum() > attackBasePhase) {
-            isRefilling = false;  // does not actually stop the refill because the move step already happened, but unlocks other options
-        }
-
-        // dot nearby empty/ enemy ruins
-        nearbyRuins = rc.senseNearbyRuins(-1);
-        if (rc.isActionReady()) {
-            MapLocation closestDot = null;
-            for (MapLocation tileLoc : nearbyRuins) {
-                MapLocation tentativeDot = Utils.nearestEmptyOnRuinIfEnemyOrIsUndotted(tileLoc);
-                if (tentativeDot != null) {
-                    if (closestDot == null || rc.getLocation().distanceSquaredTo(tentativeDot) < rc.getLocation().distanceSquaredTo(closestDot)) {
-                        closestDot = tentativeDot;
-                    }
-                }
-            }
-            if (rc.canAttack(closestDot)) {
-                rc.attack(closestDot);
-            }
-        }
-
         wallAdjacent = false;
         for (MapInfo tile : rc.senseNearbyMapInfos(1)) {
             if (tile.isWall()) {
@@ -310,7 +288,7 @@ public class Soldiers extends RobotPlayer {
             // }
 
             rc.setIndicatorLine(rc.getLocation(), target, 131, 252, 131);
-        } /*else {
+        } else {
             // wallAdjacent = false;
             // for (MapInfo tile : rc.senseNearbyMapInfos(1)) {
             //     if (tile.isWall()) {
@@ -326,13 +304,31 @@ public class Soldiers extends RobotPlayer {
             //     wallRounds = 0;
             //     // sqDistanceToTargetOnWallTouch = (int) 2e9;
             // }
-        }*/
+        }
 
         // if (lastSRPloc != null && rc.getRoundNum() - lastSRProundNum < 25) {
         //     HeuristicPath.circleSRP();
         // }
         // ImpureUtils.tryMarkSRP();
 
+
+
+        // dot nearby empty/ enemy ruins
+        nearbyRuins = rc.senseNearbyRuins(-1);
+        if (rc.isActionReady()) {
+            MapLocation closestDot = null;
+            for (MapLocation tileLoc : nearbyRuins) {
+                MapLocation tentativeDot = Utils.nearestEmptyOnRuinIfEnemyOrIsUndotted(tileLoc);
+                if (tentativeDot != null) {
+                    if (closestDot == null || rc.getLocation().distanceSquaredTo(tentativeDot) < rc.getLocation().distanceSquaredTo(closestDot)) {
+                        closestDot = tentativeDot;
+                    }
+                }
+            }
+            if (rc.canAttack(closestDot)) {
+                rc.attack(closestDot);
+            }
+        }
 
         if (fstTowerTarget != null) {
             MapLocation tileLoc = fstTowerTarget;

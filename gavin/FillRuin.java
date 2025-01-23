@@ -1,4 +1,4 @@
-package ref_best;
+package gavin;
 
 import battlecode.common.*;
 
@@ -9,7 +9,6 @@ public class FillRuin extends RobotPlayer {
         Soldiers.numWrongTilesInRuin = 0;
         MapLocation ruinLoc = curRuin.getMapLocation();
         boolean[][] towerPattern = rc.getTowerPattern(towerType);
-        nearestWrongInRuin = null;
 
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 5; j++) {

@@ -1,4 +1,4 @@
-package ref_best;
+package gavin;
 
 import battlecode.common.*;
 
@@ -127,8 +127,6 @@ public class RobotPlayer {
     static MapLocation[] potentialEnemySpawnLocations = new MapLocation[3];
     static int totalManDist;
 
-    static int refillDistLimit = 40;  // don't refill if more than this number of manhattan units away from nearest paint tower
-
     public static void run(RobotController r) throws GameActionException {
         rc = r;
         mapHeight = rc.getMapHeight();
@@ -147,11 +145,8 @@ public class RobotPlayer {
         moneyPattern = rc.getTowerPattern(UnitType.LEVEL_ONE_MONEY_TOWER);
         defensePattern = rc.getTowerPattern(UnitType.LEVEL_ONE_DEFENSE_TOWER);
 
-        nearbyRuins = rc.senseNearbyRuins(-1);
-        for (MapLocation ruinLoc : nearbyRuins) {
-            if (!rc.canSenseRobotAtLocation(ruinLoc))
-                continue;
-            RobotInfo robot = rc.senseRobotAtLocation(ruinLoc);
+        nearbyRobots = rc.senseNearbyRobots();
+        for (RobotInfo robot : nearbyRobots) {
             if (robot.getTeam() == rc.getTeam()) {
                 if (robot.getType().isTowerType()) {
                     if (spawnTowerLocation == null || rc.getLocation().distanceSquaredTo(robot.getLocation()) < rc.getLocation().distanceSquaredTo(spawnTowerLocation)) {
@@ -171,7 +166,7 @@ public class RobotPlayer {
         siegePhase = (int)(mx * 3);  // cast to int, will be useful for tuning later
         fullFillPhase = (int)(mx * 3);
         mopperPhase = (int)(mx * 4);
-        splasherPhase = (int)(mx * 2);
+        splasherPhase = (int)(mx * 2.5);
         attackBasePhase = (int)(mx * 3);
         fullAttackBasePhase = (int)(mx * 8);
         reservePaintPhase = (int)(mx * 1.5);
@@ -180,10 +175,10 @@ public class RobotPlayer {
 
         if (rc.getRoundNum() <= 3) {
             System.out.println("total man distance for 3 syms : " + totalManDist);
-            if (totalManDist < 50 || mx < 33) {
+            if (totalManDist < 90 || mx < 33) {
                 if (spawnTowerType == UnitType.LEVEL_ONE_PAINT_TOWER) {
                     role = 1;  // on small/med maps send 2 to their paint tower
-                } else if (totalManDist < 30) {
+                } else if (totalManDist < 40) {
                     role = 1;  // send from money tower if really close
                 }
             }

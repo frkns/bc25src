@@ -1,7 +1,8 @@
 // https://github.com/maxwelljones14/BattleCode2023/blob/main/src/MPWorking/Debug.java
-package ref_best;
+package gavin;
 
-import battlecode.common.*;
+import battlecode.common.GameActionException;
+import battlecode.common.MapLocation;
 
 /**
  * Utilizes the robot's indicator string to display debug information
