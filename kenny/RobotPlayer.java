@@ -1,4 +1,4 @@
-package ref_best;
+package kenny;
 
 import battlecode.common.*;
 
