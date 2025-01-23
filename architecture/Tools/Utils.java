@@ -16,24 +16,22 @@ public class Utils extends RobotPlayer {
         boolean isMopperNearby = false;
         for(RobotInfo ally: rc.senseNearbyRobots(ruinLoc, 36, rc.getTeam())){
             switch (ally.type){
-                case UnitType.SOLDIER:
-                    break;
                 case UnitType.MOPPER: isMopperNearby = true; break;
             }
         }
 
 
         for(UnitType tower: TOWERS){
-            PatternReport report = CheckPattern.analyseTowerPatern(ruinLoc, tower);
+            PatternReport repport = CheckPattern.analyseTowerPatern(ruinLoc, tower);
 
-            int cost = report.numWrongTiles;
+            int cost = repport.numWrongTiles;
 
-            if(report.nearestWrongEnemies != null && !isMopperNearby){
+            if(repport.nearestWrongEnemie != null && !isMopperNearby){
                 cost += 5;
             }
 
             if(tower == AuxConstants.buildOrder[rc.getNumberTowers()]){
-                cost -= 5;
+                cost -= 7;
             }
 
             if(cost < minCost){
