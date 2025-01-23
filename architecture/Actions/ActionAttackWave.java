@@ -107,7 +107,6 @@ public class ActionAttackWave extends RobotPlayer {
 
         } else {
             // Explore next possible loc
-
             Pathfinder.move(nextLocToExplore);
         }
     }

@@ -234,7 +234,6 @@ public class RobotPlayer {
 
                 if (!rc.getType().isTowerType())
                     ImpureUtils.updateNearestPaintTower();
-                ActionHelpSignal.remove(); // Remove help at start of turn.
 
                 // Plays actions
                 Debug.println("Start of actions   : as " + role.name() + " " + action.name());
@@ -278,8 +277,6 @@ public class RobotPlayer {
                         ActionFillSRP.run();
                         ActionMarkSRP.run();
 
-                        // End of turn update.
-                        // ActionMarkSRP.updateScores();
                         break;
 
 
@@ -340,10 +337,7 @@ public class RobotPlayer {
 
                     default:
                         Debug.println("No role corresponding to " + role.name());
-
                 }
-
-                ActionHelpSignal.run(); // Place MARK2 under unit to call help if needed.
                 Debug.println("End of actions     : with " + action.name());
 
                 if (action == Action.ACTION_WAITING_FOR_ACTION) {
@@ -370,10 +364,9 @@ public class RobotPlayer {
                 Clock.yield();
             }
 
-            if (rc.getRoundNum() > 200) {
+            if (rc.getRoundNum() > 1000) {
                 rc.resign();
             }
-
         }
     }
 }

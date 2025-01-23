@@ -5,12 +5,12 @@ import architecture.Tools.*;
 import battlecode.common.*;
 
 public class ActionFillRuin extends RobotPlayer {
-    static PatternReport repport;
+    static PatternReport report;
 
     static boolean canHelp() {
         return switch (rc.getType()) {
-            case UnitType.SOLDIER -> repport.nearestWrongPaint != null && rc.getPaint() >= 5;
-            case UnitType.MOPPER -> repport.nearestWrongEnemies != null;
+            case UnitType.SOLDIER -> report.nearestWrongPaint != null && rc.getPaint() >= 5;
+            case UnitType.MOPPER -> report.nearestWrongEnemies != null;
             default -> false;
         };
     }
@@ -46,7 +46,7 @@ public class ActionFillRuin extends RobotPlayer {
             return;
         }
 
-        repport = CheckPattern.analyseTowerPatern(nearestEmptyRuin, towerType);
+        report = CheckPattern.analyseTowerPatern(nearestEmptyRuin, towerType);
 
         // Check if I can help
         if(canHelp() == false){
@@ -62,10 +62,9 @@ public class ActionFillRuin extends RobotPlayer {
         Debug.println("\t0 - ACTION_FILL_RUIN     : Playing!");
         action = Action.ACTION_FILL_RUINS;
 
-        Pathfinder.move(nearestEmptyRuin);
         MapLocation target = switch (rc.getType()){
-            case UnitType.SOLDIER -> repport.nearestWrongPaint;
-            case UnitType.MOPPER -> repport.nearestWrongEnemies;
+            case UnitType.SOLDIER -> report.nearestWrongPaint;
+            case UnitType.MOPPER -> report.nearestWrongEnemies;
             default -> null;
         };
 
@@ -86,9 +85,9 @@ public class ActionFillRuin extends RobotPlayer {
         Pathfinder.move(target);
         if (rc.canAttack(target)) {
             rc.attack(target, useSecondary);
-            repport.numWrongTiles--;
+            report.numWrongTiles--;
 
-            if (repport.numWrongTiles == 0) {
+            if (report.numWrongTiles == 0) {
                 action = Action.ACTION_COMPLETE_TOWER;
             }else{
                 action = Action.ACTION_FILL_RUINS;

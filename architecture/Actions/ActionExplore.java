@@ -62,15 +62,6 @@ public class ActionExplore extends RobotPlayer {
 
         Debug.println("\t0 - ACTION_EXPLORE       : Playing!");
 
-        // Check for help signal
-        for (RobotInfo ally : rc.senseNearbyRobots(-1, rc.getTeam())) {
-            MapLocation loc = ally.getLocation();
-            if (rc.senseMapInfo(loc).getMark() == PaintType.ALLY_SECONDARY) {
-                Debug.println("\t\tHelp signal found at " + loc);
-                target = loc;
-            }
-        }
-
         if (target == null
                 || rc.getLocation().isWithinDistanceSquared(target, 9)
                 || rc.getRoundNum() - lastTargetChangeRound > targetChangeWaitTime) {

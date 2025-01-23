@@ -102,8 +102,6 @@ public class ActionFillSRP extends RobotPlayer {
         Debug.println("\tX - ACTION_FILL_SRP      : Playing!");
         RobotPlayer.action = Action.ACTION_FILL_SRP;
 
-        Pathfinder.move(target);
-
         // Calculate paint type to use
         boolean[][] towerPattern = rc.getResourcePattern();
         int delta_x = curSRP.x - target.x;
