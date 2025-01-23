@@ -68,7 +68,7 @@ public class ActionMarkSRP extends RobotPlayer {
         Debug.println("\t\tUpdating scores.");
         for (MapInfo info : rc.senseNearbyMapInfos()) {
 
-            if (Clock.getBytecodesLeft() < 7000) {
+            if (Clock.getBytecodesLeft() < 9000) {
                 Debug.println("\tW - ACTION_MARK_SRP      : Need more time to update. Skipping to next action.");
 
                 if(action == Action.ACTION_MARK_SRP) {

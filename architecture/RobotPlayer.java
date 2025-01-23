@@ -287,7 +287,7 @@ public class RobotPlayer {
                         ActionMarkSRP.run();
 
                         // End of turn update.
-                        ActionMarkSRP.updateScores();
+                        // ActionMarkSRP.updateScores();
                         break;
 
 

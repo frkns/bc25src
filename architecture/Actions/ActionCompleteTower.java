@@ -47,17 +47,6 @@ public class ActionCompleteTower extends RobotPlayer {
             return;
         }
 
-        // Can build or havent any paint so wait tower
-        if (!rc.canCompleteTowerPattern(tower, nearestEmptyRuin)) {
-            if (rc.getPaint() < 30) {
-                action = Action.ACTION_WAIT_COMPLETE_TOWER;
-            } else {
-                Debug.println("\tX - ACTION_COMPLETE_TOWER: Can't complete pattern and have paint -> move something else");
-                checked.set(nearestEmptyRuin, (char) rc.getRoundNum());
-                action = Action.ACTION_WAITING_FOR_ACTION;
-                return;
-            }
-        }
 
         PatternReport report = CheckPattern.analyseTowerPatern(nearestEmptyRuin, tower);
 
@@ -67,6 +56,18 @@ public class ActionCompleteTower extends RobotPlayer {
             checked.set(nearestEmptyRuin, (char) rc.getRoundNum());
             action = Action.ACTION_WAITING_FOR_ACTION;
             return;
+        }
+
+        // Have enought chips
+        if(rc.getChips() < 1000) {
+            if (rc.getPaint() < 30) {
+                action = Action.ACTION_WAIT_COMPLETE_TOWER;
+            } else {
+                Debug.println("\tX - ACTION_COMPLETE_TOWER: Not enought chips, continue something else");
+                checked.set(nearestEmptyRuin, (char) rc.getRoundNum());
+                action = Action.ACTION_WAITING_FOR_ACTION;
+                return;
+            }
         }
 
         // No one is nearby

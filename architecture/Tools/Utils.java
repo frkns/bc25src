@@ -6,7 +6,7 @@ import battlecode.common.*;
 // these Utils are pure functions - no side-effects, they don't change variables or modify game state in any way
 
 public class Utils extends RobotPlayer {
-    public static UnitType[] TOWERS = {UnitType.LEVEL_ONE_PAINT_TOWER, UnitType.LEVEL_ONE_DEFENSE_TOWER, UnitType.LEVEL_ONE_PAINT_TOWER};
+    public static UnitType[] TOWERS = {UnitType.LEVEL_ONE_PAINT_TOWER, UnitType.LEVEL_ONE_DEFENSE_TOWER, UnitType.LEVEL_ONE_MONEY_TOWER};
 
     public static UnitType getBuildType(MapLocation ruinLoc) throws GameActionException {
         int minCost = 1000;
@@ -31,7 +31,7 @@ public class Utils extends RobotPlayer {
             }
 
             if(tower == AuxConstants.buildOrder[rc.getNumberTowers()]){
-                cost -= 7;
+                cost -= 10;
             }
 
             if(cost < minCost){

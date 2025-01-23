@@ -8,7 +8,7 @@ import battlecode.common.*;
 public class ImpureUtils extends RobotPlayer {
     public static void updateNearestEmptyRuins() throws GameActionException{
         nearestEmptyRuin = null;
-        int minDistance = 36000;
+        int minDistance = 3600;
 
         for(MapLocation ruin: nearbyRuins){
             if(!rc.canSenseRobotAtLocation(ruin)){
