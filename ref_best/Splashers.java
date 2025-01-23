@@ -1,7 +1,7 @@
-package kenny;
+package ref_best;
 
 import battlecode.common.*;
-import kenny.Pathfinder;
+import ref_best.Pathfinder;
 
 public class Splashers extends RobotPlayer{
 

@@ -1,4 +1,4 @@
-package kenny;
+package tempi;
 
 import battlecode.common.*;
 
@@ -129,11 +129,8 @@ public class RobotPlayer {
 
     static int refillDistLimit = 40;  // don't refill if more than this number of manhattan units away from nearest paint tower
 
-    static int birthRound;
-
     public static void run(RobotController r) throws GameActionException {
         rc = r;
-        birthRound = rc.getRoundNum();
         mapHeight = rc.getMapHeight();
         mapWidth = rc.getMapWidth();
         mapCenter = new MapLocation(mapWidth/2, mapHeight/2);
@@ -150,7 +147,7 @@ public class RobotPlayer {
         moneyPattern = rc.getTowerPattern(UnitType.LEVEL_ONE_MONEY_TOWER);
         defensePattern = rc.getTowerPattern(UnitType.LEVEL_ONE_DEFENSE_TOWER);
 
-        nearbyRuins = rc.senseNearbyRuins(4);
+        nearbyRuins = rc.senseNearbyRuins(-1);
         for (MapLocation ruinLoc : nearbyRuins) {
             if (!rc.canSenseRobotAtLocation(ruinLoc))
                 continue;
@@ -168,11 +165,6 @@ public class RobotPlayer {
         if (spawnTowerLocation == null)  // it is possible that spawn tower is destroyed in the middle of the turn
             spawnTowerLocation = rc.getLocation();
 
-        if (spawnTowerType == UnitType.LEVEL_ONE_MONEY_TOWER
-                && rc.canCompleteTowerPattern(UnitType.LEVEL_ONE_MONEY_TOWER, spawnTowerLocation)) {
-            rc.completeTowerPattern(UnitType.LEVEL_ONE_MONEY_TOWER, spawnTowerLocation);
-        }
-
         AttackBase.init();
 
         mx = Math.max(mapWidth, mapHeight);  // ~60 for huge ~35 for medium
@@ -186,18 +178,24 @@ public class RobotPlayer {
         reserveMorePaintPhase = (int)(mx * 10);
         alwaysBuildDefenseTowerPhase = (int)(mx * 10);
 
-
-        if (rc.getType() == UnitType.SOLDIER) {
-            if (rc.getRoundNum() <= 3) {
-                System.out.println("total man distance for 3 syms : " + totalManDist);
-                if (totalManDist < 50 || mx < 33) {
-                    if (spawnTowerType == UnitType.LEVEL_ONE_PAINT_TOWER) {
-                        role = 1;  // on small/med maps send 2 to their paint tower
-                    } else if (totalManDist < 30) {
-                        role = 1;  // send from money tower if really close
-                    }
+        if (rc.getRoundNum() <= 3) {
+            System.out.println("total man distance for 3 syms : " + totalManDist);
+            if (totalManDist < 50 || mx < 33) {
+                if (spawnTowerType == UnitType.LEVEL_ONE_PAINT_TOWER) {
+                    role = 1;  // on small/med maps send 2 to their paint tower
+                } else if (totalManDist < 30) {
+                    role = 1;  // send from money tower if really close
                 }
             }
+        }
+
+
+        // if (mx < 30) {
+        //     attackBasePhase = 0;  // may be beneficial to send immediately on small maps
+        // }
+
+        if (rc.getType() == UnitType.SOLDIER) {
+            // we do divison by ~10 first because we want to send the attackers in "waves"
             if (Utils.isAttackingBase()) {
                 role = 1;
             }

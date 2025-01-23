@@ -1,7 +1,6 @@
-package kenny;
+package gavin_jan22_531_MST;
 
 import battlecode.common.*;
-import kenny.Pathfinder;
 
 public class Splashers extends RobotPlayer{
 
@@ -11,23 +10,10 @@ public class Splashers extends RobotPlayer{
     static int lastTargetChangeRound = 0;
 
     public static void run() throws GameActionException {
-        // nearest paint tower is updated by default
-        ImpureUtils.updateNearbyMask(false);
+        ImpureUtils.updateNearbyMask(true);
         ImpureUtils.updateNearestEnemyTower();
         ImpureUtils.updateNearestEnemyPaint();
 
-        if (fstTowerTarget != null) {
-            MapLocation tileLoc = fstTowerTarget;
-            if (rc.getLocation().isWithinDistanceSquared(tileLoc, 20)) {
-                visFstTowerTarget = true;
-            }
-        }
-        if (sndTowerTarget != null) {
-            MapLocation tileLoc = sndTowerTarget;
-            if (rc.getLocation().isWithinDistanceSquared(tileLoc, 20)) {
-                visSndTowerTarget = true;
-            }
-        }
 
         isRefilling = rc.getPaint() < 100;
         MapLocation paintTarget = nearestPaintTower;
@@ -56,16 +42,9 @@ public class Splashers extends RobotPlayer{
         }
 
         if (isRefilling && target != null) {
-            // if (Utils.manhattanDistance(rc.getLocation(), target) > 50)
-            // Pathfinder.move(target);
-            // else
             HeuristicPath.refill(target);  // 1.
             return;
         }
-
-        // if (nearestPaintTower != null && Utils.manhattanDistance(rc.getLocation(), nearestPaintTower) > refillDistLimit) {
-        //     isRefilling = false;
-        // }
 
         if (target == null
                 || rc.getLocation().isWithinDistanceSquared(target, 9)
@@ -74,20 +53,15 @@ public class Splashers extends RobotPlayer{
             lastTargetChangeRound = rc.getRoundNum();
         }
 
-        if (rc.isMovementReady()) {
-            // if (nearestEnemyTower != null) {
-                HeuristicPath.splasherMove(target);
-            // } else {
-                // Pathfinder.move(target);
-            // }
-        }
+        if (rc.isMovementReady())
+            HeuristicPath.splasherMove(target);
 
         // find best attack location
 
-        int scoreThreshold = 1200;  // score must reach this number in order to be considered
+        int scoreThreshold = 1100;  // score must reach this number in order to be considered
 
-        int[] locScores = new int[9];
-        MapLocation[] locs = new MapLocation[9];  // locations to splash, it should form a diamond, updated to include center
+        int[] locScores = new int[8];
+        MapLocation[] locs = new MapLocation[8];  // locations to splash, it should form a diamond
 
         for (int i = 8; i-- > 0;) {
             Direction dir = directions[i];
@@ -101,11 +75,6 @@ public class Splashers extends RobotPlayer{
             }
         }
 
-        locs[8] = rc.getLocation();  // center
-        if (!rc.canAttack(rc.getLocation())) {
-            locScores[8] = (int) -2e9;  // if we can't attack it set it to -inf
-        }
-
         nearbyTiles = rc.senseNearbyMapInfos(18);
         for (MapInfo tile : nearbyTiles) {
             if (tile.isWall())
@@ -113,11 +82,10 @@ public class Splashers extends RobotPlayer{
 
             MapLocation tileLoc = tile.getMapLocation();
             if (rc.canSenseRobotAtLocation(tileLoc)) {
-                RobotInfo robot = rc.senseRobotAtLocation(tileLoc);
-                if (robot.getTeam() != rc.getTeam() && robot.getType().isTowerType()) {
-                    for (int i = 9; i-- > 0;) {
-                        if (locs[i].isWithinDistanceSquared(tileLoc, /*2*/4)) {
-                            locScores[i] += 1500;  // add score for being able to hit an enemy tower
+                if (rc.senseRobotAtLocation(tileLoc).getTeam() != rc.getTeam()) {
+                    for (int i = 8; i-- > 0;) {
+                        if (locs[i].isWithinDistanceSquared(tileLoc, 2)) {
+                            locScores[i] += 500;  // add score for being able to hit an enemy tower
                         }
                     }
                 }
@@ -128,21 +96,15 @@ public class Splashers extends RobotPlayer{
                 continue;
 
             if (tile.getPaint().isEnemy()) {
-                for (int i = 9; i-- > 0;) {
+                for (int i = 8; i-- > 0;) {
                     if (locs[i].isWithinDistanceSquared(tileLoc, 2)) {
                         locScores[i] += 200;  // add score for being able to paint over enemy paint
-                        if (rc.canSenseRobotAtLocation(tileLoc)) {
-                            locScores[i] += 50;  // if there is a robot there (on either team) add some score
-                        }
                     }
                 }
             } else if (tile.getPaint() == PaintType.EMPTY) {
-                for (int i = 9; i-- > 0;) {
+                for (int i = 8; i-- > 0;) {
                     if (locs[i].isWithinDistanceSquared(tileLoc, 4)) {
                         locScores[i] += 100;  // add score for painting neutral
-                        if (rc.canSenseRobotAtLocation(tileLoc)) {
-                            locScores[i] += 50;  // if there is a robot there (on either team) add some score
-                        }
                     }
                 }
             }
@@ -150,7 +112,7 @@ public class Splashers extends RobotPlayer{
 
         int mxScore = scoreThreshold;
         MapLocation mxLoc = null;
-        for (int i = 9; i-- > 0;) {
+        for (int i = 8; i-- > 0;) {
             if (locScores[i] >= mxScore) {
                 mxScore = locScores[i];
                 mxLoc = locs[i];

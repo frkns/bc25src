@@ -1,4 +1,4 @@
-package kenny;
+package tempi;
 
 import battlecode.common.*;
 
@@ -39,12 +39,12 @@ public class Comms extends RobotPlayer {
             sndLoc = snd == 0 ? null : Comms.intToLoc(snd);
 
 
-            if (fstLoc != null && fstLoc.equals(fstTowerTarget) && fstLoc.equals(sndTowerTarget)) {
+            if (fstLoc != null && fstLoc != fstTowerTarget && fstLoc != sndTowerTarget) {
                 visFstTowerTarget = false;
                 fstTowerTarget = fstLoc;
                 fstTowerTargetIsDefense = fstType;
             }
-            if (sndLoc != null && sndLoc.equals(fstTowerTarget) && sndLoc.equals(sndTowerTarget)) {
+            if (sndLoc != null && sndLoc != fstTowerTarget && sndLoc != sndTowerTarget) {
                 visSndTowerTarget = false;
                 sndTowerTarget = sndLoc;
                 sndTowerTargetIsDefense = sndType;

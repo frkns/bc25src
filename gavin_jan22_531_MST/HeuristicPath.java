@@ -1,4 +1,4 @@
-package kenny;
+package gavin_jan22_531_MST;
 
 import battlecode.common.*;
 
@@ -157,7 +157,7 @@ public class HeuristicPath extends RobotPlayer {
                 minDir = directions[i];
             }
         }
-        if (minDir != null && rc.canMove(minDir))  // because of negative costs, we have to put canMove check
+        if (minDir != null)
             rc.move(minDir);
     }
 
@@ -297,14 +297,12 @@ public class HeuristicPath extends RobotPlayer {
             if (nearestWrongInRuin != null) {
                 // add cost for moving in a direction that gets us further away from nearest
                 // empty tile
-                directionCost[i] += Math.max(9, newLoc.distanceSquaredTo(nearestWrongInRuin)) * 1500;
+                directionCost[i] += Math.max(9, newLoc.distanceSquaredTo(nearestWrongInRuin)) * 1000;
             }
 
             if (ruinLoc != null) {
                 // add cost for moving in a direction that gets us further away from target
                 directionCost[i] += Utils.manhattanDistance(newLoc, ruinLoc) * 500;
-                if (Soldiers.numWrongTilesInRuin < 2)
-                    directionCost[i] += Utils.manhattanDistance(newLoc, ruinLoc) * 1000;
             }
 
             // add cost for moving in a direction that gets us gets us closer to a clump (-)
@@ -819,19 +817,11 @@ public class HeuristicPath extends RobotPlayer {
             // add a cost for moving in range of an enemy tower
             if (nearestEnemyTower != null && newLoc.isWithinDistanceSquared(nearestEnemyTower,
                     nearestEnemyTowerType == UnitType.LEVEL_ONE_DEFENSE_TOWER ? 16 : 9)) {  // account for defense tower range
-                directionCost[i] += 300000;
+                directionCost[i] += 30000;
             }
             if (sndNearestEnemyTower != null && newLoc.isWithinDistanceSquared(sndNearestEnemyTower,
                     sndNearestEnemyTowerType == UnitType.LEVEL_ONE_DEFENSE_TOWER ? 16 : 9)) {
-                directionCost[i] += 300000;
-            }
-
-            if (nearestEnemyTower != null && nearestEnemyTowerType != UnitType.LEVEL_ONE_DEFENSE_TOWER) {
-                if (rc.getActionCooldownTurns() < 20)
-                if (newLoc.isWithinDistanceSquared(nearestEnemyTower, 16)) {
-                    rc.setIndicatorLine(newLoc, nearestEnemyTower, 255, 0, 255);
-                    directionCost[i] -= 6000;
-                }
+                directionCost[i] += 30000;
             }
 
             // bug nav?
@@ -855,19 +845,16 @@ public class HeuristicPath extends RobotPlayer {
             directionCost[i] += Utils.manhattanDistance(newLoc, targetLoc) * 500;
 
             // add cost for moving in a direction that gets us further away from enemyPaint,
-            if (rc.getRoundNum() < fullFillPhase)
             if (nearestEnemyPaint != null) {
-                directionCost[i] += Math.max(1, Utils.manhattanDistance(newLoc, nearestEnemyPaint)) * 700;
+                directionCost[i] += Math.max(1, Utils.manhattanDistance(newLoc, nearestEnemyPaint)) * 1000;
             }
 
             // try to attack the target our towers tell us to
-            // if (rc.getRoundNum() >= fullAttackBasePhase && role == 1) {
-            if (rc.getID() % 10 < 7) {
+            if (rc.getRoundNum() >= fullAttackBasePhase && role == 1) {
                 MapLocation tentativeTarget = Utils.chooseTowerTarget();
                 if (tentativeTarget != null)
-                    directionCost[i] += Utils.manhattanDistance(newLoc, tentativeTarget) * 1500;
+                    directionCost[i] += Utils.manhattanDistance(newLoc, tentativeTarget) * 500;
             }
-            // }
 
             // good anti clumping
             int maskx = dir.dx + 2;

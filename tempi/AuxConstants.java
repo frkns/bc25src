@@ -1,4 +1,4 @@
-package kenny;
+package tempi;
 import battlecode.common.*;
 
 
@@ -12,7 +12,6 @@ public class AuxConstants extends RobotPlayer {
         UnitType.LEVEL_ONE_MONEY_TOWER,
         UnitType.LEVEL_ONE_MONEY_TOWER,
         UnitType.LEVEL_ONE_MONEY_TOWER,
-        UnitType.LEVEL_ONE_MONEY_TOWER,
         UnitType.LEVEL_ONE_PAINT_TOWER,
         UnitType.LEVEL_ONE_MONEY_TOWER,
         UnitType.LEVEL_ONE_MONEY_TOWER,
@@ -26,8 +25,8 @@ public class AuxConstants extends RobotPlayer {
         UnitType.LEVEL_ONE_MONEY_TOWER,
         UnitType.LEVEL_ONE_MONEY_TOWER,
         UnitType.LEVEL_ONE_PAINT_TOWER,
-        UnitType.LEVEL_ONE_MONEY_TOWER,
-        UnitType.LEVEL_ONE_MONEY_TOWER,
+        UnitType.LEVEL_ONE_PAINT_TOWER,
+        UnitType.LEVEL_ONE_PAINT_TOWER,
 
         UnitType.LEVEL_ONE_DEFENSE_TOWER,
         UnitType.LEVEL_ONE_DEFENSE_TOWER,

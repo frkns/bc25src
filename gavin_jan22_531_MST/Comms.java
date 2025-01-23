@@ -1,6 +1,9 @@
-package kenny;
+package gavin_jan22_531_MST;
 
-import battlecode.common.*;
+import battlecode.common.GameActionException;
+import battlecode.common.MapLocation;
+import battlecode.common.Message;
+import battlecode.common.UnitType;
 
 
 public class Comms extends RobotPlayer {
@@ -39,18 +42,16 @@ public class Comms extends RobotPlayer {
             sndLoc = snd == 0 ? null : Comms.intToLoc(snd);
 
 
-            if (fstLoc != null && fstLoc.equals(fstTowerTarget) && fstLoc.equals(sndTowerTarget)) {
+            if (fstLoc != null && fstLoc != fstTowerTarget && fstLoc != sndTowerTarget) {
                 visFstTowerTarget = false;
                 fstTowerTarget = fstLoc;
                 fstTowerTargetIsDefense = fstType;
             }
-            if (sndLoc != null && sndLoc.equals(fstTowerTarget) && sndLoc.equals(sndTowerTarget)) {
+            if (sndLoc != null && sndLoc != fstTowerTarget && sndLoc != sndTowerTarget) {
                 visSndTowerTarget = false;
                 sndTowerTarget = sndLoc;
                 sndTowerTargetIsDefense = sndType;
             }
-
-            break;
         }
     }
 

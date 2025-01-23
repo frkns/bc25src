@@ -1,4 +1,4 @@
-package kenny;
+package ref_best;
 import battlecode.common.*;
 
 // these Utils are NOT pure functions (i.e. they modify state / change global variables, etc.)

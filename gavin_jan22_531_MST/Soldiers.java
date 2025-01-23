@@ -1,4 +1,4 @@
-package kenny;
+package gavin_jan22_531_MST;
 
 import battlecode.common.*;
 
@@ -72,6 +72,7 @@ public class Soldiers extends RobotPlayer {
 
         // ImpureUtils.updateNearbyUnits();  // pending removal
 
+        ImpureUtils.tryUpgradeNearbyTowers();
         ImpureUtils.updateNearbyMask(false);
 
         // if (Utils.selfDestructRequirementsMet()) {
@@ -99,8 +100,8 @@ public class Soldiers extends RobotPlayer {
             curRuin = null;
         }
 
-        ImpureUtils.tryUpgradeNearbyTowers();
-        // nearbyRuins = rc.senseNearbyRuins(-1);  // keep updated for SRP as well
+
+        nearbyRuins = rc.senseNearbyRuins(-1);  // keep updated for SRP as well
         if (!isRefilling && rc.getNumberTowers() != GameConstants.MAX_NUMBER_OF_TOWERS) {
             int distance = (int)2e9;
             for (MapLocation tileLoc : nearbyRuins) {
@@ -117,10 +118,6 @@ public class Soldiers extends RobotPlayer {
                 // }
             }
         }
-
-
-
-
         if (rc.getNumberTowers() == GameConstants.MAX_NUMBER_OF_TOWERS) {
             isFillingRuin = false;
         }
@@ -170,7 +167,6 @@ public class Soldiers extends RobotPlayer {
 
             boolean noEnemyPaint = buildTowerType != null;
             if (noEnemyPaint) {
-                FillRuin.updateNearestWrongInRuin(buildTowerType);
                 HeuristicPath.moveToWrongInRuin();
                 FillRuin.updateNearestWrongInRuin(buildTowerType);
 
@@ -221,26 +217,10 @@ public class Soldiers extends RobotPlayer {
             }
         }
 
-        // dot nearby empty/ enemy ruins
-        nearbyRuins = rc.senseNearbyRuins(-1);
-        if (rc.isActionReady()) {
-            MapLocation closestDot = null;
-            for (MapLocation tileLoc : nearbyRuins) {
-                MapLocation tentativeDot = Utils.nearestEmptyOnRuinIfEnemyOrIsUndotted(tileLoc);
-                if (tentativeDot != null) {
-                    if (closestDot == null || rc.getLocation().distanceSquaredTo(tentativeDot) < rc.getLocation().distanceSquaredTo(closestDot)) {
-                        closestDot = tentativeDot;
-                    }
-                }
-            }
-            if (rc.canAttack(closestDot)) {
-                rc.attack(closestDot);
-            }
-        }
 
         if (!rc.isMovementReady()) {
             nearbyTiles = rc.senseNearbyMapInfos();
-            // ImpureUtils.updateNearestPaintTower();  // already updated at the start
+            ImpureUtils.updateNearestPaintTower();  // already updated at the start
         }
         ImpureUtils.tryMarkSRP();
 
@@ -254,11 +234,6 @@ public class Soldiers extends RobotPlayer {
             target = paintTarget;
             sqDistanceToTargetOnWallTouch = rc.getLocation().distanceSquaredTo(target);
         }
-        if (paintTarget != null && Utils.manhattanDistance(rc.getLocation(), paintTarget) > refillDistLimit && rc.getRoundNum() > attackBasePhase) {
-            isRefilling = false;  // does not actually stop the refill because the move step already happened, but unlocks other options
-        }
-
-
         wallAdjacent = false;
         for (MapInfo tile : rc.senseNearbyMapInfos(1)) {
             if (tile.isWall()) {
@@ -313,7 +288,7 @@ public class Soldiers extends RobotPlayer {
             // }
 
             rc.setIndicatorLine(rc.getLocation(), target, 131, 252, 131);
-        } /*else {
+        } else {
             // wallAdjacent = false;
             // for (MapInfo tile : rc.senseNearbyMapInfos(1)) {
             //     if (tile.isWall()) {
@@ -329,13 +304,31 @@ public class Soldiers extends RobotPlayer {
             //     wallRounds = 0;
             //     // sqDistanceToTargetOnWallTouch = (int) 2e9;
             // }
-        }*/
+        }
 
         // if (lastSRPloc != null && rc.getRoundNum() - lastSRProundNum < 25) {
         //     HeuristicPath.circleSRP();
         // }
         // ImpureUtils.tryMarkSRP();
 
+
+
+        // dot nearby empty/ enemy ruins
+        nearbyRuins = rc.senseNearbyRuins(-1);
+        if (rc.isActionReady()) {
+            MapLocation closestDot = null;
+            for (MapLocation tileLoc : nearbyRuins) {
+                MapLocation tentativeDot = Utils.nearestEmptyOnRuinIfEnemyOrIsUndotted(tileLoc);
+                if (tentativeDot != null) {
+                    if (closestDot == null || rc.getLocation().distanceSquaredTo(tentativeDot) < rc.getLocation().distanceSquaredTo(closestDot)) {
+                        closestDot = tentativeDot;
+                    }
+                }
+            }
+            if (rc.canAttack(closestDot)) {
+                rc.attack(closestDot);
+            }
+        }
 
         if (fstTowerTarget != null) {
             MapLocation tileLoc = fstTowerTarget;

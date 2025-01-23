@@ -1,4 +1,4 @@
-package kenny;
+package gavin_jan22_531_MST;
 
 import battlecode.common.*;
 
@@ -125,6 +125,9 @@ public class Moppers extends RobotPlayer {
                 bestAttackTarget = tileLoc;
             }
         }
+        if (bestAttackTarget != null) {
+            rc.attack(bestAttackTarget);
+        }
 
         ImpureUtils.updateNearbyMask(true);
 
@@ -195,17 +198,8 @@ public class Moppers extends RobotPlayer {
         // assert (rc.canMopSwing(Direction.WEST));
         // }
 
-        // must be able to hit ~2 robots with sweep for it to trigger
-
-        if (bestSwingScore >= 3 && rc.canMopSwing(bestSwingDir)) {
-            rc.mopSwing(bestSwingDir);
-            rc.setIndicatorDot(rc.getLocation().add(bestSwingDir), 255, 255, 255);
-            rc.setIndicatorDot(rc.getLocation().add(bestSwingDir).add(bestSwingDir), 255, 255, 255);
-        } else
-        if (bestAttackTarget != null) {
-            rc.attack(bestAttackTarget);
-        } else
-        if (bestSwingScore >= 1 && rc.canMopSwing(bestSwingDir)) {
+        // must be able to hit 2 robots with sweep for it to trigger
+        if (bestSwingScore >= 2 && rc.canMopSwing(bestSwingDir)) {
             rc.mopSwing(bestSwingDir);
             rc.setIndicatorDot(rc.getLocation().add(bestSwingDir), 255, 255, 255);
             rc.setIndicatorDot(rc.getLocation().add(bestSwingDir).add(bestSwingDir), 255, 255, 255);

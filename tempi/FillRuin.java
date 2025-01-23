@@ -1,4 +1,4 @@
-package kenny;
+package tempi;
 
 import battlecode.common.*;
 

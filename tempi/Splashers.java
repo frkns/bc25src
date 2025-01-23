@@ -1,7 +1,7 @@
-package kenny;
+package tempi;
 
 import battlecode.common.*;
-import kenny.Pathfinder;
+import tempi.Pathfinder;
 
 public class Splashers extends RobotPlayer{
 
@@ -12,7 +12,7 @@ public class Splashers extends RobotPlayer{
 
     public static void run() throws GameActionException {
         // nearest paint tower is updated by default
-        ImpureUtils.updateNearbyMask(false);
+        ImpureUtils.updateNearbyMask(true);
         ImpureUtils.updateNearestEnemyTower();
         ImpureUtils.updateNearestEnemyPaint();
 

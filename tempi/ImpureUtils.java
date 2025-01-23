@@ -1,4 +1,4 @@
-package kenny;
+package tempi;
 import battlecode.common.*;
 
 // these Utils are NOT pure functions (i.e. they modify state / change global variables, etc.)
@@ -30,17 +30,9 @@ public class ImpureUtils extends RobotPlayer {
         }
     }
 
-    static void tryUpgradeNearbyTowers() throws GameActionException {  // updates nearest ruins as well
-        nearbyRuins = rc.senseNearbyRuins(-1);
-        if (rc.getMoney() < 3000)
-            return;
-
-        for (MapLocation ruinLoc : nearbyRuins) {
-            if (!rc.canSenseRobotAtLocation(ruinLoc))
-                continue;
-            RobotInfo robot = rc.senseRobotAtLocation(ruinLoc);
-            if (robot.getType() == UnitType.LEVEL_ONE_MONEY_TOWER && (rc.getMoney() < 15000 || robot.getPaintAmount() >= 100))  // experimental testing
-                continue;
+    static void tryUpgradeNearbyTowers() throws GameActionException {
+        if (rc.getMoney() > 3000)
+        for (RobotInfo robot : nearbyRobots) {
             if (rc.canUpgradeTower(robot.getLocation())) {
                 if (rc.getMoney() < 6000) {
                     if (robot.getType().getBaseType() == UnitType.LEVEL_ONE_DEFENSE_TOWER) {
@@ -99,8 +91,6 @@ public class ImpureUtils extends RobotPlayer {
                 continue;
             RobotInfo robot = rc.senseRobotAtLocation(ruinLoc);
             if (robot.getTeam() == rc.getTeam() && (robot.getType().isTowerType())) {
-                // if (robot.getType() == UnitType.LEVEL_ONE_MONEY_TOWER)  // experimental
-                //     continue;
                 if (robot.getType().getBaseType() == UnitType.LEVEL_ONE_PAINT_TOWER) {
                     if (nearestPaintTower == null || rc.getLocation().distanceSquaredTo(robot.getLocation()) < rc
                             .getLocation().distanceSquaredTo(nearestPaintTower)) {
