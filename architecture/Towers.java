@@ -8,6 +8,7 @@ import battlecode.common.*;
 public class Towers extends RobotPlayer {
 
     static boolean spawnedFirstMopper = false;
+    static int[] lastSummonDirection = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     static int nonGreedyPhase = (int)(mx * 2);  // not used
     static int firstMopper = (int)(mx);
@@ -174,8 +175,6 @@ public class Towers extends RobotPlayer {
             }
         }
 
-
-
         ImpureUtils.updateNearestEnemyPaint();
         ImpureUtils.updateNearestEnemyRobot();
 
@@ -204,7 +203,7 @@ public class Towers extends RobotPlayer {
             spawn = UnitType.MOPPER;
         }
 
-        if (nearestEnemyRobot != null && nearbyMoppers < 3) {
+        if (nearestEnemyRobot != null && nearbyMoppers < 2) {
             // "clog will mog" reactionary mopper
             if (rc.getRoundNum() < mx * 2 || canSpawnSplasher) {
                 rc.setIndicatorString("there is a enemy robot nearby, spawning mopper");
@@ -222,13 +221,20 @@ public class Towers extends RobotPlayer {
         for (MapInfo tile : nearbyDiamond) {
             MapLocation tileLoc = tile.getMapLocation();
             // rc.setIndicatorDot(tileLoc, 255, 255, 0);
+
             if (rc.canSenseRobotAtLocation(tileLoc))  // can't spawn here
                 continue;
+
             int score = 0;
             score += Math.min(tileLoc.x * 600, 6*600);  // wall avoidance
             score += Math.min((mapWidth - tileLoc.x) * 600, 7*600);
             score += Math.min(tileLoc.y * 600, 6*600);
             score += Math.min((mapHeight - tileLoc.y) * 600, 7*600);
+
+            Direction summonDirection = rc.getLocation().directionTo(tileLoc);
+            score += rc.getRoundNum() - lastSummonDirection[summonDirection.ordinal()] * 500;
+            score += rc.getRoundNum() - lastSummonDirection[summonDirection.rotateLeft().ordinal()] * 500;
+            score += rc.getRoundNum() - lastSummonDirection[summonDirection.rotateRight().ordinal()] * 500;
 
             if (rc.getLocation().isWithinDistanceSquared(tileLoc, 1)) {
                 score -= 500;  // add a cost for spawning closer
@@ -264,6 +270,8 @@ public class Towers extends RobotPlayer {
         if (nextLoc != null)
             if (hasEnoughResources())
                 if (rc.canBuildRobot(spawn, nextLoc)) {
+                    lastSummonDirection[rc.getLocation().directionTo(nextLoc).ordinal()] = rc.getRoundNum();
+
                     rc.buildRobot(spawn, nextLoc);
                     if (spawn == UnitType.MOPPER)
                         spawnedFirstMopper = true;

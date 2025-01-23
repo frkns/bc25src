@@ -4,7 +4,6 @@ import architecture.RobotPlayer;
 import architecture.Tools.Debug;
 import architecture.Tools.HeuristicPath;
 import architecture.Tools.ImpureUtils;
-import architecture.Tools.Pathfinder;
 import battlecode.common.GameActionException;
 
 public class ActionGetPaintWhenLow extends RobotPlayer {
@@ -14,6 +13,10 @@ public class ActionGetPaintWhenLow extends RobotPlayer {
         //------------------------------------------------------------------------------//
         // Init
         //------------------------------------------------------------------------------//
+
+        if (action == Action.ACTION_WAIT_COMPLETE_TOWER){
+            return;
+        }
 
         if (rc.getPaint() > MIN_PAINT || nearestPaintTower == null) {
             Debug.println("\tX - ACTION_GET_PAINT_LOW : No paint tower or no need for paint");

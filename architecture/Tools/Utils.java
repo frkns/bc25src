@@ -14,10 +14,8 @@ public class Utils extends RobotPlayer {
 
         // Update nearby units
         boolean isMopperNearby = false;
-        boolean isSoldierNearby = false;
         for(RobotInfo ally: rc.senseNearbyRobots(ruinLoc, 36, rc.getTeam())){
             switch (ally.type){
-                case UnitType.SOLDIER: isSoldierNearby = true; break;
                 case UnitType.MOPPER: isMopperNearby = true; break;
             }
         }
@@ -33,7 +31,7 @@ public class Utils extends RobotPlayer {
             }
 
             if(tower == AuxConstants.buildOrder[rc.getNumberTowers()]){
-                cost -= 5;
+                cost -= 7;
             }
 
             if(cost < minCost){

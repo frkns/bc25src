@@ -29,13 +29,6 @@ public class ActionFillSRP extends RobotPlayer {
         // Init and check if can play
         //------------------------------------------------------------------------------//
 
-        // Check if not too early
-        if (rc.getRoundNum() < 30) {
-            Debug.println("\tX - ACTION_FILL_SRP      : Round < 30 : skipping");
-            action = Action.ACTION_WAITING_FOR_ACTION;
-            return;
-        }
-
         // Update nearest wrong SRP
         int minDistance = 3600;
         MapLocation bestSRP = null;
@@ -72,7 +65,6 @@ public class ActionFillSRP extends RobotPlayer {
             return;
         }
 
-
         // Check if enough paint
         if (rc.getType() == UnitType.SOLDIER && rc.getPaint() < 5) {
             Debug.println("\tX - ACTION_FILL_SRP      : Not enough paint");
@@ -82,10 +74,26 @@ public class ActionFillSRP extends RobotPlayer {
 
         // Check if can recover paint
         report = CheckPattern.analyseSRP(bestSRP);
-        if (!canHelp(report)) {
+
+        MapLocation target = switch (rc.getType()) {
+            case UnitType.SOLDIER -> report.nearestWrongPaint;
+            case UnitType.MOPPER -> report.nearestWrongEnemie;
+            default -> null; // Never append, because canHelp.
+        };
+
+        if (target == null) {
             Debug.println("\tX - ACTION_FILL_SRP      : Can't help");
             action = Action.ACTION_WAITING_FOR_ACTION;
             return;
+        }
+
+        // Check if not empty ruins nearby
+        for(MapLocation ruin: rc.senseNearbyRuins(-1)) {
+            if (Utils.chessDistance(target, ruin) <= 2) {
+                Debug.println("\tX - ACTION_FILL_SRP      : Empty ruins nearby.");
+                action = Action.ACTION_WAITING_FOR_ACTION;
+                return;
+            }
         }
 
         //------------------------------------------------------------------------------//
@@ -94,11 +102,6 @@ public class ActionFillSRP extends RobotPlayer {
         Debug.println("\tX - ACTION_FILL_SRP      : Playing!");
         RobotPlayer.action = Action.ACTION_FILL_SRP;
 
-        MapLocation target = switch (rc.getType()) {
-            case UnitType.SOLDIER -> report.nearestWrongPaint;
-            case UnitType.MOPPER -> report.nearestWrongEnemie;
-            default -> null;
-        };
         Pathfinder.move(target);
 
         // Calculate paint type to use
