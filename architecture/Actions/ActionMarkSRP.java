@@ -118,12 +118,12 @@ public class ActionMarkSRP extends RobotPlayer {
             // Debug.println("Score at : " + info.getMapLocation() + " : " + (int) scores[id] + " (" + ((int) scores[id] - (int) ZERO) + ")");
             if (scale < 0) {
                 if(scale < 10000){
-                    rc.setIndicatorDot(loc, 0, 0, 255);
+//                    rc.setIndicatorDot(loc, 0, 0, 255);
                 }else{
-                    rc.setIndicatorDot(loc, min(255, -scale), 0, 0);
+//                    rc.setIndicatorDot(loc, min(255, -scale), 0, 0);
                 }
             } else {
-                rc.setIndicatorDot(loc, 0, min(255, scale), 0);
+//                rc.setIndicatorDot(loc, 0, min(255, scale), 0);
             }
         }
 
@@ -141,12 +141,12 @@ public class ActionMarkSRP extends RobotPlayer {
                 // Debug.println("Score at : " + info.getMapLocation() + " : " + (int) scores[id] + " (" + ((int) scores[id] - (int) ZERO) + ")");
                 if (scale < 0) {
                     if(scale < 10000){
-                        rc.setIndicatorDot(loc, 0, 0, 255);
+//                        rc.setIndicatorDot(loc, 0, 0, 255);
                     }else{
-                        rc.setIndicatorDot(loc, min(255, -scale), 0, 0);
+//                        rc.setIndicatorDot(loc, min(255, -scale), 0, 0);
                     }
                 } else {
-                    rc.setIndicatorDot(loc, 0, min(255, scale), 0);
+//                    rc.setIndicatorDot(loc, 0, min(255, scale), 0);
                 }
             }
         }

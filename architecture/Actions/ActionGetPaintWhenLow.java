@@ -7,7 +7,7 @@ import architecture.Tools.Pathfinder;
 import battlecode.common.GameActionException;
 
 public class ActionGetPaintWhenLow extends RobotPlayer {
-    static int MIN_PAINT = 15;
+    static int MIN_PAINT = 50;
 
     public static void run() throws GameActionException {
         //------------------------------------------------------------------------------//
@@ -31,7 +31,7 @@ public class ActionGetPaintWhenLow extends RobotPlayer {
         ImpureUtils.withdrawPaintIfPossible(nearestPaintTower);
         rc.setIndicatorLine(nearestPaintTower, rc.getLocation(),0, 0, 255);
 
-        if(rc.getPaint() > 10){
+        if(rc.getPaint() > MIN_PAINT){
             action = Action.ACTION_WAITING_FOR_ACTION;
         }
     }

@@ -34,13 +34,7 @@ public class ActionExplore extends RobotPlayer {
         if (target == null
                 || rc.getLocation().isWithinDistanceSquared(target, 9)
                 || rc.getRoundNum() - lastTargetChangeRound > targetChangeWaitTime) {
-            // selecting a random target location on the map has an inherent bias towards the center if e.g. we are in a corner
-            // this is more of a problem on big maps
-            // try to combat this but also instead sometimes selecting a location in our current quadrant
-            /*if (rc.getRoundNum() % 2 == 0 && rc.getRoundNum() < stopQuadrantModifierPhase)
-                target = Utils.randomLocationInQuadrant(Utils.currentQuadrant());
-            else*/
-            target = Utils.randomLocationInQuadrant(rng.nextInt(4));
+            target = new MapLocation(rng.nextInt(rc.getMapWidth()), rng.nextInt(rc.getMapHeight()));
             lastTargetChangeRound = rc.getRoundNum();
         }
 

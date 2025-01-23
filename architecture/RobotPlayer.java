@@ -26,12 +26,6 @@ public class RobotPlayer {
             Direction.WEST,
             Direction.NORTHWEST,
     };
-    public static final Direction[] directions4 = {
-            Direction.NORTH,
-            Direction.EAST,
-            Direction.SOUTH,
-            Direction.WEST,
-    };
 
     public enum Action {
         ACTION_ATTACK_RUSH,
@@ -83,7 +77,6 @@ public class RobotPlayer {
 
 
     // Location, Nearest
-    public static MapInfo curRuin;
     public static MapLocation curSRP;
 
     public static MapInfo[] nearbyTiles;
@@ -136,10 +129,8 @@ public class RobotPlayer {
 
 
     // History of location
-    public static MapLocation avgClump;  // will eventually get rid of this one, in favor of 5x5 bool map
     public static boolean[][] nearbyAlliesMask;  // 5x5 area centered around robot
     public static boolean[][] nearbyEnemiesMask;
-    public static MapLocation[] quadrantCenters = new MapLocation[4];
     public static MapLocation[] locationHistory = new MapLocation[8];
 
 
@@ -148,11 +139,6 @@ public class RobotPlayer {
     public static boolean[][] paintPattern;
     public static boolean[][] moneyPattern;
     public static boolean[][] defensePattern;
-
-    // PathFinding
-    public static boolean wallAdjacent = false;  // might not use this maybe bugnav potential
-    public static int wallRounds = 0;
-    public static int sqDistanceToTargetOnWallTouch = (int) 2e9;
 
 
     // Others
@@ -169,10 +155,6 @@ public class RobotPlayer {
         mapHeight = rc.getMapHeight();
         mapWidth = rc.getMapWidth();
         mapCenter = new MapLocation(mapWidth / 2, mapHeight / 2);
-        quadrantCenters[0] = new MapLocation(3 * mapWidth / 4, 3 * mapHeight / 4);
-        quadrantCenters[1] = new MapLocation(1 * mapWidth / 4, 3 * mapHeight / 4);
-        quadrantCenters[2] = new MapLocation(1 * mapWidth / 4, 1 * mapHeight / 4);
-        quadrantCenters[3] = new MapLocation(3 * mapWidth / 4, 1 * mapHeight / 4);
 
         // Patterns
         paintPattern = rc.getTowerPattern(UnitType.LEVEL_ONE_PAINT_TOWER);
@@ -384,7 +366,7 @@ public class RobotPlayer {
                         break;
 
                     default:
-                        Debug.println("No role correspondign to " + role.name());
+                        Debug.println("No role corresponding to " + role.name());
 
                 }
                 Debug.println("End of actions     : with " + action.name());

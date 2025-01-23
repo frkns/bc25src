@@ -48,22 +48,6 @@ public class Utils extends RobotPlayer {
                         numWrongInDefense++;
                 }
 
-                // if (paint == PaintType.EMPTY
-                //         || (paint == PaintType.ALLY_SECONDARY && !paintPattern[i][j])
-                //         || (paint == PaintType.ALLY_PRIMARY && paintPattern[i][j])) {
-                //     numWrongInPaint++;
-                // }
-                // if (paint == PaintType.EMPTY
-                //         || (paint == PaintType.ALLY_SECONDARY && !moneyPattern[i][j])
-                //         || (paint == PaintType.ALLY_PRIMARY && moneyPattern[i][j])) {
-                //     numWrongInMoney++;
-                // }
-                // if (paint == PaintType.EMPTY
-                //         || (paint == PaintType.ALLY_SECONDARY && !defensePattern[i][j])
-                //         || (paint == PaintType.ALLY_PRIMARY && defensePattern[i][j])) {
-                //     numWrongInDefense++;
-                // }
-
             }
         }
 
@@ -87,13 +71,6 @@ public class Utils extends RobotPlayer {
     // returns null if it's already dotted and there's no enemy paint on the ruin,
     // otherwise returns nearest empty location
     static MapLocation nearestEmptyOnRuinIfEnemyOrIsUndotted(MapLocation ruinLoc) throws GameActionException {
-        // if (rc.canSenseRobotAtLocation(ruinLoc)) {
-        // RobotInfo ruinLocInfo = rc.senseRobotAtLocation(ruinLoc);
-        // if (ruinLocInfo.getTeam() == rc.getTeam())
-        // return null; // this "ruin" is acutally an ally tower
-        // }
-        // ^ this code checks to see if ruinLoc has an ally tower on it (update: removed
-        // because we want to dot it anyway)
         boolean hasEnemyPaint = false;
         boolean hasAllyPaint = false;
         MapLocation nearestEmpty = null;
@@ -127,48 +104,7 @@ public class Utils extends RobotPlayer {
         return nearestEmpty;
     }
 
-    static int currentQuadrant() throws GameActionException {  // numbered like the cartesian plane, except 0-indexed
-        MapLocation loc = rc.getLocation();
-        if (loc.x > mapWidth/2) {
-            // Q1 or Q4
-            if (loc.y > mapHeight/2)
-                return 0;
-            return 3;
-        }
-        // Q2 or Q3
-        if (loc.y > mapHeight/2)
-            return 1;
-        return 2;
-    }
-    public static MapLocation randomLocationInQuadrant(int Q) {  // 0-indexed
-        int offsetx = rng.nextInt(mapWidth/2) - mapWidth/4;
-        int offsety = rng.nextInt(mapHeight/2) - mapHeight/4;
 
-        if (offsetx > 0) offsetx -= 2;  // doing this because i don't want to do the math to get it exact
-        else offsetx += 2;
-        if (offsety > 0) offsety -= 2;
-        else offsety += 2;
-
-        return new MapLocation(quadrantCenters[Q].x + offsetx, quadrantCenters[Q].y + offsety);
-    }
-
-    // static int leastExploredQuadrant() {
-    //     int q = 0;
-    //     int xp = roundsSpentInQuadrant[q];
-    //     if (roundsSpentInQuadrant[1] < xp) {
-    //         q = 1;
-    //         xp = roundsSpentInQuadrant[q];
-    //     }
-    //     if (roundsSpentInQuadrant[2] < xp) {
-    //         q = 2;
-    //         xp = roundsSpentInQuadrant[q];
-    //     }
-    //     if (roundsSpentInQuadrant[3] < xp) {
-    //         q = 3;
-    //         xp = roundsSpentInQuadrant[q];
-    //     }
-    //     return q;
-    // }
 
     public static int chessDistance(MapLocation A, MapLocation B) {
         return Math.max(Math.abs(A.x - B.x), Math.abs(A.y - B.y));
