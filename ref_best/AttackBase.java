@@ -1,8 +1,6 @@
 package ref_best;
 
 import battlecode.common.*;
-import java.util.Arrays;
-import java.util.Comparator;
 
 public class AttackBase extends RobotPlayer {
 

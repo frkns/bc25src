@@ -1,5 +1,4 @@
 package ref_best;
-import java.util.Random;
 import battlecode.common.*;
 
 // these Utils are pure functions - no side-effects, they don't change variables or modify game state in any way
@@ -37,12 +36,13 @@ public class Utils extends RobotPlayer {
     }
 
     static UnitType getBuildType() throws GameActionException {
+
         MapLocation ruinLoc = curRuin.getMapLocation();
         int numWrongInPaint = 0; // *relative counting* empty tiles are skipped
         int numWrongInMoney = 0;
         int numWrongInDefense = 0;
-        for (int i = 5; i-- > 0;) {
-            for (int j = 5; j-- > 0;) {
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 5; j++) {
                 if (i == 2 && j == 2)
                     continue;
                 MapLocation loc = new MapLocation(ruinLoc.x + i - 2, ruinLoc.y + j - 2);
@@ -75,9 +75,6 @@ public class Utils extends RobotPlayer {
             }
         }
 
-        // if (true)
-        // return UnitType.LEVEL_ONE_MONEY_TOWER;  // testing self-destruct
-
         // do not early return so we can return null if there is enemy paint
         if (rc.getNumberTowers() <= Soldiers.strictFollowBuildOrderNumTowers) {
             if (Soldiers.bypassIfPaint && numWrongInPaint < numWrongInMoney && numWrongInPaint < numWrongInDefense) {
@@ -92,7 +89,7 @@ public class Utils extends RobotPlayer {
         if (Math.abs(numWrongInPaint - numWrongInMoney) < 3 && Math.abs(numWrongInMoney - numWrongInDefense) < 3) {
             return AuxConstants.buildOrder[rc.getNumberTowers()];
         }
-        if (numWrongInMoney <= numWrongInPaint && numWrongInMoney <= numWrongInDefense && rc.getMoney() < 10000)
+        if (numWrongInMoney <= numWrongInPaint && numWrongInMoney <= numWrongInDefense)
             return UnitType.LEVEL_ONE_MONEY_TOWER;
         if (numWrongInPaint <= numWrongInDefense)
             return UnitType.LEVEL_ONE_PAINT_TOWER;
@@ -112,8 +109,8 @@ public class Utils extends RobotPlayer {
         boolean hasEnemyPaint = false;
         boolean hasAllyPaint = false;
         MapLocation nearestEmpty = null;
-        for (int i = 5; i-- > 0;) {
-            for (int j = 5; j-- > 0;) {
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 5; j++) {
                 if (i == 2 && j == 2)
                     continue;
                 MapLocation loc = new MapLocation(ruinLoc.x + i - 2, ruinLoc.y + j - 2);

@@ -1,7 +1,6 @@
 package ref_best;
 
 import battlecode.common.*;
-import ref_best.Pathfinder;
 
 public class Splashers extends RobotPlayer{
 
@@ -12,7 +11,7 @@ public class Splashers extends RobotPlayer{
 
     public static void run() throws GameActionException {
         // nearest paint tower is updated by default
-        ImpureUtils.updateNearbyMask(false);
+        ImpureUtils.updateNearbyMask(true);
         ImpureUtils.updateNearestEnemyTower();
         ImpureUtils.updateNearestEnemyPaint();
 

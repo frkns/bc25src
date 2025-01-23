@@ -1,17 +1,19 @@
 package architecture;
 
+import architecture.Actions.*;
+import architecture.Tools.AuxConstants;
+import architecture.Tools.Comms;
+import architecture.Tools.Debug;
+import architecture.Tools.ImpureUtils;
 import battlecode.common.*;
+import gavin.fast.FastMath;
 
 import java.util.Random;
 
 
 public class RobotPlayer {
-    // Constants and Utilities
-    static final int dx8[] = {0, 1, 1, 1, 0, -1, -1, -1};
-    static final int dy8[] = {-1, -1, 0, 1, 1, 1, 0, -1};
-
-    static final Random rng = new Random();
-    static final Direction[] directions = {
+    public static final Random rng = new Random();
+    public static final Direction[] directions = {
             Direction.NORTH,
             Direction.NORTHEAST,
             Direction.EAST,
@@ -21,125 +23,105 @@ public class RobotPlayer {
             Direction.WEST,
             Direction.NORTHWEST,
     };
-    static final Direction[] directions4 = {
-            Direction.NORTH,
-            Direction.EAST,
-            Direction.SOUTH,
-            Direction.WEST,
-    };
 
-    enum Action {
-        ACTION_SRP,
-        ACTION_RUINS,
+    public enum Action {
+        ACTION_ATTACK_RUSH,
+        ACTION_ATTACK_WAVE,
         ACTION_ATTACK_MICRO,
+        ACTION_SPLASH,
+
+        ACTION_FILL_RUINS,
+        ACTION_COMPLETE_TOWER,
+
+        ACTION_MARK_SRP,
+        ACTION_FILL_SRP,
+        ACTION_COMPLETE_SRP,
+
         ACTION_EXPLORE,
-        ACTION_SPLASH, ACTION_COMPLETE_TOWER, ACTION_COMPLETE_SRP, ACTION_GET_PAINT, ACTION_ATTACK_RUSH, ACTION_WAITING_FOR_ACTION
-    }
-
-    ;
-
-    public enum Heuristic {
-        HEURISTIC_REFILL,
-        HEURISTIC_WRONG_RUINS,
-        HEURISTIC_WRONG_SRP,
-        HEURISTIC_TOWER_MICRO,
-        HEURISTIC_MOPPER, HEURISTIC_SOLDIER, EXPLORE, HEURISTIC_FASTEST
+        ACTION_GET_PAINT,
+        ACTION_REMOVE_ENEMY_PAINT, ACTION_ATTACK_SWING, ACTION_WAIT_COMPLETE_TOWER, ACTION_WAITING_FOR_ACTION
     }
 
     public enum Role {
         ROLE_SOLDIER,
         ROLE_SOLDIER_ATTACK,
+        ROLE_SOLDIER_ATTACK_RUSH,
         ROLE_MOPPER,
-        ROLE_TOWER,
-        ROLE_SPLASHER
+        ROLE_SPLASHER,
+        ROLE_TOWER
     }
 
     // General States
-    static Action action = Action.ACTION_WAITING_FOR_ACTION;
-    static Role role;
-    static boolean inTowerRange = false;
-    static int turnsAlive = 0;
+    public static Action action = Action.ACTION_WAITING_FOR_ACTION;
+    public static Role role;
 
     // Map Size
-    static RobotController rc;
-    static int roundNum;
-    static int mapWidth;
-    static int mapHeight;
-    static MapLocation mapCenter;
+    public static RobotController rc;
+    public static int roundNum;
+    public static int mapWidth;
+    public static int mapHeight;
+    public static MapLocation mapCenter;
 
 
     // Location, Nearest
-    static MapInfo curRuin;
-    static MapLocation curSRP;
+    public static MapLocation curSRP;
 
-    static MapInfo[] nearbyTiles;
-    static RobotInfo[] nearbyRobots;
-    static MapLocation[] nearbyRuins;
+    public static MapInfo[] nearbyTiles;
+    public static RobotInfo[] nearbyRobots;
+    public static MapLocation[] nearbyRuins;
 
-    static MapLocation nearestPaintTower;  // misnomer, can be money/defense tower if we haven't see a paint tower yet
-    static MapLocation nearestEmptyTile;  // not used (update: we use it now for full fill)
-    static MapLocation nearestEmptyRuin;
-    static MapLocation nearestEnemyPaint;
-    static MapLocation nearestEnemyRobot;  // non-tower
-    static MapLocation nearestEnemyTower;
-    static MapLocation sndNearestEnemyTower;  // if there is a second one
-    static MapLocation spawnTowerLocation;
+    public static MapLocation nearestPaintTower;  // misnomer, can be money/defense tower if we haven't see a paint tower yet
+    public static MapLocation nearestEmptyTile;  // not used (update: we use it now for full fill)
+    public static MapLocation nearestEmptyRuin;
+    public static MapLocation nearestEnemyPaint;
+    public static MapLocation nearestEnemyRobot;  // non-tower
+    public static MapLocation nearestEnemyTower;
+    public static MapLocation sndNearestEnemyTower;  // if there is a second one
+    public static MapLocation spawnTowerLocation;
 
-    static RobotInfo nearestEnemyRobotInfo;
-    static UnitType nearestEnemyTowerType;  //
-    static boolean nearestPaintTowerIsPaintTower = false;
-    static UnitType sndNearestEnemyTowerType;
-    static int nearbyFriendlyRobots;
-    static int nearbyEnemyRobots;
+    public static RobotInfo nearestEnemyRobotInfo;
+    public static UnitType nearestEnemyTowerType;  //
+    public static boolean nearestPaintTowerIsPaintTower = false;
+    public static UnitType sndNearestEnemyTowerType;
+    public static int nearbyFriendlyRobots;
+    public static int nearbyEnemyRobots;
 
-    static MapLocation fstTowerTarget;  // what tower is our tower telling us to attack?
-    static boolean fstTowerTargetIsDefense;
-    static MapLocation sndTowerTarget;  // what tower is our tower telling us to attack?
-    static boolean sndTowerTargetIsDefense;
+    public static MapLocation fstTowerTarget;  // what tower is our tower telling us to attack?
+    public static boolean fstTowerTargetIsDefense;
+    public static MapLocation sndTowerTarget;  // what tower is our tower telling us to attack?
+    public static boolean sndTowerTargetIsDefense;
 
 
     // Phase
-    static int siegePhase;
-    static int mopperPhase;
-    static int splasherPhase;
-    static int fullFillPhase;
-    static int attackBasePhase;
-    static int alwaysBuildDefenseTowerPhase;
-    static int reservePaintPhase;  // it is really bad to reserve paint in the first few rounds because we'll fall behind
-    static int reservePaint = 100;
-    static int reserveChips = 1800;
-    static int startPaintingFloorTowerNum = 4;  // don't paint floor before this to conserve paint
-    static int strictFollowBuildOrderNumTowers = 4;
+    public static int siegePhase;
+    public static int mopperPhase;
+    public static int splasherPhase;
+    public static int fullFillPhase;
+    public static int attackBasePhase;
+    public static int alwaysBuildDefenseTowerPhase;
+    public static int reservePaintPhase;  // it is really bad to reserve paint in the first few rounds because we'll fall behind
+    public static int reservePaint = 100;
+    public static int reserveChips = 1800;
+    public static int reserveMorePaintPhase;
+    public static int reserveMorePaint = 500;
 
-    // Self destruction (not sure if self destructing is worth it, needs more testing)
-    static int selfDestructPhase = 300;
-    static int selfDestructFriendlyRobotsThreshold = 20;  // > this to self destruct
-    static int selfDestructEnemyRobotsThreshold = 5;  // < this to self destruct
-    static int selfDestructPaintThreshold = 50;
 
 
     // History of location
-    static MapLocation avgClump;  // will eventually get rid of this one, in favor of 5x5 bool map
-    static boolean[][] nearbyAlliesMask;  // 5x5 area centered around robot
-    static boolean[][] nearbyEnemiesMask;
-    static MapLocation[] quadrantCenters = new MapLocation[4];
+    public static boolean[][] nearbyAlliesMask;  // 5x5 area centered around robot
+    public static boolean[][] nearbyEnemiesMask;
     public static MapLocation[] locationHistory = new MapLocation[8];
 
 
     // Patterns
-    static int mx;  // max of mapWidth and mapHeight
-    static boolean[][] paintPattern;
-    static boolean[][] moneyPattern;
-    static boolean[][] defensePattern;
-
-    // PathFinding
-    static boolean wallAdjacent = false;  // might not use this maybe bugnav potential
-    static int wallRounds = 0;
-    static int sqDistanceToTargetOnWallTouch = (int) 2e9;
+    public static int mx;  // max of mapWidth and mapHeight
+    public static boolean[][] paintPattern;
+    public static boolean[][] moneyPattern;
+    public static boolean[][] defensePattern;
 
 
     // Others
-    static UnitType spawnTowerType;
+    public static UnitType spawnTowerType;
 
     public static void run(RobotController r) throws GameActionException {
         rc = r;
@@ -152,10 +134,6 @@ public class RobotPlayer {
         mapHeight = rc.getMapHeight();
         mapWidth = rc.getMapWidth();
         mapCenter = new MapLocation(mapWidth / 2, mapHeight / 2);
-        quadrantCenters[0] = new MapLocation(3 * mapWidth / 4, 3 * mapHeight / 4);
-        quadrantCenters[1] = new MapLocation(1 * mapWidth / 4, 3 * mapHeight / 4);
-        quadrantCenters[2] = new MapLocation(1 * mapWidth / 4, 1 * mapHeight / 4);
-        quadrantCenters[3] = new MapLocation(3 * mapWidth / 4, 1 * mapHeight / 4);
 
         // Patterns
         paintPattern = rc.getTowerPattern(UnitType.LEVEL_ONE_PAINT_TOWER);
@@ -181,13 +159,13 @@ public class RobotPlayer {
 
         // Phases
         mx = Math.max(mapWidth, mapHeight);  // ~60 for huge ~35 for medium
-        siegePhase = (int) (mx * 3);  // cast to int, will be useful for tuning later
-        fullFillPhase = (int) (mx * 3);
-        splasherPhase = (int) (mx * 2);
-        mopperPhase = (int) (mx * 4);
-        attackBasePhase = (int) (mx * 3);
+        siegePhase = (mx * 3);  // cast to int, will be useful for tuning later
+        fullFillPhase = (mx * 3);
+        splasherPhase = (mx * 2);
+        mopperPhase = (mx * 4);
+        attackBasePhase = (mx * 3);
         reservePaintPhase = (int) (mx * 1.5);
-        alwaysBuildDefenseTowerPhase = (int) (mx * 8);
+        alwaysBuildDefenseTowerPhase = (mx * 8);
         if (mx < 36) {
             AuxConstants.buildOrder[3] = UnitType.LEVEL_ONE_PAINT_TOWER;
         }
@@ -203,7 +181,6 @@ public class RobotPlayer {
         Debug.println("Get role : " + role.name());
 
 
-
         // Promoting to more specific role
         if (rc.getType() == UnitType.SOLDIER && rc.getRoundNum() >= attackBasePhase) {
             // we do divison by ~10 first because we want to send the attackers in "waves"
@@ -212,17 +189,32 @@ public class RobotPlayer {
             }
         }
 
+        // Rush early game : Harder since the spawn tower is level 2.
+        // if (rc.getType() == UnitType.SOLDIER && spawnTowerType == UnitType.LEVEL_ONE_PAINT_TOWER && rc.getRoundNum() < 10) {
+        //    role = Role.ROLE_SOLDIER_ATTACK_RUSH;
+        // }
+
 
         // Init actions
         Debug.println("Init Actions.");
-        ActionAttackRush.initRush();
+        ActionCompleteTower.init();
+        ActionAttackWave.init();
+        ActionMarkSRP.init(); // Using ref_best on turns < 500.
+        ActionExplore.init(); // Explore in direction of spawn
+
         switch (role) {
-            case Role.ROLE_SOLDIER_ATTACK:
-                ActionAttackRush.initRush();
-                break;
+            case Role.ROLE_SOLDIER_ATTACK_RUSH:
+                ActionAttackRush.init();
 
             case Role.ROLE_SPLASHER:
                 ActionSplash.init();
+                break;
+
+            case Role.ROLE_MOPPER:
+                // Defend against rush
+                if(rc.senseNearbyRobots(-1, rc.getTeam().opponent()).length != 0){
+                    action = Action.ACTION_ATTACK_SWING;
+                }
                 break;
         }
 
@@ -234,7 +226,6 @@ public class RobotPlayer {
                 Comms.readAndUpdateTowerTargets(rc.getRoundNum() - 1);
                 Comms.readAndUpdateTowerTargets(rc.getRoundNum());
 
-                turnsAlive++;
                 roundNum = rc.getRoundNum();
 
                 // Update sensing
@@ -244,72 +235,131 @@ public class RobotPlayer {
                 nearbyRuins = rc.senseNearbyRuins(-1);
 
                 // Update impure
+                ImpureUtils.updateNearbyUnits();
                 ImpureUtils.updateNearestEnemyTower();
                 ImpureUtils.updateNearestPaintTower();
-                ImpureUtils.updateNearbyMask(true); // true -> Also update enemie mask
                 ImpureUtils.updateNearestEmptyRuins();
 
                 if (!rc.getType().isTowerType())
                     ImpureUtils.updateNearestPaintTower();
-
+                ActionHelpSignal.remove(); // Remove help at start of turn.
 
                 // Plays actions
                 Debug.println("Start of actions   : as " + role.name() + " " + action.name());
                 switch (role) {
+                    //------------------------------------------------------------------------------//
+                    // Attack soldier
+                    //------------------------------------------------------------------------------//
+                    case Role.ROLE_SOLDIER_ATTACK_RUSH:
+                        ActionAttackRush.run();   // Explore map to rush tower, kill only one tower.
+                        // + ROLE_SOLDIER_ATTACK
+
                     case Role.ROLE_SOLDIER_ATTACK:
-                        ActionAttackRush.run();   // Explore map to rush tower
+                        ActionGetPaint.run();
+
+                        // Main behavior
                         ActionCompleteTower.run();
                         ActionAttackMicro.run();  // Just attack when see a tower
+                        ActionAttackWave.run();
+
+                        // If nothing else to do.
                         ActionFillRuin.run();
+                        ActionCompleteTower.run();
+                        ActionCompleteSRP.run();
                         ActionFillSRP.run();
-                        ActionGetPaintWhenLow.run();
                         break;
 
+
+                    //------------------------------------------------------------------------------//
+                    // Soldier
+                    //------------------------------------------------------------------------------//
                     case Role.ROLE_SOLDIER:
+                        // Survive
+                        ActionGetPaint.run();
+
+                        // Build tower
                         ActionCompleteTower.run();
                         ActionFillRuin.run();
+
+                        // Build SRP
+                        ActionCompleteSRP.run();
                         ActionFillSRP.run();
+                        ActionMarkSRP.run();
 
-                        if(rc.getRoundNum() > siegePhase && turnsAlive > 10){
-                            ActionAttackRush.run();
+                        // End of turn update.
+                        // ActionMarkSRP.updateScores();
+                        break;
 
-                            // We don't want soldier to stay in attackrush mode.
-                            switch (action){case Action.ACTION_ATTACK_RUSH: action = Action.ACTION_WAITING_FOR_ACTION;}
+
+                    //------------------------------------------------------------------------------//
+                    // Mopper
+                    //------------------------------------------------------------------------------//
+                    case Role.ROLE_MOPPER:
+                        ActionGetPaint.run();
+
+                        // Tower
+                        ActionCompleteTower.run();
+
+                        action = Action.ACTION_WAITING_FOR_ACTION;
+                        if(rc.getPaint() < 30 || FastMath.rand256() < 126){
+                            ActionAttackSwing.run();
+                            ActionFillRuin.run();
+                        }else{
+                            ActionFillRuin.run();
+                            ActionAttackSwing.run();
                         }
 
 
-                        ActionAttackMicro.run();
-                        ActionGetPaintWhenLow.run();
-                        break;
-
-                    case Role.ROLE_MOPPER:
-                        ActionCompleteTower.run();
-                        ActionFillRuin.run();
+                        // SRP
+                        ActionCompleteSRP.run();
                         ActionFillSRP.run();
-                        ActionGetPaintWhenLow.run();
+                        ActionMarkSRP.run();
+
+                        // Basic
+                        ActionRemoveEnemyPaint.run();
+
+                        // End of turn update.
+                        ActionMarkSRP.updateScores();
                         break;
 
+
+                    //------------------------------------------------------------------------------//
+                    // Splasher
+                    //------------------------------------------------------------------------------//
                     case Role.ROLE_SPLASHER:
+                        ActionGetPaint.run();
+
+                        // Can validate pattern but not complete
                         ActionCompleteTower.run();
+                        ActionCompleteSRP.run();
+
+                        // Main behavior
                         ActionSplash.run();
-                        ActionGetPaintWhenLow.run();
                         break;
 
+
+                    //------------------------------------------------------------------------------//
+                    // Tower
+                    //------------------------------------------------------------------------------//
                     case Role.ROLE_TOWER:
+                        // Default has ref_best
                         Towers.run();
                         break;
 
                     default:
-                        Debug.println("No role correspondign to " + role.name());
+                        Debug.println("No role corresponding to " + role.name());
+
                 }
+
+                ActionHelpSignal.run(); // Place MARK2 under unit to call help if needed.
                 Debug.println("End of actions     : with " + action.name());
 
-                if(action == Action.ACTION_WAITING_FOR_ACTION){
+                if (action == Action.ACTION_WAITING_FOR_ACTION) {
                     ActionExplore.run();
+                    ActionPaintUnder.run();
                 }
                 rc.setIndicatorString(role.name() + " - " + action.name());
                 Debug.println("End of turn. " + Clock.getBytecodeNum() + " bytecodes used.\n\n\n");
-
 
 
             } catch (GameActionException e) {
@@ -327,6 +377,11 @@ public class RobotPlayer {
                 }
                 Clock.yield();
             }
+
+            if (rc.getRoundNum() > 200) {
+                rc.resign();
+            }
+
         }
     }
 }

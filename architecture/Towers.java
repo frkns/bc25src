@@ -1,15 +1,23 @@
 package architecture;
 
+import architecture.Tools.Comms;
+import architecture.Tools.ImpureUtils;
+import architecture.Tools.Utils;
 import battlecode.common.*;
+
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 
 public class Towers extends RobotPlayer {
 
     static boolean spawnedFirstMopper = false;
+    static int[] lastSummonDirection = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     static int nonGreedyPhase = (int)(mx * 2);  // not used
     static int firstMopper = (int)(mx);
 
     static int numSpawnedUnits = 0;
+    static Direction dirMiddle;
 
     // force the spawning of a unit if possible, bypassing reserve checks, resets to false end of round
     static boolean forceSpawn = false;
@@ -21,6 +29,9 @@ public class Towers extends RobotPlayer {
     static boolean sndIsDefense;
 
     static int msgUpdateRoundNum = -99;
+
+    static UnitType spawn = UnitType.SOLDIER;
+    static boolean canSpawnSplasher = false;
 
     public static void readMessages(int round) throws GameActionException {
         Message[] receivedMsgs = rc.readMessages(round);
@@ -36,17 +47,21 @@ public class Towers extends RobotPlayer {
 
             // replace if greater distance, always update if old messages - actually since we're reading past 2 rounds, not required
             if (fstLoc != null)
-            if (rc.getRoundNum() >= msgUpdateRoundNum + 11 || fstEnemyTower == null /*|| rc.getLocation().distanceSquaredTo(fstLoc) > rc.getLocation().distanceSquaredTo(fstEnemyTower) */&& fstLoc != sndEnemyTower) {
-                fstEnemyTower = fstLoc;
-                fstIsDefense = fstType;
-                // msgUpdateRoundNum = rc.getRoundNum();
-            }
+                // if (fstLoc != sndEnemyTower && fstLoc != fstEnemyTower) {
+                if (!fstLoc.equals(fstEnemyTower)) {
+                    sndEnemyTower = fstEnemyTower;
+                    sndIsDefense = fstIsDefense;
+                    fstEnemyTower = fstLoc;
+                    fstIsDefense = fstType;
+                }
             if (sndLoc != null)
-            if (rc.getRoundNum() >= msgUpdateRoundNum + 11 || sndEnemyTower == null /*|| rc.getLocation().distanceSquaredTo(sndLoc) > rc.getLocation().distanceSquaredTo(sndEnemyTower) */&& sndLoc != fstEnemyTower) {
-                sndEnemyTower = sndLoc;
-                sndIsDefense = sndType;
-                // msgUpdateRoundNum = rc.getRoundNum();
-            }
+                // if (sndLoc != fstEnemyTower && sndLoc != sndEnemyTower) {
+                if (!sndLoc.equals(sndEnemyTower)) {
+                    fstEnemyTower = sndEnemyTower;
+                    fstIsDefense = sndIsDefense;
+                    sndEnemyTower = sndLoc;
+                    sndIsDefense = sndType;
+                }
         }
     }
 
@@ -83,7 +98,45 @@ public class Towers extends RobotPlayer {
         }
     }
 
+    public static boolean canSpawnSplasherFn() throws GameActionException {
+        if (forceSpawn || rc.getRoundNum() < 3 || numSpawnedUnits < 1)
+            return true;
+        if (rc.getType().getBaseType() != UnitType.LEVEL_ONE_PAINT_TOWER)
+            return true;
+        if (rc.getMoney() - UnitType.SPLASHER.moneyCost >= reserveChips) {
+            if (rc.getRoundNum() < reservePaintPhase)
+                return true;
+            if (rc.getPaint() - UnitType.SPLASHER.paintCost >= reservePaint && rc.getRoundNum() < reserveMorePaintPhase)
+                return true;
+            if (rc.getPaint() - UnitType.SPLASHER.paintCost >= reserveMorePaint)
+                return true;
+
+        }
+
+        return false;
+    }
+
+    public static boolean hasEnoughResources() throws GameActionException {
+        if (forceSpawn || rc.getRoundNum() < 3 || numSpawnedUnits < 1)
+            return true;
+        if (rc.getType().getBaseType() != UnitType.LEVEL_ONE_PAINT_TOWER)
+            return true;
+        if (rc.getMoney() - spawn.moneyCost >= reserveChips && (canSpawnSplasher || rc.getRoundNum() < splasherPhase)) {
+            if (rc.getRoundNum() < reservePaintPhase)
+                return true;
+            if (rc.getPaint() - spawn.paintCost >= reservePaint && rc.getRoundNum() < reserveMorePaintPhase)
+                return true;
+            if (rc.getPaint() - spawn.paintCost >= reserveMorePaint)
+                return true;
+
+        }
+
+        return false;
+    }
+
     public static void run() throws GameActionException {
+        assert(rc.getType().isTowerType());
+
         readMessages(rc.getRoundNum() - 1);  // read last round's messages
         readMessages(rc.getRoundNum());      // read this round's messages
 
@@ -93,11 +146,18 @@ public class Towers extends RobotPlayer {
             System.out.println("Siege phase " + siegePhase);
             System.out.println("Mopper phase " + mopperPhase);
         }
+
         if (fstEnemyTower != null) {
-            rc.setIndicatorLine(rc.getLocation(), fstEnemyTower, 255, 255, 255);
+            if (rc.getTeam() == Team.A)
+                rc.setIndicatorLine(rc.getLocation(), fstEnemyTower, 0, 0, 0);
+            else
+                rc.setIndicatorLine(rc.getLocation(), fstEnemyTower, 255, 255, 200);
         }
         if (sndEnemyTower != null) {
-            rc.setIndicatorLine(rc.getLocation(), sndEnemyTower, 199, 199, 199);
+            if (rc.getTeam() == Team.A)
+                rc.setIndicatorLine(rc.getLocation(), sndEnemyTower, 70, 70, 70);
+            else
+                rc.setIndicatorLine(rc.getLocation(), sndEnemyTower, 255, 255, 0);
         }
         /* */
 
@@ -120,39 +180,39 @@ public class Towers extends RobotPlayer {
             }
         }
 
-
-
         ImpureUtils.updateNearestEnemyPaint();
         ImpureUtils.updateNearestEnemyRobot();
+        dirMiddle = rc.getLocation().directionTo(new MapLocation(mapWidth / 2, mapHeight /2));
 
         int r = rng.nextInt(100);
-        // rc.setIndicatorString("RNG: " + r);
 
-        UnitType spawn = UnitType.SOLDIER;
+        canSpawnSplasher = canSpawnSplasherFn();
 
-        if (rc.getRoundNum() >= mopperPhase) {
-            // if (rc.getRoundNum() % 5 == 0) {
-            if (r < 60) {
+        spawn = UnitType.SOLDIER;
+        if (rc.getRoundNum() >= mopperPhase && rc.getPaint() < 700) {
+            if (r < 20) {
                 spawn = UnitType.MOPPER;
             }
-        }
-
-        if(rc.getRoundNum() >= splasherPhase) {
-            if(r < 40) {
+        } else if (rc.getRoundNum() >= splasherPhase) {
+            if (r < 20) {
+                spawn = UnitType.MOPPER;
+            }
+            else
+            if (r < 70) {
                 spawn = UnitType.SPLASHER;
             }
         }
 
-        if (turnsAlive > 2 && rc.getRoundNum() > firstMopper && !spawnedFirstMopper && rc.getMoney() > reserveChips) {
-            spawn = UnitType.MOPPER;
-        }
 
         if (nearestEnemyRobot != null && nearbyMoppers < 2) {
             // "clog will mog" reactionary mopper
-            rc.setIndicatorString("there is a enemy robot nearby, spawning mopper");
-            spawn = UnitType.MOPPER;
-            forceSpawn = true;
+            if (rc.getRoundNum() < mx * 2 || canSpawnSplasher) {
+                rc.setIndicatorString("there is a enemy robot nearby, spawning mopper");
+                spawn = UnitType.MOPPER;
+                forceSpawn = true;
+            }
         }
+
 
         // determine which tile to spawn this UnitType
         MapInfo[] nearbyDiamond = rc.senseNearbyMapInfos(4);
@@ -162,13 +222,33 @@ public class Towers extends RobotPlayer {
         for (MapInfo tile : nearbyDiamond) {
             MapLocation tileLoc = tile.getMapLocation();
             // rc.setIndicatorDot(tileLoc, 255, 255, 0);
+
             if (rc.canSenseRobotAtLocation(tileLoc))  // can't spawn here
                 continue;
+
+
             int score = 0;
-            score += Math.min(tileLoc.x * 600, 6*600);  // wall avoidance
-            score += Math.min((mapWidth - tileLoc.x) * 600, 7*600);
-            score += Math.min(tileLoc.y * 600, 6*600);
-            score += Math.min((mapHeight - tileLoc.y) * 600, 7*600);
+            score += min(tileLoc.x * 10, 6*10);  // wall avoidance
+            score += min((mapWidth - tileLoc.x) * 10, 7*10);
+            score += min(tileLoc.y * 10, 6*10);
+            score += min((mapHeight - tileLoc.y) * 10, 7*10);
+
+            Direction summonDirection = rc.getLocation().directionTo(tileLoc);
+
+            if(numSpawnedUnits == 0){
+                if(summonDirection == dirMiddle)
+                    score += 2000;
+            }
+
+
+            // Better score if not spawn units in this direction recently
+            score += min(5, rc.getRoundNum() - lastSummonDirection[summonDirection.ordinal()]) * 100;
+            score += min(5, rc.getRoundNum() - lastSummonDirection[summonDirection.rotateLeft().ordinal()]) * 100;
+            score += min(5, rc.getRoundNum() - lastSummonDirection[summonDirection.rotateRight().ordinal()]) * 100;
+
+            // or if oposite recently direction
+            score +=  max(0, 10 - lastSummonDirection[summonDirection.opposite().ordinal()]) * 50;
+
 
             if (rc.getLocation().isWithinDistanceSquared(tileLoc, 1)) {
                 score -= 500;  // add a cost for spawning closer
@@ -176,13 +256,13 @@ public class Towers extends RobotPlayer {
 
             if (spawn == UnitType.MOPPER) {
                 if (nearestEnemyPaint != null)
-                    score -= Math.min(1, Utils.chessDistance(tileLoc, nearestEnemyPaint)) * 1500; // add a cost for
-                                                                                                      // spawning
-                                                                                                      // further from
-                                                                                                      // enemy paint
+                    score -= min(1, Utils.chessDistance(tileLoc, nearestEnemyPaint)) * 1500; // add a cost for
+                // spawning
+                // further from
+                // enemy paint
                 if (nearestEnemyRobot != null)
                     score -= Utils.chessDistance(tileLoc, nearestEnemyRobot) * 4000;    // add a cost for spawning
-                                                                                        // further from enemy robot
+                // further from enemy robot
 
                 if (!tile.getPaint().isAlly()) {  // add cost if it's not our paint
                     score -= 1500;
@@ -190,7 +270,8 @@ public class Towers extends RobotPlayer {
 
             }
 
-            // score += rng.nextInt((int)(Math.abs(score) * 0.5 + 10));
+            if (rc.getRoundNum() > 100)
+                score += rng.nextInt((int)(Math.abs(score) * 0.3 + 1));  // add a bit of randomness
 
             if (score > bestScore) {
                 bestScore = score;
@@ -201,17 +282,15 @@ public class Towers extends RobotPlayer {
         MapLocation nextLoc = bestLoc;
 
         if (nextLoc != null)
-        if (forceSpawn || numSpawnedUnits < 1 ||  // don't conserve resources if we haven't spawned one units yet
-            true // (rc.getRoundNum() < nonGreedyPhase || rc.getMoney() > 2000)
-            && rc.getMoney() - spawn.moneyCost >= reserveChips
-            && (rc.getPaint() - spawn.paintCost >= reservePaint || rc.getRoundNum() < reservePaintPhase || rc.getType().getBaseType() != UnitType.LEVEL_ONE_PAINT_TOWER))
-            // only reserve paint if we are a paint tower ^
-        if (rc.canBuildRobot(spawn, nextLoc)) {
-            rc.buildRobot(spawn, nextLoc);
-            if (spawn == UnitType.MOPPER)
-                spawnedFirstMopper = true;
-            numSpawnedUnits++;
-        }
+            if (hasEnoughResources())
+                if (rc.canBuildRobot(spawn, nextLoc)) {
+                    lastSummonDirection[rc.getLocation().directionTo(nextLoc).ordinal()] = rc.getRoundNum();
+
+                    rc.buildRobot(spawn, nextLoc);
+                    if (spawn == UnitType.MOPPER)
+                        spawnedFirstMopper = true;
+                    numSpawnedUnits++;
+                }
 
         rc.attack(null);
         RobotInfo[] robots = rc.senseNearbyRobots();
@@ -229,7 +308,7 @@ public class Towers extends RobotPlayer {
                 MapLocation robotLoc = robot.getLocation();
                 int robotPaint = robot.getPaintAmount();
                 int towerPaint = rc.getPaint();
-                int transferAmt = Math.min(towerPaint, robot.getType().paintCapacity - robotPaint);
+                int transferAmt = min(towerPaint, robot.getType().paintCapacity - robotPaint);
                 if (rc.canTransferPaint(robotLoc, transferAmt)) {
                     // can towers transfer paint?
                     assert(false);  // apparantely not? pending deletion

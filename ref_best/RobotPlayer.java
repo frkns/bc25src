@@ -129,11 +129,8 @@ public class RobotPlayer {
 
     static int refillDistLimit = 40;  // don't refill if more than this number of manhattan units away from nearest paint tower
 
-    static int birthRound;
-
     public static void run(RobotController r) throws GameActionException {
         rc = r;
-        birthRound = rc.getRoundNum();
         mapHeight = rc.getMapHeight();
         mapWidth = rc.getMapWidth();
         mapCenter = new MapLocation(mapWidth/2, mapHeight/2);
@@ -150,7 +147,7 @@ public class RobotPlayer {
         moneyPattern = rc.getTowerPattern(UnitType.LEVEL_ONE_MONEY_TOWER);
         defensePattern = rc.getTowerPattern(UnitType.LEVEL_ONE_DEFENSE_TOWER);
 
-        nearbyRuins = rc.senseNearbyRuins(4);
+        nearbyRuins = rc.senseNearbyRuins(-1);
         for (MapLocation ruinLoc : nearbyRuins) {
             if (!rc.canSenseRobotAtLocation(ruinLoc))
                 continue;
@@ -168,11 +165,6 @@ public class RobotPlayer {
 
         if (spawnTowerLocation == null)  // it is possible that spawn tower is destroyed in the middle of the turn
             spawnTowerLocation = rc.getLocation();
-
-        if (spawnTowerType == UnitType.LEVEL_ONE_MONEY_TOWER
-                && rc.canCompleteTowerPattern(UnitType.LEVEL_ONE_MONEY_TOWER, spawnTowerLocation)) {
-            rc.completeTowerPattern(UnitType.LEVEL_ONE_MONEY_TOWER, spawnTowerLocation);
-        }
 
         AttackBase.init();
 

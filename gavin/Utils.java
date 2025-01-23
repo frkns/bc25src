@@ -3,21 +3,113 @@ package gavin;
 import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 import battlecode.common.PaintType;
+import battlecode.common.UnitType;
 
 // these Utils are pure functions - no side-effects, they don't change variables or modify game state in any way
 
 public class Utils extends RobotPlayer {
 
-    // returns null if it's already dotted and there's no enemy paint on the ruin, otherwise returns nearest empty location
+    static MapLocation chooseTowerTarget() throws GameActionException {  // choose a target for robot to move towards/ attack
+        if (rc.getID() % 2 == 1) {
+            if (fstTowerTarget != null && !visFstTowerTarget) {
+                return fstTowerTarget;
+            } else
+            if (sndTowerTarget != null && !visSndTowerTarget) {
+                return sndTowerTarget;
+            }
+        } else {
+            if (sndTowerTarget != null && !visSndTowerTarget) {
+                return sndTowerTarget;
+            } else
+            if (fstTowerTarget != null && !visFstTowerTarget) {
+                return fstTowerTarget;
+            }
+        }
+
+        return null;
+    }
+
+    static boolean isSendingWave() throws GameActionException {
+        return (rc.getRoundNum() / 20) % 3 == 0;
+    }
+    static boolean isAttackingBase() throws GameActionException {
+        if (isSendingWave() && rc.getRoundNum() >= attackBasePhase)
+            return true;
+
+        return false;
+    }
+
+    static UnitType getBuildType() throws GameActionException {
+
+        MapLocation ruinLoc = curRuin.getMapLocation();
+        int numWrongInPaint = 0; // *relative counting* empty tiles are skipped
+        int numWrongInMoney = 0;
+        int numWrongInDefense = 0;
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 5; j++) {
+                if (i == 2 && j == 2)
+                    continue;
+                MapLocation loc = new MapLocation(ruinLoc.x + i - 2, ruinLoc.y + j - 2);
+                if (!rc.canSenseLocation(loc))
+                    continue;
+                PaintType paint = rc.senseMapInfo(loc).getPaint();
+                if (paint.isEnemy()) {
+                    return null;
+                }
+                if (paint == PaintType.EMPTY) {
+                    continue;
+                }
+
+                if (paint == PaintType.ALLY_SECONDARY) {
+                    if (!paintPattern[i][j])
+                        numWrongInPaint++;
+                    if (!moneyPattern[i][j])
+                        numWrongInMoney++;
+                    if (!defensePattern[i][j])
+                        numWrongInDefense++;
+                } else
+                if (paint == PaintType.ALLY_PRIMARY) {
+                    if (paintPattern[i][j])
+                        numWrongInPaint++;
+                    if (moneyPattern[i][j])
+                        numWrongInMoney++;
+                    if (defensePattern[i][j])
+                        numWrongInDefense++;
+                }
+            }
+        }
+
+        // do not early return so we can return null if there is enemy paint
+        if (rc.getNumberTowers() <= Soldiers.strictFollowBuildOrderNumTowers) {
+            if (Soldiers.bypassIfPaint && numWrongInPaint < numWrongInMoney && numWrongInPaint < numWrongInDefense) {
+                return UnitType.LEVEL_ONE_PAINT_TOWER;
+            }
+            return AuxConstants.buildOrder[rc.getNumberTowers()];  // follow the build order
+        }
+        if (rc.getRoundNum() >= alwaysBuildDefenseTowerPhase)
+            return UnitType.LEVEL_ONE_DEFENSE_TOWER;
+
+        // if roughly same num of wrong tiles, follow the build order
+        if (Math.abs(numWrongInPaint - numWrongInMoney) < 3 && Math.abs(numWrongInMoney - numWrongInDefense) < 3) {
+            return AuxConstants.buildOrder[rc.getNumberTowers()];
+        }
+        if (numWrongInMoney <= numWrongInPaint && numWrongInMoney <= numWrongInDefense)
+            return UnitType.LEVEL_ONE_MONEY_TOWER;
+        if (numWrongInPaint <= numWrongInDefense)
+            return UnitType.LEVEL_ONE_PAINT_TOWER;
+        return UnitType.LEVEL_ONE_DEFENSE_TOWER;
+    }
+
+    // returns null if it's already dotted and there's no enemy paint on the ruin,
+    // otherwise returns nearest empty location
     static MapLocation nearestEmptyOnRuinIfEnemyOrIsUndotted(MapLocation ruinLoc) throws GameActionException {
-
-        // this code checks to see if ruinLoc has an ally tower on it (update: removed because we want to dot it anyway)
         // if (rc.canSenseRobotAtLocation(ruinLoc)) {
-        //     RobotInfo ruinLocInfo = rc.senseRobotAtLocation(ruinLoc);
-        //     if (ruinLocInfo.getTeam() == rc.getTeam())
-        //         return null;  // this "ruin" is acutally an ally tower
+        // RobotInfo ruinLocInfo = rc.senseRobotAtLocation(ruinLoc);
+        // if (ruinLocInfo.getTeam() == rc.getTeam())
+        // return null; // this "ruin" is acutally an ally tower
         // }
-
+        // ^ this code checks to see if ruinLoc has an ally tower on it (update: removed
+        // because we want to dot it anyway)
         boolean hasEnemyPaint = false;
         boolean hasAllyPaint = false;
         MapLocation nearestEmpty = null;
@@ -50,6 +142,7 @@ public class Utils extends RobotPlayer {
             return null;
         return nearestEmpty;
     }
+
     static int currentQuadrant() throws GameActionException {  // numbered like the cartesian plane, except 0-indexed
         MapLocation loc = rc.getLocation();
         if (loc.x > mapWidth/2) {
@@ -74,24 +167,24 @@ public class Utils extends RobotPlayer {
 
         return new MapLocation(quadrantCenters[Q].x + offsetx, quadrantCenters[Q].y + offsety);
     }
-    static int leastExploredQuadrant() {
-        int q = 0;
-        int xp = roundsSpentInQuadrant[q];
 
-        if (roundsSpentInQuadrant[1] < xp) {
-            q = 1;
-            xp = roundsSpentInQuadrant[q];
-        }
-        if (roundsSpentInQuadrant[2] < xp) {
-            q = 2;
-            xp = roundsSpentInQuadrant[q];
-        }
-        if (roundsSpentInQuadrant[3] < xp) {
-            q = 3;
-            xp = roundsSpentInQuadrant[q];
-        }
-        return q;
-    }
+    // static int leastExploredQuadrant() {
+    //     int q = 0;
+    //     int xp = roundsSpentInQuadrant[q];
+    //     if (roundsSpentInQuadrant[1] < xp) {
+    //         q = 1;
+    //         xp = roundsSpentInQuadrant[q];
+    //     }
+    //     if (roundsSpentInQuadrant[2] < xp) {
+    //         q = 2;
+    //         xp = roundsSpentInQuadrant[q];
+    //     }
+    //     if (roundsSpentInQuadrant[3] < xp) {
+    //         q = 3;
+    //         xp = roundsSpentInQuadrant[q];
+    //     }
+    //     return q;
+    // }
 
     static int chessDistance(MapLocation A, MapLocation B) {
         return Math.max(Math.abs(A.x - B.x), Math.abs(A.y - B.y));

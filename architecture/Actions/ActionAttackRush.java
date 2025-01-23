@@ -1,12 +1,14 @@
-package architecture;
+package architecture.Actions;
 
+import architecture.RobotPlayer;
+import architecture.Tools.Debug;
+import architecture.Tools.Pathfinder;
+import architecture.Tools.Utils;
 import battlecode.common.GameActionException;
-import battlecode.common.MapInfo;
 import battlecode.common.MapLocation;
 
 public class ActionAttackRush extends RobotPlayer {
 
-    static MapInfo[] _attackableNearbyTiles;  // var names that start with an underscore are set static to save bytecode
     static MapLocation target;
     // create an array of the 3 possible symetries for enemy spawn location
     static MapLocation[] potentialEnemySpawnLocations = new MapLocation[3];
@@ -14,10 +16,11 @@ public class ActionAttackRush extends RobotPlayer {
     static boolean[] visited = new boolean[3];
     static MapLocation nextLocToExplore = null;
 
-    static boolean visFstTowerTarget = false;
+    static MapLocation firstTower = null;
+    static boolean haveDestroyFirstTower = false;
 
 
-    static void initRush() throws GameActionException {
+    public static void init() throws GameActionException {
         potentialEnemySpawnLocations[0] = Utils.mirror(spawnTowerLocation);
         potentialEnemySpawnLocations[1] = Utils.verticalMirror(spawnTowerLocation);
         potentialEnemySpawnLocations[2] = Utils.horizontalMirror(spawnTowerLocation);
@@ -29,7 +32,7 @@ public class ActionAttackRush extends RobotPlayer {
     }
 
 
-    static void run() throws GameActionException {
+    public static void run() throws GameActionException {
         switch (RobotPlayer.action) {
             case Action.ACTION_ATTACK_RUSH:
             case Action.ACTION_WAITING_FOR_ACTION:
@@ -37,6 +40,12 @@ public class ActionAttackRush extends RobotPlayer {
             default:
                 // We are already playing an action
                 return;
+        }
+
+        if (haveDestroyFirstTower) {
+            Debug.println("\tX - ACTION_ATTACK_RUSH   : Have Already destroy target.");
+            RobotPlayer.action = Action.ACTION_WAITING_FOR_ACTION;
+            return;
         }
 
         //------------------------------------------------------------------------------//
@@ -65,7 +74,6 @@ public class ActionAttackRush extends RobotPlayer {
             }
         }
 
-        RobotPlayer.action = Action.ACTION_ATTACK_MICRO;
 
         //------------------------------------------------------------------------------//
         // Check if can play action
@@ -77,14 +85,14 @@ public class ActionAttackRush extends RobotPlayer {
         }
 
         // Attack if in range
-        if (rc.canAttack(nearestEnemyTower)) {
+        if (nearestEnemyTower != null && rc.canAttack(nearestEnemyTower)) {
             Debug.println("\t0 - ACTION_ATTACK_RUSH   : Attacking !");
             rc.attack(nearestEnemyTower);
         }
 
         // stop attacking if low health, 30 or less means we die to level 1 paint/money tower shot + AoE
-        if (rc.getHealth() < 31) {
-            Debug.println("\tX - ACTION_ATTACK_RUSH   : Low on health");
+        if (rc.getHealth() < 31 || rc.getPaint() < 5) {
+            Debug.println("\tX - ACTION_ATTACK_RUSH   : Low on health or not enough paint");
             RobotPlayer.action = Action.ACTION_WAITING_FOR_ACTION;
             return;
         }
@@ -96,17 +104,24 @@ public class ActionAttackRush extends RobotPlayer {
         action = Action.ACTION_ATTACK_RUSH;
 
         if (nearestEnemyTower != null) {
-            // Play micro
+            if (firstTower == null) {
+                firstTower = nearestEnemyTower;
+            }
 
-            HeuristicPath.move(nearestEnemyTower, Heuristic.HEURISTIC_TOWER_MICRO);
+            // Play micro
             if (rc.canAttack(nearestEnemyTower)) {
                 rc.attack(nearestEnemyTower);
             }
 
         } else {
-            // Explore next possible loc
-
             Pathfinder.move(nextLocToExplore);
+        }
+
+        if (firstTower != null) {
+            if (!rc.canSenseRobotAtLocation(firstTower)) {
+                haveDestroyFirstTower = true;
+                action = Action.ACTION_WAITING_FOR_ACTION;
+            }
         }
     }
 }

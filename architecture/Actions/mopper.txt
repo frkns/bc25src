@@ -1,0 +1,312 @@
+public static void addMoperScore(MapLocation loc){
+	MapLocation myLoc = RobotPlayer.rc.getLocation();
+	int shift = (loc.x - myLoc.x) + (loc.y - myLoc.y) * 1000;
+	switch(shift){
+		case -2003:
+			scores[38] += 18;
+			break;
+		case -1003:
+			scores[31] += 18;
+			scores[38] += 17;
+			break;
+		case -3:
+			scores[31] += 17;
+			scores[32] += 18;
+			scores[38] += 16;
+			break;
+		case 997:
+			scores[31] += 16;
+			scores[32] += 17;
+			break;
+		case 1997:
+			scores[32] += 16;
+			break;
+		case -3002:
+			scores[28] += 18;
+			break;
+		case -2002:
+			scores[21] += 18;
+			scores[37] += 18;
+			scores[28] += 17;
+			scores[38] += 17;
+			break;
+		case -1002:
+			scores[30] += 18;
+			scores[21] += 17;
+			scores[31] += 17;
+			scores[22] += 18;
+			scores[37] += 17;
+			scores[38] += 16;
+			break;
+		case -2:
+			scores[30] += 17;
+			scores[31] += 16;
+			scores[22] += 17;
+			scores[32] += 17;
+			scores[33] += 18;
+			scores[37] += 16;
+			scores[8] += 15;
+			scores[38] += 15;
+			break;
+		case 998:
+			scores[30] += 16;
+			scores[1] += 15;
+			scores[31] += 15;
+			scores[32] += 16;
+			scores[33] += 17;
+			scores[8] += 14;
+			break;
+		case 1998:
+			scores[1] += 14;
+			scores[2] += 15;
+			scores[32] += 15;
+			scores[33] += 16;
+			break;
+		case 2998:
+			scores[2] += 14;
+			break;
+		case -3001:
+			scores[27] += 18;
+			scores[28] += 17;
+			break;
+		case -2001:
+			scores[20] += 18;
+			scores[21] += 17;
+			scores[36] += 18;
+			scores[27] += 17;
+			scores[37] += 17;
+			scores[28] += 16;
+			break;
+		case -1001:
+			scores[20] += 17;
+			scores[30] += 17;
+			scores[21] += 16;
+			scores[22] += 17;
+			scores[23] += 18;
+			scores[35] += 18;
+			scores[36] += 17;
+			scores[37] += 16;
+			break;
+		case -1:
+			scores[30] += 16;
+			scores[22] += 16;
+			scores[23] += 17;
+			scores[33] += 17;
+			scores[34] += 18;
+			scores[35] += 17;
+			scores[36] += 16;
+			scores[7] += 15;
+			scores[37] += 15;
+			scores[8] += 14;
+			break;
+		case 999:
+			scores[0] += 15;
+			scores[30] += 15;
+			scores[1] += 14;
+			scores[33] += 16;
+			scores[34] += 17;
+			scores[35] += 16;
+			scores[7] += 14;
+			scores[8] += 13;
+			break;
+		case 1999:
+			scores[0] += 14;
+			scores[1] += 13;
+			scores[2] += 14;
+			scores[3] += 15;
+			scores[33] += 15;
+			scores[34] += 16;
+			break;
+		case 2999:
+			scores[2] += 13;
+			scores[3] += 14;
+			break;
+		case -3000:
+			scores[26] += 18;
+			scores[27] += 17;
+			scores[28] += 16;
+			break;
+		case -2000:
+			scores[20] += 17;
+			scores[21] += 16;
+			scores[25] += 18;
+			scores[26] += 17;
+			scores[36] += 17;
+			scores[27] += 16;
+			scores[18] += 15;
+			scores[28] += 15;
+			break;
+		case -1000:
+			scores[20] += 16;
+			scores[11] += 15;
+			scores[21] += 15;
+			scores[22] += 16;
+			scores[23] += 17;
+			scores[24] += 18;
+			scores[25] += 17;
+			scores[35] += 17;
+			scores[36] += 16;
+			scores[18] += 14;
+			break;
+		case 0:
+			scores[11] += 14;
+			scores[12] += 15;
+			scores[22] += 15;
+			scores[23] += 16;
+			scores[24] += 17;
+			scores[34] += 17;
+			scores[35] += 16;
+			scores[6] += 15;
+			scores[36] += 15;
+			scores[7] += 14;
+			scores[8] += 13;
+			scores[18] += 13;
+			break;
+		case 1000:
+			scores[0] += 14;
+			scores[1] += 13;
+			scores[11] += 13;
+			scores[12] += 14;
+			scores[34] += 16;
+			scores[5] += 15;
+			scores[35] += 15;
+			scores[6] += 14;
+			scores[7] += 13;
+			scores[8] += 12;
+			break;
+		case 2000:
+			scores[0] += 13;
+			scores[1] += 12;
+			scores[2] += 13;
+			scores[12] += 13;
+			scores[3] += 14;
+			scores[4] += 15;
+			scores[34] += 15;
+			scores[5] += 14;
+			break;
+		case 3000:
+			scores[2] += 12;
+			scores[3] += 13;
+			scores[4] += 14;
+			break;
+		case -2999:
+			scores[26] += 17;
+			scores[27] += 16;
+			break;
+		case -1999:
+			scores[20] += 16;
+			scores[25] += 17;
+			scores[26] += 16;
+			scores[17] += 15;
+			scores[27] += 15;
+			scores[18] += 14;
+			break;
+		case -999:
+			scores[10] += 15;
+			scores[20] += 15;
+			scores[11] += 14;
+			scores[23] += 16;
+			scores[24] += 17;
+			scores[25] += 16;
+			scores[17] += 14;
+			scores[18] += 13;
+			break;
+		case 1:
+			scores[10] += 14;
+			scores[11] += 13;
+			scores[12] += 14;
+			scores[13] += 15;
+			scores[23] += 15;
+			scores[24] += 16;
+			scores[6] += 14;
+			scores[7] += 13;
+			scores[17] += 13;
+			scores[18] += 12;
+			break;
+		case 1001:
+			scores[0] += 13;
+			scores[10] += 13;
+			scores[11] += 12;
+			scores[12] += 13;
+			scores[13] += 14;
+			scores[5] += 14;
+			scores[6] += 13;
+			scores[7] += 12;
+			break;
+		case 2001:
+			scores[0] += 12;
+			scores[12] += 12;
+			scores[3] += 13;
+			scores[13] += 13;
+			scores[4] += 14;
+			scores[5] += 13;
+			break;
+		case 3001:
+			scores[3] += 12;
+			scores[4] += 13;
+			break;
+		case -2998:
+			scores[26] += 16;
+			break;
+		case -1998:
+			scores[25] += 16;
+			scores[16] += 15;
+			scores[26] += 15;
+			scores[17] += 14;
+			break;
+		case -998:
+			scores[10] += 14;
+			scores[24] += 16;
+			scores[15] += 15;
+			scores[25] += 15;
+			scores[16] += 14;
+			scores[17] += 13;
+			break;
+		case 2:
+			scores[10] += 13;
+			scores[13] += 14;
+			scores[14] += 15;
+			scores[24] += 15;
+			scores[15] += 14;
+			scores[6] += 13;
+			scores[16] += 13;
+			scores[17] += 12;
+			break;
+		case 1002:
+			scores[10] += 12;
+			scores[13] += 13;
+			scores[14] += 14;
+			scores[5] += 13;
+			scores[15] += 13;
+			scores[6] += 12;
+			break;
+		case 2002:
+			scores[13] += 12;
+			scores[4] += 13;
+			scores[14] += 13;
+			scores[5] += 12;
+			break;
+		case 3002:
+			scores[4] += 12;
+			break;
+		case -1997:
+			scores[16] += 14;
+			break;
+		case -997:
+			scores[15] += 14;
+			scores[16] += 13;
+			break;
+		case 3:
+			scores[14] += 14;
+			scores[15] += 13;
+			scores[16] += 12;
+			break;
+		case 1003:
+			scores[14] += 13;
+			scores[15] += 12;
+			break;
+		case 2003:
+			scores[14] += 12;
+			break;
+	}
+}

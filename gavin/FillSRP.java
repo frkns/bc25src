@@ -60,14 +60,14 @@ public class FillSRP extends RobotPlayer {
 
     public static void tryComplete() throws GameActionException {
         rc.setIndicatorString("complete: SRP @ " + curSRP);
+        if (rc.getMoney() >= 200 /*&& rc.getLocation().isWithinDistanceSquared(curSRP, 9)*/) {
+            isFillingSRP = false;
+        }
         if (rc.canCompleteResourcePattern(curSRP)) {
             rc.completeResourcePattern(curSRP);
         }
-        isFillingSRP = false;
-        Soldiers.lastSRPloc = curSRP;
-        Soldiers.lastSRProundNum = rc.getRoundNum();
     }
-
+//
     public static void tryToPaintSRP() throws GameActionException {
         MapLocation SRPloc = curSRP;
 
@@ -88,6 +88,16 @@ public class FillSRP extends RobotPlayer {
             return;
         }
         boolean useSecondary = resourcePattern[mask_x][mask_y];
+
+        // nearbyRuins = rc.senseNearbyRuins(-1);
+        // for (MapLocation tileLoc : nearbyRuins) {
+        //     if (!rc.canSenseRobotAtLocation(tileLoc) && tileLoc.distanceSquaredTo(nearestWrongInSRP) <= 8) {
+        //         if (Utils.nearestEmptyOnRuinIfEnemyOrIsUndotted(tileLoc) == null) {
+                    // isFillingSRP = false;
+        //             return;
+        //         }
+        //     }
+        // }
 
         if (rc.canAttack(nearestWrongInSRP)) {
             rc.attack(nearestWrongInSRP, useSecondary);
