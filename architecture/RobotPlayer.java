@@ -200,6 +200,7 @@ public class RobotPlayer {
         ActionCompleteTower.init();
         ActionAttackWave.init();
         ActionMarkSRP.init(); // Using ref_best on turns < 500.
+        ActionExplore.init(); // Explore in direction of spawn
 
         switch (role) {
             case Role.ROLE_SOLDIER_ATTACK_RUSH:

@@ -3,6 +3,7 @@ package architecture.Actions;
 import architecture.RobotPlayer;
 import architecture.Tools.Debug;
 import architecture.Tools.ImpureUtils;
+import architecture.Tools.Pathfinder;
 import battlecode.common.GameActionException;
 
 public class ActionGetPaintWhenLow extends RobotPlayer {

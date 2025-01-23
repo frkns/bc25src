@@ -5,6 +5,9 @@ import architecture.Tools.ImpureUtils;
 import architecture.Tools.Utils;
 import battlecode.common.*;
 
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+
 public class Towers extends RobotPlayer {
 
     static boolean spawnedFirstMopper = false;
@@ -14,6 +17,7 @@ public class Towers extends RobotPlayer {
     static int firstMopper = (int)(mx);
 
     static int numSpawnedUnits = 0;
+    static Direction dirMiddle;
 
     // force the spawning of a unit if possible, bypassing reserve checks, resets to false end of round
     static boolean forceSpawn = false;
@@ -142,6 +146,7 @@ public class Towers extends RobotPlayer {
             System.out.println("Siege phase " + siegePhase);
             System.out.println("Mopper phase " + mopperPhase);
         }
+
         if (fstEnemyTower != null) {
             if (rc.getTeam() == Team.A)
                 rc.setIndicatorLine(rc.getLocation(), fstEnemyTower, 0, 0, 0);
@@ -177,6 +182,7 @@ public class Towers extends RobotPlayer {
 
         ImpureUtils.updateNearestEnemyPaint();
         ImpureUtils.updateNearestEnemyRobot();
+        dirMiddle = rc.getLocation().directionTo(new MapLocation(mapWidth / 2, mapHeight /2));
 
         int r = rng.nextInt(100);
 
@@ -220,16 +226,29 @@ public class Towers extends RobotPlayer {
             if (rc.canSenseRobotAtLocation(tileLoc))  // can't spawn here
                 continue;
 
+
             int score = 0;
-            score += Math.min(tileLoc.x * 600, 6*600);  // wall avoidance
-            score += Math.min((mapWidth - tileLoc.x) * 600, 7*600);
-            score += Math.min(tileLoc.y * 600, 6*600);
-            score += Math.min((mapHeight - tileLoc.y) * 600, 7*600);
+            score += min(tileLoc.x * 10, 6*10);  // wall avoidance
+            score += min((mapWidth - tileLoc.x) * 10, 7*10);
+            score += min(tileLoc.y * 10, 6*10);
+            score += min((mapHeight - tileLoc.y) * 10, 7*10);
 
             Direction summonDirection = rc.getLocation().directionTo(tileLoc);
-            score += rc.getRoundNum() - lastSummonDirection[summonDirection.ordinal()] * 500;
-            score += rc.getRoundNum() - lastSummonDirection[summonDirection.rotateLeft().ordinal()] * 500;
-            score += rc.getRoundNum() - lastSummonDirection[summonDirection.rotateRight().ordinal()] * 500;
+
+            if(numSpawnedUnits == 0){
+                if(summonDirection == dirMiddle)
+                    score += 2000;
+            }
+
+
+            // Better score if not spawn units in this direction recently
+            score += min(5, rc.getRoundNum() - lastSummonDirection[summonDirection.ordinal()]) * 100;
+            score += min(5, rc.getRoundNum() - lastSummonDirection[summonDirection.rotateLeft().ordinal()]) * 100;
+            score += min(5, rc.getRoundNum() - lastSummonDirection[summonDirection.rotateRight().ordinal()]) * 100;
+
+            // or if oposite recently direction
+            score +=  max(0, 10 - lastSummonDirection[summonDirection.opposite().ordinal()]) * 50;
+
 
             if (rc.getLocation().isWithinDistanceSquared(tileLoc, 1)) {
                 score -= 500;  // add a cost for spawning closer
@@ -237,7 +256,7 @@ public class Towers extends RobotPlayer {
 
             if (spawn == UnitType.MOPPER) {
                 if (nearestEnemyPaint != null)
-                    score -= Math.min(1, Utils.chessDistance(tileLoc, nearestEnemyPaint)) * 1500; // add a cost for
+                    score -= min(1, Utils.chessDistance(tileLoc, nearestEnemyPaint)) * 1500; // add a cost for
                 // spawning
                 // further from
                 // enemy paint
@@ -289,7 +308,7 @@ public class Towers extends RobotPlayer {
                 MapLocation robotLoc = robot.getLocation();
                 int robotPaint = robot.getPaintAmount();
                 int towerPaint = rc.getPaint();
-                int transferAmt = Math.min(towerPaint, robot.getType().paintCapacity - robotPaint);
+                int transferAmt = min(towerPaint, robot.getType().paintCapacity - robotPaint);
                 if (rc.canTransferPaint(robotLoc, transferAmt)) {
                     // can towers transfer paint?
                     assert(false);  // apparantely not? pending deletion
