@@ -52,7 +52,7 @@ public class ImpureUtils extends RobotPlayer {
                 nearestPaintTowerIsPaintTower = false;
             }
         }
-        for (RobotInfo robot : nearbyRobots) {
+
         for (RobotInfo robot : nearbyRobots) {
             if (robot.getTeam() == rc.getTeam() && (robot.getType().isTowerType())) {
                 if (robot.getType().getBaseType() == UnitType.LEVEL_ONE_PAINT_TOWER) {
@@ -95,7 +95,7 @@ public class ImpureUtils extends RobotPlayer {
         if (sndNearestEnemyTower != null && rc.getLocation().isWithinDistanceSquared(sndNearestEnemyTower, 20) && (!rc.canSenseRobotAtLocation(sndNearestEnemyTower) || rc.senseRobotAtLocation(sndNearestEnemyTower).getTeam() == rc.getTeam())) {
             sndNearestEnemyTower = null;  // invalidation
         }
-        for (RobotInfo robot : nearbyRobots) {  // assumes non-defense tower
+
         for (RobotInfo robot : nearbyRobots) {  // assumes non-defense tower
             if (robot.getTeam() != rc.getTeam() && robot.getType().isTowerType()) {
                 MapLocation robotLoc = robot.getLocation();
