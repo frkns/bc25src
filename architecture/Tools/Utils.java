@@ -1,71 +1,48 @@
 package architecture.Tools;
 
 import architecture.RobotPlayer;
-import battlecode.common.GameActionException;
-import battlecode.common.MapLocation;
-import battlecode.common.PaintType;
-import battlecode.common.UnitType;
+import battlecode.common.*;
 
 // these Utils are pure functions - no side-effects, they don't change variables or modify game state in any way
 
 public class Utils extends RobotPlayer {
+    public static UnitType[] TOWERS = {UnitType.LEVEL_ONE_PAINT_TOWER, UnitType.LEVEL_ONE_DEFENSE_TOWER, UnitType.LEVEL_ONE_PAINT_TOWER};
 
     public static UnitType getBuildType(MapLocation ruinLoc) throws GameActionException {
-        int numWrongInPaint = 0; // *relative counting* empty tiles are skipped
-        int numWrongInMoney = 0;
-        int numWrongInDefense = 0;
+        int minCost = 1000;
+        UnitType bestType = null;
 
-        for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < 5; j++) {
-                if (i == 2 && j == 2)
-                    continue;
-                MapLocation loc = new MapLocation(ruinLoc.x + i - 2, ruinLoc.y + j - 2);
-                if (!rc.canSenseLocation(loc))
-                    continue;
-                PaintType paint = rc.senseMapInfo(loc).getPaint();
-                if (paint.isEnemy()) {
-                    // return null;
-                    continue;
-                }
-                if (paint == PaintType.EMPTY) {
-                    continue;
-                }
-
-                if (paint == PaintType.ALLY_SECONDARY) {
-                    if (!paintPattern[i][j])
-                        numWrongInPaint++;
-                    if (!moneyPattern[i][j])
-                        numWrongInMoney++;
-                    if (!defensePattern[i][j])
-                        numWrongInDefense++;
-                } else
-                if (paint == PaintType.ALLY_PRIMARY) {
-                    if (paintPattern[i][j])
-                        numWrongInPaint++;
-                    if (moneyPattern[i][j])
-                        numWrongInMoney++;
-                    if (defensePattern[i][j])
-                        numWrongInDefense++;
-                }
-
+        // Update nearby units
+        boolean isMopperNearby = false;
+        boolean isSoldierNearby = false;
+        for(RobotInfo ally: rc.senseNearbyRobots(ruinLoc, 36, rc.getTeam())){
+            switch (ally.type){
+                case UnitType.SOLDIER: isSoldierNearby = true; break;
+                case UnitType.MOPPER: isMopperNearby = true; break;
             }
         }
 
-        // do not early return so we can return null if there is enemy paint
-        if (rc.getNumberTowers() <= strictFollowBuildOrderNumTowers)
-            return AuxConstants.buildOrder[rc.getNumberTowers()];  // follow the build order
-        if (nearbyEnemyRobots > 0)
-            return UnitType.LEVEL_ONE_DEFENSE_TOWER;
 
-        // if roughly same num of wrong tiles, follow the build order
-        if (Math.abs(numWrongInPaint - numWrongInMoney) < 3 && Math.abs(numWrongInMoney - numWrongInDefense) < 3) {
-            return AuxConstants.buildOrder[rc.getNumberTowers()];
+        for(UnitType tower: TOWERS){
+            PatternReport repport = CheckPattern.analyseTowerPatern(ruinLoc, tower);
+
+            int cost = repport.numWrongTiles;
+
+            if(repport.nearestWrongEnemie != null && !isMopperNearby){
+                cost += 5;
+            }
+
+            if(tower == AuxConstants.buildOrder[rc.getNumberTowers()]){
+                cost -= 5;
+            }
+
+            if(cost < minCost){
+                minCost = cost;
+                bestType = tower;
+            }
         }
-        if (numWrongInMoney <= numWrongInPaint && numWrongInMoney <= numWrongInDefense)
-            return UnitType.LEVEL_ONE_MONEY_TOWER;
-        if (numWrongInPaint <= numWrongInDefense)
-            return UnitType.LEVEL_ONE_PAINT_TOWER;
-        return UnitType.LEVEL_ONE_DEFENSE_TOWER;
+
+        return bestType;
     }
 
     // returns null if it's already dotted and there's no enemy paint on the ruin,

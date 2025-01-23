@@ -36,26 +36,53 @@ public class ActionAttackSwing extends RobotPlayer {
         RobotInfo[] enemies = rc.senseNearbyRobots(-1, rc.getTeam().opponent());
 
         // Check if enemy
-        if(enemies.length == 0){
+        if (enemies.length == 0) {
             Debug.println("\tX - ACTION_ATTACK_SWING  : No enemy");
             action = RobotPlayer.Action.ACTION_WAITING_FOR_ACTION;
             return;
         }
 
         // Update score
-        for(RobotInfo enemy: enemies){
+        for (RobotInfo enemy : enemies) {
+            Debug.println("\t\t\tUpdating enemy at : " + enemy.location);
             addMoperScore(enemy.location);
         }
 
         // Update max
-        for(int iDirectionMovement=0; iDirectionMovement<9; iDirectionMovement++){
-            if(!rc.canMove(DIRECTIONS[iDirectionMovement])){
+        for (int iDirectionMovement = 0; iDirectionMovement < 9; iDirectionMovement++) {
+            if (!rc.canMove(DIRECTIONS[iDirectionMovement])) {
                 continue;
             }
 
-            for(int iDirectionAttack=0; iDirectionAttack<50; iDirectionAttack += 10){
-                if(scores[iDirectionMovement + iDirectionAttack] > maxTarget && rc.canMove(DIRECTIONS_ATTACK[iDirectionAttack])){
-                    maxTarget = scores[iDirectionMovement + iDirectionAttack];
+            MapLocation loc = rc.getLocation().add(DIRECTIONS[iDirectionMovement]);
+            MapInfo info = rc.senseMapInfo(loc);
+
+            int coef = 1;
+            int baseScore = 0;
+            switch (info.getPaint()){
+                case PaintType.ALLY_PRIMARY:
+                case PaintType.ALLY_SECONDARY:
+                    baseScore += 20;
+                    break;
+
+                case PaintType.EMPTY:
+                    baseScore += 10;
+                    break;
+
+                case PaintType.ENEMY_PRIMARY:
+                case PaintType.ENEMY_SECONDARY:
+                    coef = 2;
+            };
+            // Not 80 because one of the robot is current bot.
+            baseScore += 90 - (rc.senseNearbyRobots(loc, 2, rc.getTeam()).length * coef);
+
+            for (int iDirectionAttack = 0; iDirectionAttack < 5; iDirectionAttack++) {
+                int id = iDirectionMovement + iDirectionAttack * 10;
+                int score = scores[id] + baseScore;
+
+                if (score > maxTarget) {
+                    // Don't check for mop swing, if we have score != 0, it means we can.
+                    maxTarget = score;
                     bestDirMovement = DIRECTIONS[iDirectionMovement];
                     bestDirAttack = DIRECTIONS_ATTACK[iDirectionAttack];
                 }
@@ -63,7 +90,7 @@ public class ActionAttackSwing extends RobotPlayer {
         }
 
         // Check for target
-        if(bestDirMovement == null || bestDirAttack == null){
+        if (bestDirMovement == null || bestDirAttack == null) {
             Debug.println("\tX - ACTION_ATTACK_SWING  : No best Direction");
             action = RobotPlayer.Action.ACTION_WAITING_FOR_ACTION;
             return;
@@ -74,321 +101,324 @@ public class ActionAttackSwing extends RobotPlayer {
         Debug.println("\t\tMove " + bestDirMovement.name() + " and swing " + bestDirAttack.name());
 
         rc.move(bestDirMovement);
-        rc.mopSwing(bestDirAttack);
+
+        // Check if action ready
+        if (rc.isActionReady()) {
+            rc.mopSwing(bestDirAttack);
+        }else{
+            Debug.println("\tW - ACTION_ATTACK_SWING  : not action ready, keep moving in direction of enemy.");
+        }
     }
-
-
-    public static void addMoperScore(MapLocation loc) {
-        MapLocation myLoc = rc.getLocation();
-        int shift = (loc.x - myLoc.y) + (loc.y - myLoc.y) * 100;
-        switch (shift) {
-            case -123:
-                scores[38]++;
+    public static void addMoperScore(MapLocation loc){
+        MapLocation myLoc = RobotPlayer.rc.getLocation();
+        int shift = (loc.x - myLoc.x) + (loc.y - myLoc.y) * 1000;
+        switch(shift){
+            case -2003:
+                scores[38] += 58;
                 break;
-            case -63:
-                scores[31]++;
-                scores[38]++;
+            case -1003:
+                scores[31] += 58;
+                scores[38] += 57;
                 break;
             case -3:
-                scores[31]++;
-                scores[32]++;
-                scores[38]++;
+                scores[31] += 57;
+                scores[32] += 58;
+                scores[38] += 56;
                 break;
-            case 57:
-                scores[31]++;
-                scores[32]++;
+            case 997:
+                scores[31] += 56;
+                scores[32] += 57;
                 break;
-            case 117:
-                scores[32]++;
+            case 1997:
+                scores[32] += 56;
                 break;
-            case -182:
-                scores[28]++;
+            case -3002:
+                scores[28] += 58;
                 break;
-            case -122:
-                scores[21]++;
-                scores[37]++;
-                scores[28]++;
-                scores[38]++;
+            case -2002:
+                scores[21] += 58;
+                scores[37] += 58;
+                scores[28] += 57;
+                scores[38] += 57;
                 break;
-            case -62:
-                scores[30]++;
-                scores[21]++;
-                scores[31]++;
-                scores[22]++;
-                scores[37]++;
-                scores[38]++;
+            case -1002:
+                scores[30] += 58;
+                scores[21] += 57;
+                scores[31] += 57;
+                scores[22] += 58;
+                scores[37] += 57;
+                scores[38] += 56;
                 break;
             case -2:
-                scores[30]++;
-                scores[31]++;
-                scores[22]++;
-                scores[32]++;
-                scores[33]++;
-                scores[37]++;
-                scores[8]++;
-                scores[38]++;
+                scores[30] += 57;
+                scores[31] += 56;
+                scores[22] += 57;
+                scores[32] += 57;
+                scores[33] += 58;
+                scores[37] += 56;
+                scores[8] += 55;
+                scores[38] += 55;
                 break;
-            case 58:
-                scores[30]++;
-                scores[1]++;
-                scores[31]++;
-                scores[32]++;
-                scores[33]++;
-                scores[8]++;
+            case 998:
+                scores[30] += 56;
+                scores[1] += 55;
+                scores[31] += 55;
+                scores[32] += 56;
+                scores[33] += 57;
+                scores[8] += 54;
                 break;
-            case 118:
-                scores[1]++;
-                scores[2]++;
-                scores[32]++;
-                scores[33]++;
+            case 1998:
+                scores[1] += 54;
+                scores[2] += 55;
+                scores[32] += 55;
+                scores[33] += 56;
                 break;
-            case 178:
-                scores[2]++;
+            case 2998:
+                scores[2] += 54;
                 break;
-            case -181:
-                scores[27]++;
-                scores[28]++;
+            case -3001:
+                scores[27] += 58;
+                scores[28] += 57;
                 break;
-            case -121:
-                scores[20]++;
-                scores[21]++;
-                scores[36]++;
-                scores[27]++;
-                scores[37]++;
-                scores[28]++;
+            case -2001:
+                scores[20] += 58;
+                scores[21] += 57;
+                scores[36] += 58;
+                scores[27] += 57;
+                scores[37] += 57;
+                scores[28] += 56;
                 break;
-            case -61:
-                scores[20]++;
-                scores[30]++;
-                scores[21]++;
-                scores[22]++;
-                scores[23]++;
-                scores[35]++;
-                scores[36]++;
-                scores[37]++;
+            case -1001:
+                scores[20] += 57;
+                scores[30] += 57;
+                scores[21] += 56;
+                scores[22] += 57;
+                scores[23] += 58;
+                scores[35] += 58;
+                scores[36] += 57;
+                scores[37] += 56;
                 break;
             case -1:
-                scores[30]++;
-                scores[22]++;
-                scores[23]++;
-                scores[33]++;
-                scores[34]++;
-                scores[35]++;
-                scores[36]++;
-                scores[7]++;
-                scores[37]++;
-                scores[8]++;
+                scores[30] += 56;
+                scores[22] += 56;
+                scores[23] += 57;
+                scores[33] += 57;
+                scores[34] += 58;
+                scores[35] += 57;
+                scores[36] += 56;
+                scores[7] += 55;
+                scores[37] += 55;
+                scores[8] += 54;
                 break;
-            case 59:
-                scores[0]++;
-                scores[30]++;
-                scores[1]++;
-                scores[33]++;
-                scores[34]++;
-                scores[35]++;
-                scores[7]++;
-                scores[8]++;
+            case 999:
+                scores[0] += 55;
+                scores[30] += 55;
+                scores[1] += 54;
+                scores[33] += 56;
+                scores[34] += 57;
+                scores[35] += 56;
+                scores[7] += 54;
+                scores[8] += 53;
                 break;
-            case 119:
-                scores[0]++;
-                scores[1]++;
-                scores[2]++;
-                scores[3]++;
-                scores[33]++;
-                scores[34]++;
+            case 1999:
+                scores[0] += 54;
+                scores[1] += 53;
+                scores[2] += 54;
+                scores[3] += 55;
+                scores[33] += 55;
+                scores[34] += 56;
                 break;
-            case 179:
-                scores[2]++;
-                scores[3]++;
+            case 2999:
+                scores[2] += 53;
+                scores[3] += 54;
                 break;
-            case -180:
-                scores[26]++;
-                scores[27]++;
-                scores[28]++;
+            case -3000:
+                scores[26] += 58;
+                scores[27] += 57;
+                scores[28] += 56;
                 break;
-            case -120:
-                scores[20]++;
-                scores[21]++;
-                scores[25]++;
-                scores[26]++;
-                scores[36]++;
-                scores[27]++;
-                scores[18]++;
-                scores[28]++;
+            case -2000:
+                scores[20] += 57;
+                scores[21] += 56;
+                scores[25] += 58;
+                scores[26] += 57;
+                scores[36] += 57;
+                scores[27] += 56;
+                scores[18] += 55;
+                scores[28] += 55;
                 break;
-            case -60:
-                scores[20]++;
-                scores[11]++;
-                scores[21]++;
-                scores[22]++;
-                scores[23]++;
-                scores[24]++;
-                scores[25]++;
-                scores[35]++;
-                scores[36]++;
-                scores[18]++;
+            case -1000:
+                scores[20] += 56;
+                scores[11] += 55;
+                scores[21] += 55;
+                scores[22] += 56;
+                scores[23] += 57;
+                scores[24] += 58;
+                scores[25] += 57;
+                scores[35] += 57;
+                scores[36] += 56;
+                scores[18] += 54;
                 break;
             case 0:
-                scores[11]++;
-                scores[12]++;
-                scores[22]++;
-                scores[23]++;
-                scores[24]++;
-                scores[34]++;
-                scores[35]++;
-                scores[6]++;
-                scores[36]++;
-                scores[7]++;
-                scores[8]++;
-                scores[18]++;
+                scores[11] += 54;
+                scores[12] += 55;
+                scores[22] += 55;
+                scores[23] += 56;
+                scores[24] += 57;
+                scores[34] += 57;
+                scores[35] += 56;
+                scores[6] += 55;
+                scores[36] += 55;
+                scores[7] += 54;
+                scores[8] += 53;
+                scores[18] += 53;
                 break;
-            case 60:
-                scores[0]++;
-                scores[1]++;
-                scores[11]++;
-                scores[12]++;
-                scores[34]++;
-                scores[5]++;
-                scores[35]++;
-                scores[6]++;
-                scores[7]++;
-                scores[8]++;
+            case 1000:
+                scores[0] += 54;
+                scores[1] += 53;
+                scores[11] += 53;
+                scores[12] += 54;
+                scores[34] += 56;
+                scores[5] += 55;
+                scores[35] += 55;
+                scores[6] += 54;
+                scores[7] += 53;
+                scores[8] += 52;
                 break;
-            case 120:
-                scores[0]++;
-                scores[1]++;
-                scores[2]++;
-                scores[12]++;
-                scores[3]++;
-                scores[4]++;
-                scores[34]++;
-                scores[5]++;
+            case 2000:
+                scores[0] += 53;
+                scores[1] += 52;
+                scores[2] += 53;
+                scores[12] += 53;
+                scores[3] += 54;
+                scores[4] += 55;
+                scores[34] += 55;
+                scores[5] += 54;
                 break;
-            case 180:
-                scores[2]++;
-                scores[3]++;
-                scores[4]++;
+            case 3000:
+                scores[2] += 52;
+                scores[3] += 53;
+                scores[4] += 54;
                 break;
-            case -179:
-                scores[26]++;
-                scores[27]++;
+            case -2999:
+                scores[26] += 57;
+                scores[27] += 56;
                 break;
-            case -119:
-                scores[20]++;
-                scores[25]++;
-                scores[26]++;
-                scores[17]++;
-                scores[27]++;
-                scores[18]++;
+            case -1999:
+                scores[20] += 56;
+                scores[25] += 57;
+                scores[26] += 56;
+                scores[17] += 55;
+                scores[27] += 55;
+                scores[18] += 54;
                 break;
-            case -59:
-                scores[10]++;
-                scores[20]++;
-                scores[11]++;
-                scores[23]++;
-                scores[24]++;
-                scores[25]++;
-                scores[17]++;
-                scores[18]++;
+            case -999:
+                scores[10] += 55;
+                scores[20] += 55;
+                scores[11] += 54;
+                scores[23] += 56;
+                scores[24] += 57;
+                scores[25] += 56;
+                scores[17] += 54;
+                scores[18] += 53;
                 break;
             case 1:
-                scores[10]++;
-                scores[11]++;
-                scores[12]++;
-                scores[13]++;
-                scores[23]++;
-                scores[24]++;
-                scores[6]++;
-                scores[7]++;
-                scores[17]++;
-                scores[18]++;
+                scores[10] += 54;
+                scores[11] += 53;
+                scores[12] += 54;
+                scores[13] += 55;
+                scores[23] += 55;
+                scores[24] += 56;
+                scores[6] += 54;
+                scores[7] += 53;
+                scores[17] += 53;
+                scores[18] += 52;
                 break;
-            case 61:
-                scores[0]++;
-                scores[10]++;
-                scores[11]++;
-                scores[12]++;
-                scores[13]++;
-                scores[5]++;
-                scores[6]++;
-                scores[7]++;
+            case 1001:
+                scores[0] += 53;
+                scores[10] += 53;
+                scores[11] += 52;
+                scores[12] += 53;
+                scores[13] += 54;
+                scores[5] += 54;
+                scores[6] += 53;
+                scores[7] += 52;
                 break;
-            case 121:
-                scores[0]++;
-                scores[12]++;
-                scores[3]++;
-                scores[13]++;
-                scores[4]++;
-                scores[5]++;
+            case 2001:
+                scores[0] += 52;
+                scores[12] += 52;
+                scores[3] += 53;
+                scores[13] += 53;
+                scores[4] += 54;
+                scores[5] += 53;
                 break;
-            case 181:
-                scores[3]++;
-                scores[4]++;
+            case 3001:
+                scores[3] += 52;
+                scores[4] += 53;
                 break;
-            case -178:
-                scores[26]++;
+            case -2998:
+                scores[26] += 56;
                 break;
-            case -118:
-                scores[25]++;
-                scores[16]++;
-                scores[26]++;
-                scores[17]++;
+            case -1998:
+                scores[25] += 56;
+                scores[16] += 55;
+                scores[26] += 55;
+                scores[17] += 54;
                 break;
-            case -58:
-                scores[10]++;
-                scores[24]++;
-                scores[15]++;
-                scores[25]++;
-                scores[16]++;
-                scores[17]++;
+            case -998:
+                scores[10] += 54;
+                scores[24] += 56;
+                scores[15] += 55;
+                scores[25] += 55;
+                scores[16] += 54;
+                scores[17] += 53;
                 break;
             case 2:
-                scores[10]++;
-                scores[13]++;
-                scores[14]++;
-                scores[24]++;
-                scores[15]++;
-                scores[6]++;
-                scores[16]++;
-                scores[17]++;
+                scores[10] += 53;
+                scores[13] += 54;
+                scores[14] += 55;
+                scores[24] += 55;
+                scores[15] += 54;
+                scores[6] += 53;
+                scores[16] += 53;
+                scores[17] += 52;
                 break;
-            case 62:
-                scores[10]++;
-                scores[13]++;
-                scores[14]++;
-                scores[5]++;
-                scores[15]++;
-                scores[6]++;
+            case 1002:
+                scores[10] += 52;
+                scores[13] += 53;
+                scores[14] += 54;
+                scores[5] += 53;
+                scores[15] += 53;
+                scores[6] += 52;
                 break;
-            case 122:
-                scores[13]++;
-                scores[4]++;
-                scores[14]++;
-                scores[5]++;
+            case 2002:
+                scores[13] += 52;
+                scores[4] += 53;
+                scores[14] += 53;
+                scores[5] += 52;
                 break;
-            case 182:
-                scores[4]++;
+            case 3002:
+                scores[4] += 52;
                 break;
-            case -117:
-                scores[16]++;
+            case -1997:
+                scores[16] += 54;
                 break;
-            case -57:
-                scores[15]++;
-                scores[16]++;
+            case -997:
+                scores[15] += 54;
+                scores[16] += 53;
                 break;
             case 3:
-                scores[14]++;
-                scores[15]++;
-                scores[16]++;
+                scores[14] += 54;
+                scores[15] += 53;
+                scores[16] += 52;
                 break;
-            case 63:
-                scores[14]++;
-                scores[15]++;
+            case 1003:
+                scores[14] += 53;
+                scores[15] += 52;
                 break;
-            case 123:
-                scores[14]++;
+            case 2003:
+                scores[14] += 52;
                 break;
         }
     }
-
 }

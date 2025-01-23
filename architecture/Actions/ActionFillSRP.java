@@ -1,10 +1,7 @@
 package architecture.Actions;
 
 import architecture.RobotPlayer;
-import architecture.Tools.CheckPattern;
-import architecture.Tools.Debug;
-import architecture.Tools.Pathfinder;
-import architecture.Tools.PatternReport;
+import architecture.Tools.*;
 import battlecode.common.*;
 
 public class ActionFillSRP extends RobotPlayer {
@@ -118,6 +115,7 @@ public class ActionFillSRP extends RobotPlayer {
         boolean useSecondary = towerPattern[mask_x][mask_y];
 
         // Attack incorrect tile
+        HeuristicPath.move(target, Heuristic.DEFAULT);
         if (rc.canAttack(target)) {
             rc.attack(target, useSecondary);
             report.numWrongTiles--;

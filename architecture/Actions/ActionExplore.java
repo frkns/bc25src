@@ -2,10 +2,10 @@ package architecture.Actions;
 
 import architecture.RobotPlayer;
 import architecture.Tools.Debug;
+import architecture.Tools.HeuristicPath;
 import architecture.Tools.Pathfinder;
 import architecture.Tools.Utils;
-import battlecode.common.GameActionException;
-import battlecode.common.MapLocation;
+import battlecode.common.*;
 
 public class ActionExplore extends RobotPlayer {
     static MapLocation target;
@@ -30,6 +30,14 @@ public class ActionExplore extends RobotPlayer {
 
         Debug.println("\t0 - ACTION_EXPLORE       : Playing!");
 
+        // Check for help signal
+        for(RobotInfo ally: rc.senseNearbyRobots(-1, rc.getTeam())){
+            MapLocation loc = ally.getLocation();
+            if(rc.senseMapInfo(loc).getMark() == PaintType.ALLY_SECONDARY){
+                Debug.println("\t\tHelp signal found at " + loc);
+                target = loc;
+            }
+        }
 
         if (target == null
                 || rc.getLocation().isWithinDistanceSquared(target, 9)
@@ -38,7 +46,7 @@ public class ActionExplore extends RobotPlayer {
             lastTargetChangeRound = rc.getRoundNum();
         }
 
-        Pathfinder.move(target);
-        // Todo: change to use heuristic, but seems bugged.
+        HeuristicPath.move(target, Heuristic.DEFAULT);
+        rc.setIndicatorLine(rc.getLocation(), target, 196, 20, 236); // Pink
     }
 }

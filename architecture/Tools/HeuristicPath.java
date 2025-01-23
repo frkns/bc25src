@@ -25,6 +25,9 @@ public class HeuristicPath extends RobotPlayer {
 
     public static void move(MapLocation targetLoc, Heuristic moveHeuristic) throws GameActionException {
         Debug.println("\t\tMove to " + targetLoc + " with " + moveHeuristic.name());
+        assert(targetLoc != null);
+
+
         int[] directionCost = new int[8];
         int cost = 0;
         int score;
@@ -54,6 +57,7 @@ public class HeuristicPath extends RobotPlayer {
 
             // add a cost for moving in a direction that gets closer to the last 8 positions
             cost = switch (moveHeuristic) {
+                case Heuristic.HEURISTIC_REFILL -> 100;
                 case Heuristic.HEURISTIC_WRONG_SRP -> 0;
                 case Heuristic.HEURISTIC_TOWER_MICRO -> 0;
                 default -> 1000;
@@ -70,6 +74,7 @@ public class HeuristicPath extends RobotPlayer {
 
             // add a cost if new location is the previous one
             cost = switch (moveHeuristic) {
+                case Heuristic.HEURISTIC_REFILL -> 10;
                 case Heuristic.HEURISTIC_TOWER_MICRO -> 100;
                 case Heuristic.HEURISTIC_WRONG_SRP -> 200;
                 default -> 1000;
@@ -83,11 +88,22 @@ public class HeuristicPath extends RobotPlayer {
 
             // add a cost for moving in a direction that gets closer to the tower that spawned us
             cost = switch (moveHeuristic) {
+                case Heuristic.HEURISTIC_REFILL -> -50;
                 case Heuristic.HEURISTIC_TOWER_MICRO -> 0;
                 case Heuristic.HEURISTIC_WRONG_SRP -> 0;
                 case Heuristic.HEURISTIC_WRONG_RUINS -> 0;
-                case Heuristic.HEURISTIC_REFILL -> 0;
                 default -> 200;
+            };
+            if (cost != 0) {
+                if (dir == rc.getLocation().directionTo(spawnTowerLocation))
+                    directionCost[i] += cost;
+            }
+
+
+            // add a cost for moving in a direction that gets closer to the nearest paint tower
+            cost = switch (moveHeuristic) {
+                case Heuristic.SURVIVE -> -300;
+                default -> 0;
             };
             if (cost != 0) {
                 if (dir == rc.getLocation().directionTo(spawnTowerLocation))
@@ -102,9 +118,9 @@ public class HeuristicPath extends RobotPlayer {
 
             // add a cost if on enemie paint
             cost = switch (moveHeuristic) {
+                case Heuristic.HEURISTIC_REFILL -> (rc.getPaint() < 5) ? 10000 : 1000;
                 case Heuristic.HEURISTIC_WRONG_RUINS -> 0;
                 case Heuristic.HEURISTIC_TOWER_MICRO -> 100;
-                case Heuristic.HEURISTIC_REFILL -> 1000;
                 case Heuristic.HEURISTIC_MOPPER -> (rc.getNumberTowers() >= startPaintingFloorTowerNum) ? 5000 : 1500;
                 default -> enemyPaintPenalty;
             };
@@ -116,8 +132,8 @@ public class HeuristicPath extends RobotPlayer {
 
             // add a cost if on empty paint
             cost = switch (moveHeuristic) {
+                case Heuristic.HEURISTIC_REFILL -> (rc.getPaint() < 5) ? 10000 : 1000;
                 case Heuristic.HEURISTIC_WRONG_RUINS -> 0;
-                case Heuristic.HEURISTIC_REFILL -> 1000;
                 case Heuristic.HEURISTIC_MOPPER -> (rc.getNumberTowers() >= startPaintingFloorTowerNum) ? 4000 : 1400;
                 default -> neutralPaintPenalty;
             };

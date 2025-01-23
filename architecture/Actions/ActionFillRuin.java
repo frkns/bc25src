@@ -60,7 +60,7 @@ public class ActionFillRuin extends RobotPlayer {
         // Play action
         //------------------------------------------------------------------------------//
         Debug.println("\t0 - ACTION_FILL_RUIN     : Playing!");
-        RobotPlayer.action = Action.ACTION_FILL_RUINS;
+        action = Action.ACTION_FILL_RUINS;
 
         Pathfinder.move(nearestEmptyRuin);
         MapLocation target = switch (rc.getType()){
@@ -83,6 +83,7 @@ public class ActionFillRuin extends RobotPlayer {
         boolean useSecondary = towerPattern[mask_x][mask_y];
 
         // Paint incorrect tile
+        HeuristicPath.move(target, Heuristic.DEFAULT);
         if (rc.canAttack(target)) {
             rc.attack(target, useSecondary);
             repport.numWrongTiles--;
@@ -98,7 +99,7 @@ public class ActionFillRuin extends RobotPlayer {
         if (rc.canCompleteTowerPattern(towerType, nearestEmptyRuin)) {
             rc.completeTowerPattern(towerType, nearestEmptyRuin);
 
-            if (rc.getPaint() < 150) {
+            if (rc.getPaint() < 80) {
                 action = Action.ACTION_GET_PAINT;
             }else{
                 action = Action.ACTION_WAITING_FOR_ACTION;

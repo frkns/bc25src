@@ -204,7 +204,7 @@ public class Towers extends RobotPlayer {
             spawn = UnitType.MOPPER;
         }
 
-        if (nearestEnemyRobot != null && nearbyMoppers < 2) {
+        if (nearestEnemyRobot != null && nearbyMoppers < 3) {
             // "clog will mog" reactionary mopper
             if (rc.getRoundNum() < mx * 2 || canSpawnSplasher) {
                 rc.setIndicatorString("there is a enemy robot nearby, spawning mopper");

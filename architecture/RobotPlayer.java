@@ -6,6 +6,7 @@ import architecture.Tools.Comms;
 import architecture.Tools.Debug;
 import architecture.Tools.ImpureUtils;
 import battlecode.common.*;
+import gavin.fast.FastMath;
 
 import java.util.Random;
 
@@ -52,7 +53,7 @@ public class RobotPlayer {
         HEURISTIC_WRONG_RUINS,
         HEURISTIC_WRONG_SRP,
         HEURISTIC_TOWER_MICRO,
-        HEURISTIC_MOPPER, HEURISTIC_SOLDIER, EXPLORE, HEURISTIC_FASTEST
+        HEURISTIC_MOPPER, HEURISTIC_SOLDIER, EXPLORE, DEFAULT, SURVIVE, HEURISTIC_FASTEST
     }
 
     public enum Role {
@@ -220,7 +221,7 @@ public class RobotPlayer {
         Debug.println("Init Actions.");
         ActionCompleteTower.init();
         ActionAttackWave.init();
-        ActionMarkSRP.init();
+        ActionMarkSRP.init(); // Using ref_best on turns < 500.
 
         switch (role) {
             case Role.ROLE_SOLDIER_ATTACK_RUSH:
@@ -263,7 +264,7 @@ public class RobotPlayer {
 
                 if (!rc.getType().isTowerType())
                     ImpureUtils.updateNearestPaintTower();
-
+                ActionHelpSignal.remove(); // Remove help at start of turn.
 
                 // Plays actions
                 Debug.println("Start of actions   : as " + role.name() + " " + action.name());
@@ -319,9 +320,6 @@ public class RobotPlayer {
                         }
                         ActionAttackMicro.run();
 
-                        // Basic
-                        ActionPaintUnder.run();
-
                         // End of turn update.
                         ActionMarkSRP.updateScores();
                         break;
@@ -335,10 +333,16 @@ public class RobotPlayer {
 
                         // Tower
                         ActionCompleteTower.run();
-                        ActionFillRuin.run();
 
-                        // Swing
-                        ActionAttackSwing.run();
+                        action = Action.ACTION_WAITING_FOR_ACTION;
+                        if(rc.getPaint() < 30 || FastMath.rand256() < 126){
+                            ActionAttackSwing.run();
+                            ActionFillRuin.run();
+                        }else{
+                            ActionFillRuin.run();
+                            ActionAttackSwing.run();
+                        }
+
 
                         // SRP
                         ActionCompleteSRP.run();
@@ -380,10 +384,13 @@ public class RobotPlayer {
                         Debug.println("No role corresponding to " + role.name());
 
                 }
+
+                ActionHelpSignal.run(); // Place MARK2 under unit to call help if needed.
                 Debug.println("End of actions     : with " + action.name());
 
                 if (action == Action.ACTION_WAITING_FOR_ACTION) {
                     ActionExplore.run();
+                    ActionPaintUnder.run();
                 }
                 rc.setIndicatorString(role.name() + " - " + action.name());
                 Debug.println("End of turn. " + Clock.getBytecodeNum() + " bytecodes used.\n\n\n");

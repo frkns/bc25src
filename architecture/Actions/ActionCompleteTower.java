@@ -26,7 +26,7 @@ public class ActionCompleteTower extends RobotPlayer {
         // Init
         //------------------------------------------------------------------------------//
 
-        // Check for ruin
+        // No ruins
         if (nearestEmptyRuin == null) {
             Debug.println("\tX - ACTION_COMPLETE_TOWER: No ruins");
             action = Action.ACTION_WAITING_FOR_ACTION;
@@ -35,6 +35,7 @@ public class ActionCompleteTower extends RobotPlayer {
 
         UnitType tower = Utils.getBuildType(nearestEmptyRuin);
 
+        // No tower type
         if (tower == null) {
             Debug.println("\tE - ACTION_COMPLETE_TOWER: Can't build null tower type");
             checked.set(nearestEmptyRuin, (char)rc.getRoundNum());
@@ -43,8 +44,17 @@ public class ActionCompleteTower extends RobotPlayer {
             return;
         }
 
+        // Can build or havent any paint so wait tower
+        if (!rc.canCompleteTowerPattern(tower, nearestEmptyRuin) && rc.getPaint() > 30) {
+            Debug.println("\tX - ACTION_COMPLETE_TOWER: Can't complete pattern and have paint -> move something else");
+            checked.set(nearestEmptyRuin, (char)rc.getRoundNum());
+            action = Action.ACTION_WAITING_FOR_ACTION;
+            return;
+        }
+
         PatternReport report = CheckPattern.analyseTowerPatern(nearestEmptyRuin, tower);
 
+        // Pattern is good
         if (report.numWrongTiles != 0) {
             Debug.println("\tX - ACTION_COMPLETE_TOWER: Pattern not complete");
             checked.set(nearestEmptyRuin, (char)rc.getRoundNum());
@@ -52,7 +62,7 @@ public class ActionCompleteTower extends RobotPlayer {
             return;
         }
 
-        // And no one is nearby
+        // No one is nearby
         for (RobotInfo ally : rc.senseNearbyRobots(nearestEmptyRuin, 2, rc.getTeam())) {
             if (ally.ID < rc.getID()) { // Avoid to be self detected
                 Debug.println("\tX - ACTION_COMPLETE_TOWER: Someone is already here");

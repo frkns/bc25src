@@ -2,6 +2,8 @@ package architecture.Actions;
 
 import architecture.RobotPlayer;
 import architecture.Tools.Debug;
+import architecture.Tools.HeuristicPath;
+import architecture.Tools.ImpureUtils;
 import architecture.Tools.Pathfinder;
 import battlecode.common.*;
 
@@ -11,6 +13,7 @@ public class ActionMarkSRP extends RobotPlayer {
     // ---- Action variables ----
     static MapLocation targetMark;
     static char scoreTargetMark;
+    static int lastDebug = 0;
 
     static MapLocation targetExplore;
     static int lastTargetChangeRound = 0;
@@ -58,14 +61,21 @@ public class ActionMarkSRP extends RobotPlayer {
         paints = "\u0000".repeat(70 * 70).toCharArray(); // Default to empty paint
     }
 
+    //------------------------------------------------------------------------------//
+    // Update score
+    //------------------------------------------------------------------------------//
     // Return false if haven't completely update
     public static boolean updateScores() throws GameActionException {
         Debug.println("\t\tUpdating scores.");
         for (MapInfo info : rc.senseNearbyMapInfos()) {
 
-            if (Clock.getBytecodesLeft() < 5000) {
+            if (Clock.getBytecodesLeft() < 7000) {
                 Debug.println("\tW - ACTION_MARK_SRP      : Need more time to update. Skipping to next action.");
-                action = Action.ACTION_WAITING_FOR_ACTION;
+
+                if(action == Action.ACTION_MARK_SRP) {
+                    // Leave MARK_SRP because haven't finish updating. Go for another action.
+                    action = Action.ACTION_WAITING_FOR_ACTION;
+                }
                 return false;
             }
 
@@ -94,10 +104,10 @@ public class ActionMarkSRP extends RobotPlayer {
 
             // Check if paint have changed
             if (paints[id] != type) {
-                Debug.printl("\t\tCell " + locCenter + " (=" + id + ") have change from " + (int) paints[id] + " to " + (int) type); // + " (" + ((int) scores[id] - (int) ZERO) + " -> ");
+                // Debug.println("\t\tCell " + locCenter + " (=" + id + ") have change from " + (int) paints[id] + " to " + (int) type); // + " (" + ((int) scores[id] - (int) ZERO) + " -> ");
                 subScoreTo(id, paints[id]); // Remove old score
                 addScoreTo(id, type);       // Add new score
-                Debug.println(((int) scores[id] - (int) ZERO) + ")");
+                // Debug.println(((int) scores[id] - (int) ZERO) + ")");
                 paints[id] = type;
             }
         }
@@ -109,50 +119,27 @@ public class ActionMarkSRP extends RobotPlayer {
             MapLocation loc = info.getMapLocation();
             int id = SHIFT_START + loc.x + loc.y * 70;
 
-            if ((int)scores[id] > (int)scoreTargetMark) {
+            if ((int)scores[id] >= (int)scoreTargetMark) {
                 targetMark = loc;
                 scoreTargetMark = scores[id];
-            }
-
-            int scale = ((int) scores[id] - (int) ZERO) * 255 / 40;
-            // Debug.println("Score at : " + info.getMapLocation() + " : " + (int) scores[id] + " (" + ((int) scores[id] - (int) ZERO) + ")");
-            if (scale < 0) {
-                if(scale < 10000){
-//                    rc.setIndicatorDot(loc, 0, 0, 255);
-                }else{
-//                    rc.setIndicatorDot(loc, min(255, -scale), 0, 0);
-                }
-            } else {
-//                rc.setIndicatorDot(loc, 0, min(255, scale), 0);
             }
         }
 
         Debug.println("\t\tDone !");
+        // printScores();
         return true;
     }
 
-    public static void printScores() throws GameActionException {
-        for (int x = 0; x < rc.getMapWidth(); x++) {
-            for (int y = 0; y < rc.getMapHeight(); y++) {
-                int id = SHIFT_START + x + 70 * y;
-                MapLocation loc = new MapLocation(x, y);
 
-                int scale = ((int) scores[id] - (int) ZERO) * 255 / 40;
-                // Debug.println("Score at : " + info.getMapLocation() + " : " + (int) scores[id] + " (" + ((int) scores[id] - (int) ZERO) + ")");
-                if (scale < 0) {
-                    if(scale < 10000){
-//                        rc.setIndicatorDot(loc, 0, 0, 255);
-                    }else{
-//                        rc.setIndicatorDot(loc, min(255, -scale), 0, 0);
-                    }
-                } else {
-//                    rc.setIndicatorDot(loc, 0, min(255, scale), 0);
-                }
-            }
-        }
-    }
-
+    //------------------------------------------------------------------------------//
+    // Run
+    //------------------------------------------------------------------------------//
     public static void run() throws GameActionException {
+        if(rc.getRoundNum() < 1000){
+            ImpureUtils.tryMarkSRP();
+            return;
+        }
+
         switch (RobotPlayer.action) {
             case Action.ACTION_MARK_SRP:
             case Action.ACTION_WAITING_FOR_ACTION:
@@ -165,7 +152,6 @@ public class ActionMarkSRP extends RobotPlayer {
         //------------------------------------------------------------------------------//
         // Init
         //------------------------------------------------------------------------------//
-
         // Update terrains info
         if (!updateScores()) return; // If not enough time.
 
@@ -196,7 +182,7 @@ public class ActionMarkSRP extends RobotPlayer {
         }
 
         // Move
-        Pathfinder.move(targetMark);
+        HeuristicPath.move(targetMark, Heuristic.DEFAULT);
         if (!updateScores()) return; // If not enough time.
 
 
@@ -210,6 +196,41 @@ public class ActionMarkSRP extends RobotPlayer {
             action = Action.ACTION_WAITING_FOR_ACTION;
         }
     }
+
+    //------------------------------------------------------------------------------//
+    // Print score
+    //------------------------------------------------------------------------------//
+    public static void printScores() throws GameActionException {
+        if(lastDebug == rc.getRoundNum()){
+            return;
+        }
+
+        lastDebug = rc.getRoundNum();
+
+        Debug.println("Scores :");
+        for(MapInfo locInfo: rc.senseNearbyMapInfos(-1)){
+            MapLocation loc = locInfo.getMapLocation();
+            int id = SHIFT_START + loc.x + 70 * loc.y;
+
+            int score = ((int) scores[id] - (int) ZERO);
+            Debug.println("\t" + loc + " (id " + id + ") " + score);
+
+            int scale = score * 255 / 40;
+            if (scale < 0) {
+                if(scale < 10000){
+                    rc.setIndicatorDot(loc, 0, 0, 255);
+                }else{
+                    rc.setIndicatorDot(loc, min(255, -scale) + 1, 0, 0);
+                }
+            } else {
+                rc.setIndicatorDot(loc, 0, min(255, scale), 0);
+            }
+        }
+    }
+
+    //------------------------------------------------------------------------------//
+    // Add score
+    //------------------------------------------------------------------------------//
     public static void addScoreTo(int cell, char type) {
         switch (type) {
             case 0: break;

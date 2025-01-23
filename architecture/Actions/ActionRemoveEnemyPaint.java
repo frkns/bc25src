@@ -2,6 +2,7 @@ package architecture.Actions;
 
 import architecture.RobotPlayer;
 import architecture.Tools.Debug;
+import architecture.Tools.HeuristicPath;
 import architecture.Tools.ImpureUtils;
 import architecture.Tools.Pathfinder;
 import battlecode.common.GameActionException;
@@ -25,7 +26,7 @@ public class ActionRemoveEnemyPaint extends RobotPlayer {
         ImpureUtils.updateNearestEnemyPaint();
 
         // Target not null
-        if (nearestEnemyPaint != null) {
+        if (nearestEnemyPaint == null) {
             return;
         }
 
@@ -38,7 +39,7 @@ public class ActionRemoveEnemyPaint extends RobotPlayer {
             return;
         }
 
-        Pathfinder.move(nearestEnemyPaint);
+        HeuristicPath.move(nearestEnemyPaint, Heuristic.DEFAULT);
 
         if(rc.canAttack(nearestEnemyPaint)){
             rc.attack(nearestEnemyPaint);
