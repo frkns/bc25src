@@ -1,16 +1,12 @@
 package architecture.Actions;
 
 import architecture.RobotPlayer;
-import architecture.Tools.Debug;
-import architecture.Tools.ImpureUtils;
-import architecture.Tools.Pathfinder;
 import battlecode.common.GameActionException;
 import battlecode.common.PaintType;
-import battlecode.common.UnitType;
 
 public class ActionHelpSignal extends RobotPlayer {
     static int lastRoundHelpSignal = -100;
-    static int periodBeetweenSignal = 5;
+    static int periodBetweenSignal = 5;
 
     public static void remove() throws GameActionException {
         if(rc.senseMapInfo(rc.getLocation()).getMark() == PaintType.ALLY_SECONDARY){
@@ -34,7 +30,7 @@ public class ActionHelpSignal extends RobotPlayer {
         // Check
         //------------------------------------------------------------------------------//
 
-        // Already to many robots
+        // Already too many robots
         if(rc.senseNearbyRobots(-1, rc.getTeam()).length > 5){
             return;
         }
@@ -50,7 +46,7 @@ public class ActionHelpSignal extends RobotPlayer {
         }
 
         // Not spamming help
-        if(rc.getRoundNum() - lastRoundHelpSignal < periodBeetweenSignal){
+        if(rc.getRoundNum() - lastRoundHelpSignal < periodBetweenSignal){
             return;
         }
 

@@ -10,7 +10,7 @@ public class ActionFillSRP extends RobotPlayer {
     static boolean canHelp(PatternReport r) {
         return switch (rc.getType()) {
             case UnitType.SOLDIER -> r.nearestWrongPaint != null;
-            case UnitType.MOPPER -> r.nearestWrongEnemie != null;
+            case UnitType.MOPPER -> r.nearestWrongEnemies != null;
             default -> false;
         };
     }
@@ -96,7 +96,7 @@ public class ActionFillSRP extends RobotPlayer {
 
         MapLocation target = switch (rc.getType()) {
             case UnitType.SOLDIER -> report.nearestWrongPaint;
-            case UnitType.MOPPER -> report.nearestWrongEnemie;
+            case UnitType.MOPPER -> report.nearestWrongEnemies;
             default -> null;
         };
         Pathfinder.move(target);
@@ -120,7 +120,7 @@ public class ActionFillSRP extends RobotPlayer {
             rc.attack(target, useSecondary);
             report.numWrongTiles--;
 
-            if (report.numWrongTiles == 0 && report.numberUnknow == 0) {
+            if (report.numWrongTiles == 0 && report.numberUnknown == 0) {
                 action = Action.ACTION_COMPLETE_SRP;
             } else {
                 action = Action.ACTION_FILL_SRP;

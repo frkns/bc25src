@@ -14,21 +14,21 @@ public class Utils extends RobotPlayer {
 
         // Update nearby units
         boolean isMopperNearby = false;
-        boolean isSoldierNearby = false;
         for(RobotInfo ally: rc.senseNearbyRobots(ruinLoc, 36, rc.getTeam())){
             switch (ally.type){
-                case UnitType.SOLDIER: isSoldierNearby = true; break;
+                case UnitType.SOLDIER:
+                    break;
                 case UnitType.MOPPER: isMopperNearby = true; break;
             }
         }
 
 
         for(UnitType tower: TOWERS){
-            PatternReport repport = CheckPattern.analyseTowerPatern(ruinLoc, tower);
+            PatternReport report = CheckPattern.analyseTowerPatern(ruinLoc, tower);
 
-            int cost = repport.numWrongTiles;
+            int cost = report.numWrongTiles;
 
-            if(repport.nearestWrongEnemie != null && !isMopperNearby){
+            if(report.nearestWrongEnemies != null && !isMopperNearby){
                 cost += 5;
             }
 

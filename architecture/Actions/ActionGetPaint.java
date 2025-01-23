@@ -6,7 +6,7 @@ import architecture.Tools.ImpureUtils;
 import architecture.Tools.Pathfinder;
 import battlecode.common.GameActionException;
 
-public class ActionGetPaintWhenLow extends RobotPlayer {
+public class ActionGetPaint extends RobotPlayer {
     static int MIN_PAINT = 20;
 
     public static void run() throws GameActionException {
@@ -18,8 +18,6 @@ public class ActionGetPaintWhenLow extends RobotPlayer {
             Debug.println("\tX - ACTION_GET_PAINT_LOW : No paint tower or no need for paint");
 
             if(action == Action.ACTION_GET_PAINT){
-                // Check to avoid override another action.
-                // Specific behavior because ACTION_GET_PAINT is prioritary.
                 action = Action.ACTION_WAITING_FOR_ACTION;
             }
             return;
@@ -35,9 +33,5 @@ public class ActionGetPaintWhenLow extends RobotPlayer {
         Pathfinder.move(nearestPaintTower);
         ImpureUtils.withdrawPaintIfPossible(nearestPaintTower);
         rc.setIndicatorLine(nearestPaintTower, rc.getLocation(),0, 0, 255);
-
-        if(rc.getPaint() > MIN_PAINT){
-            action = Action.ACTION_WAITING_FOR_ACTION;
-        }
     }
 }

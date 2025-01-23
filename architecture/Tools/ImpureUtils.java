@@ -42,28 +42,6 @@ public class ImpureUtils extends RobotPlayer {
         }
     }
 
-    public static void updateNearbyMask(boolean alsoUpdateEnemies) throws GameActionException {
-        nearbyFriendlyRobots = 1;  // fixes div 0 error and also includes ourself in the count
-        nearbyEnemyRobots = 0;
-
-        nearbyAlliesMask = new boolean[5][5];  // reset everything to false
-        if (alsoUpdateEnemies)
-            nearbyEnemiesMask = new boolean[5][5];  // reset everything to false
-
-        RobotInfo[] nearbyTiles5x5 = rc.senseNearbyRobots(8);
-        for (RobotInfo robot : nearbyTiles5x5) {
-            int i = robot.getLocation().x - rc.getLocation().x + 2;
-            int j = robot.getLocation().y - rc.getLocation().y + 2;
-            if (rc.getTeam() == robot.getTeam()) {
-                nearbyFriendlyRobots++;
-                nearbyAlliesMask[i][j] = true;
-            } else if (alsoUpdateEnemies) {
-                nearbyEnemyRobots++;
-                nearbyEnemiesMask[i][j] = true;
-            }
-        }
-    }
-
 
     // really, after the change, this should be called updateNearestPaintTarget, because moppers/money/defense towers are inlcuded
     public static void updateNearestPaintTower() throws GameActionException {
@@ -161,16 +139,6 @@ public class ImpureUtils extends RobotPlayer {
         }
     }
 
-
-    static void paintFloor() throws GameActionException {
-        MapLocation floorTile = rc.getLocation();
-
-        // canAttack is better than canPaint because it checks action cooldown?? (changing to this avoided an error)
-        if (rc.canAttack(floorTile) && rc.senseMapInfo(floorTile).getPaint() == PaintType.EMPTY) {
-            rc.attack(floorTile, false);  // primary
-            // rc.attack(floorTile, true);  // secondary
-        }
-    }
 
 
     public static void withdrawPaintIfPossible(MapLocation withdrawTarget) throws GameActionException {
