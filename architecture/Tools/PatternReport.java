@@ -3,19 +3,19 @@ import battlecode.common.MapLocation;
 
 public class PatternReport {
     public int numWrongTiles;
-    public int numberUnknow;
+    public int numberUnknown;
     public MapLocation nearestWrongPaint;
-    public MapLocation nearestWrongEnemie;
+    public MapLocation nearestWrongEnemies;
 
     public PatternReport(
             int numWrongTiles,
-            int numberUnknow,
+            int numberUnknown,
             MapLocation nearestWrongPaint,
-            MapLocation nearestWrongEnemie
+            MapLocation nearestWrongEnemies
     ) {
         this.numWrongTiles = numWrongTiles;
-        this.numberUnknow = numberUnknow;
+        this.numberUnknown = numberUnknown;
         this.nearestWrongPaint = nearestWrongPaint;
-        this.nearestWrongEnemie = nearestWrongEnemie;
+        this.nearestWrongEnemies = nearestWrongEnemies;
     }
 }

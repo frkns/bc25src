@@ -10,7 +10,7 @@ public class ActionFillRuin extends RobotPlayer {
     static boolean canHelp() {
         return switch (rc.getType()) {
             case UnitType.SOLDIER -> repport.nearestWrongPaint != null && rc.getPaint() >= 5;
-            case UnitType.MOPPER -> repport.nearestWrongEnemie != null;
+            case UnitType.MOPPER -> repport.nearestWrongEnemies != null;
             default -> false;
         };
     }
@@ -65,7 +65,7 @@ public class ActionFillRuin extends RobotPlayer {
         Pathfinder.move(nearestEmptyRuin);
         MapLocation target = switch (rc.getType()){
             case UnitType.SOLDIER -> repport.nearestWrongPaint;
-            case UnitType.MOPPER -> repport.nearestWrongEnemie;
+            case UnitType.MOPPER -> repport.nearestWrongEnemies;
             default -> null;
         };
 
