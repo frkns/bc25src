@@ -2,7 +2,6 @@ package architecture.Actions;
 
 import architecture.RobotPlayer;
 import architecture.Tools.Debug;
-import architecture.Tools.HeuristicPath;
 import architecture.Tools.ImpureUtils;
 import battlecode.common.GameActionException;
 
@@ -36,7 +35,7 @@ public class ActionGetPaintWhenLow extends RobotPlayer {
         Debug.println("\t0 - ACTION_GET_PAINT_LOW : Playing!");
         Debug.println("\t\tRefill from " + nearestPaintTower);
 
-        HeuristicPath.move(nearestPaintTower, Heuristic.HEURISTIC_REFILL);
+        Pathfinder.move(nearestPaintTower);
         ImpureUtils.withdrawPaintIfPossible(nearestPaintTower);
         rc.setIndicatorLine(nearestPaintTower, rc.getLocation(),0, 0, 255);
 

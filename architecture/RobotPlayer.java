@@ -12,10 +12,6 @@ import java.util.Random;
 
 
 public class RobotPlayer {
-    // Constants and Utilities
-    public static final int dx8[] = {0, 1, 1, 1, 0, -1, -1, -1};
-    public static final int dy8[] = {-1, -1, 0, 1, 1, 1, 0, -1};
-
     public static final Random rng = new Random();
     public static final Direction[] directions = {
             Direction.NORTH,
@@ -46,28 +42,18 @@ public class RobotPlayer {
         ACTION_REMOVE_ENEMY_PAINT, ACTION_ATTACK_SWING, ACTION_WAIT_COMPLETE_TOWER, ACTION_WAITING_FOR_ACTION
     }
 
-    ;
-
-    public enum Heuristic {
-        HEURISTIC_REFILL,
-        HEURISTIC_WRONG_RUINS,
-        HEURISTIC_WRONG_SRP,
-        HEURISTIC_TOWER_MICRO,
-        HEURISTIC_MOPPER, HEURISTIC_SOLDIER, EXPLORE, DEFAULT, SURVIVE, HEURISTIC_FASTEST
-    }
-
     public enum Role {
         ROLE_SOLDIER,
         ROLE_SOLDIER_ATTACK,
+        ROLE_SOLDIER_ATTACK_RUSH,
         ROLE_MOPPER,
-        ROLE_TOWER,
-        ROLE_SOLDIER_ATTACK_RUSH, ROLE_SPLASHER
+        ROLE_SPLASHER,
+        ROLE_TOWER
     }
 
     // General States
     public static Action action = Action.ACTION_WAITING_FOR_ACTION;
     public static Role role;
-    public static int turnsAlive = 0;
 
     // Map Size
     public static RobotController rc;
@@ -116,17 +102,9 @@ public class RobotPlayer {
     public static int reservePaintPhase;  // it is really bad to reserve paint in the first few rounds because we'll fall behind
     public static int reservePaint = 100;
     public static int reserveChips = 1800;
-    public static int startPaintingFloorTowerNum = 4;  // don't paint floor before this to conserve paint
-    public static int strictFollowBuildOrderNumTowers = 4;
     public static int reserveMorePaintPhase;
     public static int reserveMorePaint = 500;
 
-
-    // Self destruction (not sure if self destructing is worth it, needs more testing)
-    public static int selfDestructPhase = 300;
-    public static int selfDestructFriendlyRobotsThreshold = 20;  // > this to self destruct
-    public static int selfDestructEnemyRobotsThreshold = 5;  // < this to self destruct
-    public static int selfDestructPaintThreshold = 50;
 
 
     // History of location
@@ -181,13 +159,13 @@ public class RobotPlayer {
 
         // Phases
         mx = Math.max(mapWidth, mapHeight);  // ~60 for huge ~35 for medium
-        siegePhase = (int) (mx * 3);  // cast to int, will be useful for tuning later
-        fullFillPhase = (int) (mx * 3);
-        splasherPhase = (int) (mx * 2);
-        mopperPhase = (int) (mx * 4);
-        attackBasePhase = (int) (mx * 3);
+        siegePhase = (mx * 3);  // cast to int, will be useful for tuning later
+        fullFillPhase = (mx * 3);
+        splasherPhase = (mx * 2);
+        mopperPhase = (mx * 4);
+        attackBasePhase = (mx * 3);
         reservePaintPhase = (int) (mx * 1.5);
-        alwaysBuildDefenseTowerPhase = (int) (mx * 8);
+        alwaysBuildDefenseTowerPhase = (mx * 8);
         if (mx < 36) {
             AuxConstants.buildOrder[3] = UnitType.LEVEL_ONE_PAINT_TOWER;
         }
@@ -247,7 +225,6 @@ public class RobotPlayer {
                 Comms.readAndUpdateTowerTargets(rc.getRoundNum() - 1);
                 Comms.readAndUpdateTowerTargets(rc.getRoundNum());
 
-                turnsAlive++;
                 roundNum = rc.getRoundNum();
 
                 // Update sensing
@@ -307,18 +284,6 @@ public class RobotPlayer {
                         ActionCompleteSRP.run();
                         ActionFillSRP.run();
                         ActionMarkSRP.run();
-
-                        // Attack if nothing else to do.
-                        if (rc.getRoundNum() > siegePhase && turnsAlive > 10) {
-                            // Rush for tower after 10 turns alive
-                            ActionAttackWave.run();
-
-                            // We don't want soldier to stay in attack rush mode.
-                            if(action == Action.ACTION_ATTACK_RUSH) {
-                                action = Action.ACTION_WAITING_FOR_ACTION;
-                            }
-                        }
-                        ActionAttackMicro.run();
 
                         // End of turn update.
                         ActionMarkSRP.updateScores();

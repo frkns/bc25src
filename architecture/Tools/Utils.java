@@ -102,16 +102,4 @@ public class Utils extends RobotPlayer {
         return new MapLocation(mapWidth - loc.x - 1, loc.y);
     }
 
-    static boolean selfDestructRequirementsMet() {
-        if (rc.getRoundNum() < selfDestructPhase)
-            return false;
-        if (nearbyFriendlyRobots < selfDestructFriendlyRobotsThreshold)
-            return false;
-        if (nearbyEnemyRobots > selfDestructEnemyRobotsThreshold)
-            return false;
-        if (rc.getPaint() > selfDestructPaintThreshold)
-            return false;
-
-        return true;
-    }
 }

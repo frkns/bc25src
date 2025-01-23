@@ -179,13 +179,11 @@ public class Towers extends RobotPlayer {
         ImpureUtils.updateNearestEnemyRobot();
 
         int r = rng.nextInt(100);
-        // rc.setIndicatorString("RNG: " + r);
 
         canSpawnSplasher = canSpawnSplasherFn();
 
         spawn = UnitType.SOLDIER;
         if (rc.getRoundNum() >= mopperPhase && rc.getPaint() < 700) {
-            // if (rc.getRoundNum() % 5 == 0) {
             if (r < 20) {
                 spawn = UnitType.MOPPER;
             }
@@ -199,9 +197,6 @@ public class Towers extends RobotPlayer {
             }
         }
 
-        if (turnsAlive > 2 && rc.getRoundNum() > firstMopper && !spawnedFirstMopper && rc.getMoney() > reserveChips) {
-            spawn = UnitType.MOPPER;
-        }
 
         if (nearestEnemyRobot != null && nearbyMoppers < 2) {
             // "clog will mog" reactionary mopper

@@ -2,7 +2,6 @@ package architecture.Actions;
 
 import architecture.RobotPlayer;
 import architecture.Tools.Debug;
-import architecture.Tools.HeuristicPath;
 import architecture.Tools.Pathfinder;
 import architecture.Tools.Utils;
 import battlecode.common.GameActionException;
@@ -110,7 +109,6 @@ public class ActionAttackRush extends RobotPlayer {
             }
 
             // Play micro
-            HeuristicPath.move(nearestEnemyTower, Heuristic.HEURISTIC_TOWER_MICRO);
             if (rc.canAttack(nearestEnemyTower)) {
                 rc.attack(nearestEnemyTower);
             }
