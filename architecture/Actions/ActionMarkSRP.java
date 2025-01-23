@@ -2,7 +2,6 @@ package architecture.Actions;
 
 import architecture.RobotPlayer;
 import architecture.Tools.Debug;
-import architecture.Tools.HeuristicPath;
 import architecture.Tools.ImpureUtils;
 import architecture.Tools.Pathfinder;
 import battlecode.common.*;
@@ -182,7 +181,7 @@ public class ActionMarkSRP extends RobotPlayer {
         }
 
         // Move
-        HeuristicPath.move(targetMark, Heuristic.DEFAULT);
+        Pathfinder.move(targetMark);
         if (!updateScores()) return; // If not enough time.
 
 

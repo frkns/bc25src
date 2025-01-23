@@ -2,7 +2,6 @@ package architecture.Actions;
 
 import architecture.RobotPlayer;
 import architecture.Tools.Debug;
-import architecture.Tools.HeuristicPath;
 import architecture.Tools.Pathfinder;
 import architecture.Tools.Utils;
 import battlecode.common.*;
@@ -46,7 +45,7 @@ public class ActionExplore extends RobotPlayer {
             lastTargetChangeRound = rc.getRoundNum();
         }
 
-        HeuristicPath.move(target, Heuristic.DEFAULT);
+        Pathfinder.move(target);
         rc.setIndicatorLine(rc.getLocation(), target, 196, 20, 236); // Pink
     }
 }

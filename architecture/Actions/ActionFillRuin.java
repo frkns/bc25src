@@ -83,7 +83,7 @@ public class ActionFillRuin extends RobotPlayer {
         boolean useSecondary = towerPattern[mask_x][mask_y];
 
         // Paint incorrect tile
-        HeuristicPath.move(target, Heuristic.DEFAULT);
+        Pathfinder.move(target);
         if (rc.canAttack(target)) {
             rc.attack(target, useSecondary);
             repport.numWrongTiles--;

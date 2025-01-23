@@ -115,7 +115,7 @@ public class ActionFillSRP extends RobotPlayer {
         boolean useSecondary = towerPattern[mask_x][mask_y];
 
         // Attack incorrect tile
-        HeuristicPath.move(target, Heuristic.DEFAULT);
+        Pathfinder.move(target);
         if (rc.canAttack(target)) {
             rc.attack(target, useSecondary);
             report.numWrongTiles--;
