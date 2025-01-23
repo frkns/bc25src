@@ -77,8 +77,12 @@ public class Moppers extends RobotPlayer {
         // rc.getLocation().distanceSquaredTo(nearestEnemyPaint) <= 2)
         // mopperStand = true;
 
-        if (!mopperStand)
+        MapLocation tt = Utils.chooseTowerTarget();
+        if (tt != null && rc.getNumberTowers() > 8 && rc.getID() % 10 < 2 && rc.isActionReady()) {
+            Pathfinder.move(tt);
+        } else
             HeuristicPath.mopperMove(target);
+
 
         // mop vs mop swing relative scoring logic
         // let's suppose that removing enemy paint from a tile has a value of ~10 paint

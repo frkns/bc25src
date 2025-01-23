@@ -72,7 +72,6 @@ public class Soldiers extends RobotPlayer {
 
         // ImpureUtils.updateNearbyUnits();  // pending removal
 
-        ImpureUtils.tryUpgradeNearbyTowers();
         ImpureUtils.updateNearbyMask(false);
 
         // if (Utils.selfDestructRequirementsMet()) {
@@ -100,8 +99,8 @@ public class Soldiers extends RobotPlayer {
             curRuin = null;
         }
 
-
-        nearbyRuins = rc.senseNearbyRuins(-1);  // keep updated for SRP as well
+        ImpureUtils.tryUpgradeNearbyTowers();
+        // nearbyRuins = rc.senseNearbyRuins(-1);  // keep updated for SRP as well
         if (!isRefilling && rc.getNumberTowers() != GameConstants.MAX_NUMBER_OF_TOWERS) {
             int distance = (int)2e9;
             for (MapLocation tileLoc : nearbyRuins) {
@@ -118,6 +117,10 @@ public class Soldiers extends RobotPlayer {
                 // }
             }
         }
+
+
+
+
         if (rc.getNumberTowers() == GameConstants.MAX_NUMBER_OF_TOWERS) {
             isFillingRuin = false;
         }
@@ -218,6 +221,22 @@ public class Soldiers extends RobotPlayer {
             }
         }
 
+        // dot nearby empty/ enemy ruins
+        nearbyRuins = rc.senseNearbyRuins(-1);
+        if (rc.isActionReady()) {
+            MapLocation closestDot = null;
+            for (MapLocation tileLoc : nearbyRuins) {
+                MapLocation tentativeDot = Utils.nearestEmptyOnRuinIfEnemyOrIsUndotted(tileLoc);
+                if (tentativeDot != null) {
+                    if (closestDot == null || rc.getLocation().distanceSquaredTo(tentativeDot) < rc.getLocation().distanceSquaredTo(closestDot)) {
+                        closestDot = tentativeDot;
+                    }
+                }
+            }
+            if (rc.canAttack(closestDot)) {
+                rc.attack(closestDot);
+            }
+        }
 
         if (!rc.isMovementReady()) {
             nearbyTiles = rc.senseNearbyMapInfos();
@@ -239,22 +258,6 @@ public class Soldiers extends RobotPlayer {
             isRefilling = false;  // does not actually stop the refill because the move step already happened, but unlocks other options
         }
 
-        // dot nearby empty/ enemy ruins
-        nearbyRuins = rc.senseNearbyRuins(-1);
-        if (rc.isActionReady()) {
-            MapLocation closestDot = null;
-            for (MapLocation tileLoc : nearbyRuins) {
-                MapLocation tentativeDot = Utils.nearestEmptyOnRuinIfEnemyOrIsUndotted(tileLoc);
-                if (tentativeDot != null) {
-                    if (closestDot == null || rc.getLocation().distanceSquaredTo(tentativeDot) < rc.getLocation().distanceSquaredTo(closestDot)) {
-                        closestDot = tentativeDot;
-                    }
-                }
-            }
-            if (rc.canAttack(closestDot)) {
-                rc.attack(closestDot);
-            }
-        }
 
         wallAdjacent = false;
         for (MapInfo tile : rc.senseNearbyMapInfos(1)) {

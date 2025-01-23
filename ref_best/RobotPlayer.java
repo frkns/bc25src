@@ -157,10 +157,11 @@ public class RobotPlayer {
             RobotInfo robot = rc.senseRobotAtLocation(ruinLoc);
             if (robot.getTeam() == rc.getTeam()) {
                 if (robot.getType().isTowerType()) {
-                    if (spawnTowerLocation == null || rc.getLocation().distanceSquaredTo(robot.getLocation()) < rc.getLocation().distanceSquaredTo(spawnTowerLocation)) {
+                    // if (spawnTowerLocation == null || rc.getLocation().distanceSquaredTo(robot.getLocation()) < rc.getLocation().distanceSquaredTo(spawnTowerLocation)) {
                         spawnTowerLocation = robot.getLocation();
                         spawnTowerType = robot.getType().getBaseType();
-                    }
+                    // }
+                    break;
                 }
             }
         }
@@ -178,8 +179,8 @@ public class RobotPlayer {
         mx = Math.max(mapWidth, mapHeight);  // ~60 for huge ~35 for medium
         siegePhase = (int)(mx * 3);  // cast to int, will be useful for tuning later
         fullFillPhase = (int)(mx * 3);
-        mopperPhase = (int)(mx * 4);
-        splasherPhase = (int)(mx * 2);
+        mopperPhase = (int)(mx * 2);
+        splasherPhase = (int)(mx * 3);
         attackBasePhase = (int)(mx * 3);
         fullAttackBasePhase = (int)(mx * 8);
         reservePaintPhase = (int)(mx * 1.5);
@@ -196,26 +197,32 @@ public class RobotPlayer {
                     } else if (totalManDist < 30) {
                         role = 1;  // send from money tower if really close
                     }
+                } else if (spawnTowerType == UnitType.LEVEL_ONE_PAINT_TOWER && rc.getRoundNum() == 3) {
+                    role = 2;
                 }
             }
-            if (Utils.isAttackingBase()) {
+            if (role == 0 && Utils.isAttackingBase()) {
                 role = 1;
             }
         }
 
-        switch (rc.getType()) {
-            case SOLDIER: {
-                switch (role) {
-                    case 1:
-                        // AttackBase.init();
-                        break;
-                }
-                break;
-            }
+        if (role == 2) {
+            RuinDotter.init();
         }
 
+        // switch (rc.getType()) {
+        //     case SOLDIER: {
+        //         switch (role) {
+        //             case 1:
+        //                 // AttackBase.init();
+        //                 break;
+        //         }
+        //         break;
+        //     }
+        // }
+
         if(mx < 36) {
-            AuxConstants.buildOrder[3] = UnitType.LEVEL_ONE_PAINT_TOWER;
+            AuxConstants.buildOrder[4] = UnitType.LEVEL_ONE_PAINT_TOWER;
         }
 
         while (true) {
@@ -241,6 +248,9 @@ public class RobotPlayer {
                         switch (role) {
                             case 1:
                                 AttackBase.run();
+                                break;
+                            case 2:
+                                RuinDotter.run();
                                 break;
                             default: runSoldier();
                         }

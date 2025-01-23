@@ -360,12 +360,8 @@ public class Soldiers extends RobotPlayer {
                 target = Utils.randomLocationInQuadrant(Utils.currentQuadrant());
             else*/
 
-            MapLocation tentativeTarget = Utils.chooseTowerTarget();
 
-            if (rc.getRoundNum() >= fullAttackBasePhase && tentativeTarget != null && rc.getID() % 5 == 0) {
-                target = tentativeTarget;
-            } else
-                target = Utils.randomLocationInQuadrant(rng.nextInt(4));
+            target = Utils.randomLocationInQuadrant(rng.nextInt(4));
 
             lastTargetChangeRound = rc.getRoundNum();
         }
@@ -381,7 +377,13 @@ public class Soldiers extends RobotPlayer {
         if (rc.isMovementReady()) {
             HeuristicPath.fullFill = fullFilling;
             HeuristicPath.targetIncentive = 500;
-            HeuristicPath.move(target);
+
+            MapLocation tt = Utils.chooseTowerTarget();
+            if (tt != null && rc.getNumberTowers() > 8 && rc.isActionReady() && rc.getID() % 10 < 5) {
+                Pathfinder.move(tt);
+            } else
+                HeuristicPath.move(target);
+
             // nearbyTiles = rc.senseNearbyMapInfos();
         }
 

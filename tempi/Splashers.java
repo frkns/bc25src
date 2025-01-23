@@ -12,7 +12,7 @@ public class Splashers extends RobotPlayer{
 
     public static void run() throws GameActionException {
         // nearest paint tower is updated by default
-        ImpureUtils.updateNearbyMask(true);
+        ImpureUtils.updateNearbyMask(false);
         ImpureUtils.updateNearestEnemyTower();
         ImpureUtils.updateNearestEnemyPaint();
 

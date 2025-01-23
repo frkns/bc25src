@@ -262,7 +262,8 @@ public class Towers extends RobotPlayer {
             if (r < 20) {
                 spawn = UnitType.MOPPER;
             }
-        } else if (rc.getRoundNum() >= splasherPhase) {
+        }
+        if (rc.getRoundNum() >= splasherPhase) {
             if (r < 20) {
                 spawn = UnitType.MOPPER;
             }

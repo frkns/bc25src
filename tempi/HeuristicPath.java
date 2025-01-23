@@ -862,9 +862,11 @@ public class HeuristicPath extends RobotPlayer {
 
             // try to attack the target our towers tell us to
             // if (rc.getRoundNum() >= fullAttackBasePhase && role == 1) {
+            if (rc.getID() % 10 < 7) {
                 MapLocation tentativeTarget = Utils.chooseTowerTarget();
                 if (tentativeTarget != null)
                     directionCost[i] += Utils.manhattanDistance(newLoc, tentativeTarget) * 1500;
+            }
             // }
 
             // good anti clumping

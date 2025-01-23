@@ -75,11 +75,15 @@ public class Splashers extends RobotPlayer{
         }
 
         if (rc.isMovementReady()) {
-            // if (nearestEnemyTower != null) {
+            MapLocation tt = Utils.chooseTowerTarget();
+            if (tt != null && rc.getNumberTowers() > 8 && rc.isActionReady()) {
+                if (rc.getID() % 2 == 0)
+                    Pathfinder.move(tt);
+                else
+                    Pathfinder.move(target);
+            } else {
                 HeuristicPath.splasherMove(target);
-            // } else {
-                // Pathfinder.move(target);
-            // }
+            }
         }
 
         // find best attack location
