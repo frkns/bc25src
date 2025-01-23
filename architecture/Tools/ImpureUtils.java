@@ -53,6 +53,7 @@ public class ImpureUtils extends RobotPlayer {
             }
         }
         for (RobotInfo robot : nearbyRobots) {
+        for (RobotInfo robot : nearbyRobots) {
             if (robot.getTeam() == rc.getTeam() && (robot.getType().isTowerType())) {
                 if (robot.getType().getBaseType() == UnitType.LEVEL_ONE_PAINT_TOWER) {
                     if (nearestPaintTower == null || rc.getLocation().distanceSquaredTo(robot.getLocation()) < rc
@@ -95,6 +96,7 @@ public class ImpureUtils extends RobotPlayer {
             sndNearestEnemyTower = null;  // invalidation
         }
         for (RobotInfo robot : nearbyRobots) {  // assumes non-defense tower
+        for (RobotInfo robot : nearbyRobots) {  // assumes non-defense tower
             if (robot.getTeam() != rc.getTeam() && robot.getType().isTowerType()) {
                 MapLocation robotLoc = robot.getLocation();
                 int distanceSquared = rc.getLocation().distanceSquaredTo(robotLoc);
@@ -116,6 +118,7 @@ public class ImpureUtils extends RobotPlayer {
             }
         }
     }
+
 
 
     static void updateNearestEmptyTile() throws GameActionException {
@@ -143,6 +146,7 @@ public class ImpureUtils extends RobotPlayer {
 
     public static void withdrawPaintIfPossible(MapLocation withdrawTarget) throws GameActionException {
         Debug.println("Withdraw from " + withdrawTarget);
+        Debug.println("Withdraw from " + withdrawTarget);
         if (rc.getLocation().isWithinDistanceSquared(withdrawTarget, 2)) {
             RobotInfo paintTower = rc.senseRobotAtLocation(withdrawTarget);
             if (paintTower == null)
@@ -153,6 +157,7 @@ public class ImpureUtils extends RobotPlayer {
                 rc.transferPaint(withdrawTarget, -transferAmt);
         }
     }
+
 
 
     public static void tryMarkSRP() throws GameActionException {
@@ -188,6 +193,7 @@ public class ImpureUtils extends RobotPlayer {
             }
         }
     }
+
 
 
     public static void updateNearbyUnits() throws GameActionException {

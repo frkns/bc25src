@@ -6,6 +6,10 @@ import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 import battlecode.common.Message;
 import battlecode.common.UnitType;
+import battlecode.common.GameActionException;
+import battlecode.common.MapLocation;
+import battlecode.common.Message;
+import battlecode.common.UnitType;
 
 
 public class Comms extends RobotPlayer {
@@ -37,13 +41,17 @@ public class Comms extends RobotPlayer {
             int snd = (bits >> (21 - 14)) & 0xFFF;
             MapLocation fstLoc = fst == 0xFFF ? null : Comms.intToLoc(fst);
             MapLocation sndLoc = snd == 0xFFF ? null : Comms.intToLoc(snd);
+            MapLocation fstLoc = fst == 0xFFF ? null : Comms.intToLoc(fst);
+            MapLocation sndLoc = snd == 0xFFF ? null : Comms.intToLoc(snd);
             boolean fstType = ((bits >> (32 - 13)) & 1) == 1;
             boolean sndType = ((bits >> (32 - 26)) & 1) == 1;
 
             if (fstTowerTarget == null || fstLoc != null && rc.getLocation().distanceSquaredTo(fstLoc) > rc.getLocation().distanceSquaredTo(fstTowerTarget) && fstLoc != fstTowerTarget) {
+            if (fstTowerTarget == null || fstLoc != null && rc.getLocation().distanceSquaredTo(fstLoc) > rc.getLocation().distanceSquaredTo(fstTowerTarget) && fstLoc != fstTowerTarget) {
                 fstTowerTarget = fstLoc;
                 fstTowerTargetIsDefense = fstType;
             }
+            if (sndTowerTarget == null || sndLoc != null && rc.getLocation().distanceSquaredTo(sndLoc) > rc.getLocation().distanceSquaredTo(sndTowerTarget) && sndLoc != sndTowerTarget) {
             if (sndTowerTarget == null || sndLoc != null && rc.getLocation().distanceSquaredTo(sndLoc) > rc.getLocation().distanceSquaredTo(sndTowerTarget) && sndLoc != sndTowerTarget) {
                 sndTowerTarget = sndLoc;
                 sndTowerTargetIsDefense = sndType;
