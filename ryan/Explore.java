@@ -14,11 +14,13 @@ public class Explore extends RobotPlayer {
         MapLocation checkLoc;
         MapLocation robotLoc = rc.getLocation();
         // Add bias towards center
-        directionScores[robotLoc.directionTo(mapCenter).ordinal()] += 3;
-        directionScores[robotLoc.directionTo(mapCenter).rotateLeft().ordinal()] += 2;
-        directionScores[robotLoc.directionTo(mapCenter).rotateRight().ordinal()] += 2;
-        directionScores[robotLoc.directionTo(mapCenter).rotateLeft().rotateLeft().ordinal()] += 1;
-        directionScores[robotLoc.directionTo(mapCenter).rotateRight().rotateRight().ordinal()] += 1;
+        if (!robotLoc.equals(mapCenter)) {
+            directionScores[robotLoc.directionTo(mapCenter).ordinal()] += 3;
+            directionScores[robotLoc.directionTo(mapCenter).rotateLeft().ordinal()] += 2;
+            directionScores[robotLoc.directionTo(mapCenter).rotateRight().ordinal()] += 2;
+            directionScores[robotLoc.directionTo(mapCenter).rotateLeft().rotateLeft().ordinal()] += 1;
+            directionScores[robotLoc.directionTo(mapCenter).rotateRight().rotateRight().ordinal()] += 1;
+        }
 
         // Check 2 tiles away
         checkLoc = robotLoc.translate(2, 0); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY && rc.senseMapInfo(checkLoc).isPassable()) directionScores[Direction.EAST.ordinal()] += 5;

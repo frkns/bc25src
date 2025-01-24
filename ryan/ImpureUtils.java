@@ -122,18 +122,6 @@ public class ImpureUtils extends RobotPlayer {
         }
     }
 
-    // static void updateNearestEnemyTower() throws GameActionException {
-    //     nearestEnemyTower = null;
-    //     for (RobotInfo robot : nearbyRobots) {  // assumes non-defense tower
-    //         if (robot.getTeam() != rc.getTeam() && robot.getType().isTowerType()) {
-    //             MapLocation robotLoc = robot.getLocation();
-    //             if (nearestEnemyTower == null || rc.getLocation().distanceSquaredTo(robotLoc) < rc.getLocation().distanceSquaredTo(nearestEnemyTower)) {
-    //                 nearestEnemyTower = robot.getLocation();
-    //                 nearestEnemyTowerType = robot.getType().getBaseType();
-    //             }
-    //         }
-    //     }
-    // }
 
     // updates two towers now!
     static void updateNearestEnemyTower() throws GameActionException {

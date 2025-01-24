@@ -22,7 +22,6 @@ public class FastLocSet {
 
     public void add(MapLocation loc) {
         String key = "^" + (char) (loc.x) + (char) (loc.y);
-        // String key = locToStr(loc);
         if (keys.indexOf(key) == -1) {
             keys.append(key);
             size++;

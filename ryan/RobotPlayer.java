@@ -38,8 +38,8 @@ public class RobotPlayer {
     static MapInfo[] nearbyTiles;
     static MapLocation[] nearbyRuins;
     static boolean nearestPaintSourceIsPaintTower = false;
-    static MapLocation nearestPaintSource;  // misnomer, can be money/defense tower if we haven't see a paint tower yet
-    static MapLocation nearestEmptyTile;  // not used (update: we use it now for full fill)
+    static MapLocation nearestPaintSource;  
+    static MapLocation nearestEmptyTile;
     static MapLocation nearestEnemyPaint;
     static MapLocation nearestEnemyRobot;  // non-tower
     static RobotInfo nearestEnemyRobotInfo;

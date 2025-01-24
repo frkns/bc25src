@@ -24,6 +24,7 @@ public class Debug extends RobotPlayer {
     public static final boolean INDICATORS = true;
     public static final boolean INFO = true;
     public static final boolean PATHFINDER = true;
+    public static final boolean MOPPER = false;
     public static final boolean SRP = true;
 
 

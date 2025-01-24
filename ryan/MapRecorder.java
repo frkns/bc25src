@@ -9,15 +9,17 @@ public class MapRecorder extends RobotPlayer {
     // Sets to track wall locations that have been reported and need to be reported
     private static int W = rc.getMapWidth();
     private static int H = rc.getMapHeight();
-    private static FastLocSet reportedWalls = new FastLocSet();
+    private static FastLocSet knownWalls = new FastLocSet();
+    private static FastIterableLocSet knownRuins = new FastIterableLocSet(); // Will break if robot learns of more than 100 ruins
     private static FastIterableLocSet knownEmptyRuins = new FastIterableLocSet();
     private static FastIterableLocSet knownAlliedTowers = new FastIterableLocSet();
     private static FastIterableLocSet knownEnemyTowers = new FastIterableLocSet();
 
     // Symmetry tracking variables
     private static boolean symConfirmed = false; // Whether map symmetry has been confirmed
-    private static boolean needWallFlip = false; // Whether walls need to be mirrored across symmetry line
+    private static boolean needWallFlip = false; // Whether walls & ruins need to be mirrored across symmetry line
     private static int wallFlipIndex = -1; // Index for processing wall flipping
+    private static int ruinFlipIndex = -1; // Index for processing ruin flipping
 
     // Bit flags for map cell states
     public static final char SEEN_BIT = 1; // Marks cell as seen
@@ -29,11 +31,54 @@ public class MapRecorder extends RobotPlayer {
     public static final String SIX_HUNDRED_LEN_STRING = ONE_HUNDRED_LEN_STRING + ONE_HUNDRED_LEN_STRING + ONE_HUNDRED_LEN_STRING + ONE_HUNDRED_LEN_STRING + ONE_HUNDRED_LEN_STRING + ONE_HUNDRED_LEN_STRING;
     public static final String STRING_LEN_4200 = SIX_HUNDRED_LEN_STRING + SIX_HUNDRED_LEN_STRING + SIX_HUNDRED_LEN_STRING + SIX_HUNDRED_LEN_STRING + SIX_HUNDRED_LEN_STRING + SIX_HUNDRED_LEN_STRING + SIX_HUNDRED_LEN_STRING;
 
-    // Map state array: 0=unseen, 1=no wall, 2=wall
+    // Map state array: 0=unseen, 1=no wall, 2=wall or ruin
     public static char[] vals = STRING_LEN_4200.toCharArray();
 
     // Symmetry state: bits represent eliminated symmetries (100=rotational, 010=vertical, 001=horizontal)
     private static int symmetry;
+
+    // Returns the nearest enemy tower or the first enemy tower within a squared radius of 144
+    // If no enemy tower locations are known, we assume they are symmetric to the known allied towers
+    public static MapLocation getPotentialEnemyTower(){
+        int nearestDist = 999999;
+        MapLocation nearestEnemyTower = null;
+        if (knownEnemyTowers.size > 0){
+            knownEnemyTowers.updateIterable();
+            for (int i = knownEnemyTowers.size; --i >= 0;){
+                MapLocation loc = knownEnemyTowers.locs[i];
+                int dist = rc.getLocation().distanceSquaredTo(loc);
+                if (dist < nearestDist){
+                    if (dist < 144) {
+                        return loc;
+                    } else {
+                        nearestDist = dist;
+                        nearestEnemyTower = loc;
+                    }
+                }
+            }
+            return nearestEnemyTower;
+        } else if (knownAlliedTowers.size > 0 && symConfirmed){
+            knownAlliedTowers.updateIterable();
+            for (int i = knownAlliedTowers.size; --i >= 0;){
+                MapLocation loc = getSymmetricLoc(knownAlliedTowers.locs[i]);
+                if (!knownAlliedTowers.contains(loc) && !knownEmptyRuins.contains(loc)) {
+                    int dist = rc.getLocation().distanceSquaredTo(loc);
+                    if (dist < nearestDist) {
+                        if (dist < 144) {
+                            return loc;
+                        } else {
+                            nearestDist = dist;
+                            nearestEnemyTower = loc;
+                        }
+                    }
+                }
+            }
+            return nearestEnemyTower;
+        } else {
+            return null;
+        }
+    }
+
 
     // Check if a location is passable
     public static boolean getPassible(MapLocation loc) {
@@ -43,26 +88,33 @@ public class MapRecorder extends RobotPlayer {
         return true;
     }
 
-    // Get raw data value for a location
-    public static int getData(MapLocation loc) {
-        return vals[Utils.loc2int(loc)];
-    }
-
     // Record map data and check symmetry until bytecode limit
     public static void recordSym(int leaveBytecodeCnt) throws GameActionException {
         // Process pending wall flips if symmetry was just confirmed
         if (needWallFlip) {
-            if (wallFlipIndex == -1) {
-                wallFlipIndex = reportedWalls.size;
-            }
             // Mirror each known wall across symmetry line
+            if (wallFlipIndex == -1) {
+                wallFlipIndex = knownWalls.size;
+            }
             for (; --wallFlipIndex >= 0; ) {
-                MapLocation loc = reportedWalls.pop();
+                MapLocation loc = knownWalls.pop();
                 MapLocation symloc = getSymmetricLoc(loc);
-                if (!reportedWalls.contains(symloc)) {
-                    reportedWalls.add(symloc);
-                    vals[Utils.loc2int(symloc)] = WALL_BIT;
+                knownWalls.add(symloc);
+                vals[Utils.loc2int(symloc)] = WALL_BIT;
+                if (Clock.getBytecodesLeft() <= leaveBytecodeCnt) {
+                    return;
                 }
+            }
+            // Mirror each known ruin across symmetry line
+            if (ruinFlipIndex == -1) {
+                ruinFlipIndex = knownRuins.size;
+                knownRuins.updateIterable();
+            }
+            for (; --ruinFlipIndex >= 0; ) {
+                MapLocation loc = knownRuins.locs[ruinFlipIndex];
+                MapLocation symloc = getSymmetricLoc(loc);
+                knownRuins.add(symloc);
+                vals[Utils.loc2int(symloc)] = WALL_BIT;
                 if (Clock.getBytecodesLeft() <= leaveBytecodeCnt) {
                     return;
                 }
@@ -79,8 +131,20 @@ public class MapRecorder extends RobotPlayer {
             MapInfo info = infos[i];
             MapLocation loc = info.getMapLocation();
 
-            // Track ruin locations
+
+            int locID = Utils.loc2int(loc);
+            if (vals[locID] != 0)
+                continue;
+
+            // Record ruin locations
             if (info.hasRuin()) {
+                vals[locID] = WALL_BIT;
+                knownRuins.add(loc);
+                if (symConfirmed) {
+                    MapLocation symloc = getSymmetricLoc(loc);
+                    knownRuins.add(symloc);
+                    vals[Utils.loc2int(symloc)] = WALL_BIT;
+                }
                 // Is it an allied tower, enemy tower, or empty ruin
                 RobotInfo robot = rc.senseRobotAtLocation(loc);
                 if (robot != null) {
@@ -98,21 +162,12 @@ public class MapRecorder extends RobotPlayer {
                     knownAlliedTowers.remove(loc);
                     knownEnemyTowers.remove(loc);
                 }
-            }
-
-            int locID = Utils.loc2int(loc);
-            if (vals[locID] != 0)
-                continue;
-
-            // Record walls and update shared knowledge
-            if (info.isWall()) {
+            } else if (info.isWall()) { // Record walls
                 vals[locID] = WALL_BIT;
-                if (!reportedWalls.contains(loc)) {
-                    reportedWalls.add(loc);
-                }
+                knownWalls.add(loc);
                 if (symConfirmed) {
                     MapLocation symloc = getSymmetricLoc(loc);
-                    reportedWalls.add(symloc);
+                    knownWalls.add(symloc);
                     vals[Utils.loc2int(symloc)] = WALL_BIT;
                 }
             } else {
@@ -138,31 +193,6 @@ public class MapRecorder extends RobotPlayer {
             }
         }
     }
-
-    // Initialize turn by processing shared information
-    public static void initTurn() throws GameActionException {
-        updateSym();
-    }
-
-    // Update symmetry information from shared memory
-    public static void updateSym() throws GameActionException {
-//        if (Comms.readSymmetrySym() != symmetry) {
-//            symmetry |= Comms.readSymmetrySym();
-//
-//            // Update opponent spawn locations based on symmetry
-//            Robot.oppSpawnCenters[0] = getSymmetricLoc(Robot.mySpawnCenters[0]);
-//            Robot.oppSpawnCenters[1] = getSymmetricLoc(Robot.mySpawnCenters[1]);
-//            Robot.oppSpawnCenters[2] = getSymmetricLoc(Robot.mySpawnCenters[2]);
-//
-//            // Check if symmetry is confirmed
-//            switch (symmetry) {
-//                case 0b011: case 0b101: case 0b110:
-//                    symConfirmed = true;
-//                    needWallFlip = true;
-//            }
-//        }
-    }
-
     // Eliminate a potential symmetry and update shared knowledge
     private static void eliminateSym(int sym, MapLocation loc) throws GameActionException {
         symmetry |= sym;  // Add new symmetry to eliminated symmetries
