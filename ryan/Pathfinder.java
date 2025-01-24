@@ -1,16 +1,14 @@
 // Adapted from https://github.com/chenyx512/battlecode24/blob/main/src/bot1/PathFinder.java
-package ref_best;
+package ryan;
 
 import battlecode.common.*;
 
-import ref_best.fast.*;
+import ryan.fast.*;
 
 public class Pathfinder extends RobotPlayer{
 
     static MapLocation target = null;
-    static MapLocation stayawayFrom = null;
     static int stuckCnt;
-    static boolean ignoreTowers = false;
 
 
     public static void tryMove(Direction dir) throws GameActionException {
@@ -22,16 +20,12 @@ public class Pathfinder extends RobotPlayer{
     }
 
     public static void move(MapLocation loc) throws GameActionException {
-        move(loc, false);
-        return;
-    }
-
-    public static void move(MapLocation loc, boolean _ignoreTowers) throws GameActionException {
-        ignoreTowers = _ignoreTowers;
-        if (!rc.isMovementReady() || loc == null)
+        if (!rc.isMovementReady() || loc == null){
+//            Debug.println(Debug.PATHFINDER, "Null return: Movement not ready or loc is null");
             return;
+        }
         target = loc;
-        stayawayFrom = null;
+        if (rc.getLocation().equals(target)) return; // Don't move if already at target location
         Direction dir = BugNav.getMoveDir();
         if (dir == null)
             return;
@@ -42,7 +36,6 @@ public class Pathfinder extends RobotPlayer{
         if (!rc.isMovementReady() || loc == null)
             return null;
         target = loc;
-        stayawayFrom = null;
         Direction dir = BugNav.getMoveDir();
         if (dir == null) {
             return null;
@@ -70,9 +63,8 @@ public class Pathfinder extends RobotPlayer{
         }
 
         static Direction getMoveDir() throws GameActionException {
-            //EXTRA
             if (rc.getRoundNum() == lastMoveRound) {
-                System.out.println("Null return: Already moved this round");
+                Debug.println(Debug.PATHFINDER, "Null return: Already moved this round");
                 return null;
             } else {
                 lastMoveRound = rc.getRoundNum();
@@ -96,7 +88,6 @@ public class Pathfinder extends RobotPlayer{
                 if (canMoveOrFill(dir)) {
                     return dir;
                 }
-
                 // If robot cannot move
                 MapLocation loc = rc.getLocation().add(dir);
                 // Try to sidestep enemy or empty paint
@@ -129,7 +120,7 @@ public class Pathfinder extends RobotPlayer{
                     if (!rc.onTheMap(rc.getLocation().add(dir))) {
                         currentTurnDir ^= 1;
                         dirStack.clear();
-                        System.out.println("Null return: Hit map boundary");
+                        Debug.println(Debug.PATHFINDER, "Null return: Hit map boundary");
                         return null; // do not move
                     }
                     dirStack.push(dir);
@@ -180,13 +171,13 @@ public class Pathfinder extends RobotPlayer{
                     if (!rc.onTheMap(rc.getLocation().add(curDir))) {
                         currentTurnDir ^= 1;
                         dirStack.clear();
-                        System.out.println("Null return: Hit map boundary");
+                        Debug.println(Debug.PATHFINDER, "Null return: Hit map boundary");
                         return null; // do not move
                     }
                     dirStack.push(curDir);
                     if (dirStack.size == stackSizeLimit) {
                         dirStack.clear();
-                        System.out.println("Null return: Stack size limit reached");
+                        Debug.println(Debug.PATHFINDER, "Null return: Stack size limit reached");
                         return null;
                     }
                 }
@@ -194,14 +185,15 @@ public class Pathfinder extends RobotPlayer{
                     int cutoff = stackDepthCutoff + 8;
                     dirStack.clear();
                     stackDepthCutoff = cutoff;
-                    System.out.println("Null return: Stack depth cutoff reached, new cutoff: " + cutoff);
                 }
                 Direction moveDir = dirStack.size == 0 ? dirStack.dirs[0] : turn(dirStack.top());
                 if (canMoveOrFill(moveDir)) {
                     return moveDir;
                 }
             }
-            System.out.println("Null return: Final moveDir cannot be moved to");
+            Debug.println(Debug.PATHFINDER, "Null return: Final moveDir cannot be moved to");
+            Debug.println(Debug.PATHFINDER, "Robot location: " + rc.getLocation());
+            Debug.println(Debug.PATHFINDER, "Target location: " + target);
             return null;
         }
 
@@ -321,32 +313,8 @@ public class Pathfinder extends RobotPlayer{
         }
 
         static boolean canMoveOrFill(Direction dir) throws GameActionException {
-            MapLocation loc = rc.adjacentLocation(dir);
-            if (stayawayFrom != null && loc.isAdjacentTo(stayawayFrom))
-                return false;
-
-            if (!ignoreTowers) {
-                if (nearestEnemyTower != null && loc.isWithinDistanceSquared(nearestEnemyTower,
-                        nearestEnemyTowerType == UnitType.LEVEL_ONE_DEFENSE_TOWER ? 16 : 9)) {
-                    return false;
-                }
-                if (sndNearestEnemyTower != null && loc.isWithinDistanceSquared(sndNearestEnemyTower,
-                        sndNearestEnemyTowerType == UnitType.LEVEL_ONE_DEFENSE_TOWER ? 16 : 9)) {
-                    return false;
-                }
-            }
-
             if (rc.canMove(dir)) {
                 return true;
-            }
-            // ADAPT bot 1 code that starts with: if (info.isWater()) ...
-            // EXTRA
-            if (!rc.canSenseLocation(loc))
-                return false;
-
-            RobotInfo robot = rc.senseRobotAtLocation(loc);
-            if (robot != null && robot.getType().isRobotType()) {
-                return FastMath.rand256() % 5 == 0; // small chance robot might be gone by the time duck reaches location
             }
             return false;
         }
@@ -358,7 +326,7 @@ public class Pathfinder extends RobotPlayer{
             if (rc.canSenseLocation(newLoc)) {
                 return rc.senseMapInfo(newLoc).isPassable();
             } else {
-                return true;
+                return MapRecorder.getPassible(newLoc);
             }
         }
     }
