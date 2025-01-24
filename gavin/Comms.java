@@ -4,6 +4,10 @@ import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 import battlecode.common.Message;
 import battlecode.common.UnitType;
+import battlecode.common.GameActionException;
+import battlecode.common.MapLocation;
+import battlecode.common.Message;
+import battlecode.common.UnitType;
 
 
 public class Comms extends RobotPlayer {

@@ -107,12 +107,10 @@ public class ActionAttackRush extends RobotPlayer {
             if (firstTower == null) {
                 firstTower = nearestEnemyTower;
             }
-
             // Play micro
             if (rc.canAttack(nearestEnemyTower)) {
                 rc.attack(nearestEnemyTower);
             }
-
         } else {
             Pathfinder.move(nextLocToExplore);
         }

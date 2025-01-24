@@ -49,9 +49,6 @@ public class ActionAttackMicro extends RobotPlayer {
         RobotPlayer.action = Action.ACTION_ATTACK_MICRO;
 
         Pathfinder.move(nearestEnemyTower);
-
-        // Todo: use heuristic path
-        // HeuristicPath.move(nearestEnemyTower, Heuristic.HEURISTIC_TOWER_MICRO);
         if (rc.canAttack(nearestEnemyTower)) {
             rc.attack(nearestEnemyTower);
         }

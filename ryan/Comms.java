@@ -1,11 +1,6 @@
-package architecture.Tools;
+package ryan;
 
-import architecture.RobotPlayer;
-
-import battlecode.common.GameActionException;
-import battlecode.common.MapLocation;
-import battlecode.common.Message;
-import battlecode.common.UnitType;
+import battlecode.common.*;
 
 
 public class Comms extends RobotPlayer {
@@ -35,19 +30,27 @@ public class Comms extends RobotPlayer {
             int bits = msg.getBytes();
             int fst = (bits >> (21 - 1)) & 0xFFF;
             int snd = (bits >> (21 - 14)) & 0xFFF;
-            MapLocation fstLoc = fst == 0xFFF ? null : Comms.intToLoc(fst);
-            MapLocation sndLoc = snd == 0xFFF ? null : Comms.intToLoc(snd);
             boolean fstType = ((bits >> (32 - 13)) & 1) == 1;
             boolean sndType = ((bits >> (32 - 26)) & 1) == 1;
 
-            if (fstTowerTarget == null || fstLoc != null && rc.getLocation().distanceSquaredTo(fstLoc) > rc.getLocation().distanceSquaredTo(fstTowerTarget) && fstLoc != fstTowerTarget) {
+            MapLocation fstLoc;
+            MapLocation sndLoc;
+            fstLoc = fst == 0 ? null : Comms.intToLoc(fst);
+            sndLoc = snd == 0 ? null : Comms.intToLoc(snd);
+
+
+            if (fstLoc != null && !fstLoc.equals(fstTowerTarget) && !fstLoc.equals(sndTowerTarget)) {
+                visFstTowerTarget = false;
                 fstTowerTarget = fstLoc;
                 fstTowerTargetIsDefense = fstType;
             }
-            if (sndTowerTarget == null || sndLoc != null && rc.getLocation().distanceSquaredTo(sndLoc) > rc.getLocation().distanceSquaredTo(sndTowerTarget) && sndLoc != sndTowerTarget) {
+            if (sndLoc != null && !sndLoc.equals(fstTowerTarget) && !sndLoc.equals(sndTowerTarget)) {
+                visSndTowerTarget = false;
                 sndTowerTarget = sndLoc;
                 sndTowerTargetIsDefense = sndType;
             }
+
+            break;
         }
     }
 

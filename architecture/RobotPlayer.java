@@ -2,7 +2,6 @@ package architecture;
 
 import architecture.Actions.*;
 import architecture.Tools.AuxConstants;
-import architecture.Tools.Comms;
 import architecture.Tools.Debug;
 import architecture.Tools.ImpureUtils;
 import battlecode.common.*;
@@ -189,12 +188,6 @@ public class RobotPlayer {
             }
         }
 
-        // Rush early game : Harder since the spawn tower is level 2.
-        // if (rc.getType() == UnitType.SOLDIER && spawnTowerType == UnitType.LEVEL_ONE_PAINT_TOWER && rc.getRoundNum() < 10) {
-        //    role = Role.ROLE_SOLDIER_ATTACK_RUSH;
-        // }
-
-
         // Init actions
         Debug.println("Init Actions.");
         ActionCompleteTower.init();
@@ -223,8 +216,7 @@ public class RobotPlayer {
             try {
                 // Init turn
                 Debug.println("Init turn " + rc.getType() + " " + rc.getLocation());
-                Comms.readAndUpdateTowerTargets(rc.getRoundNum() - 1);
-                Comms.readAndUpdateTowerTargets(rc.getRoundNum());
+
 
                 roundNum = rc.getRoundNum();
 
@@ -242,8 +234,7 @@ public class RobotPlayer {
 
                 if (!rc.getType().isTowerType())
                     ImpureUtils.updateNearestPaintTower();
-                ActionHelpSignal.remove(); // Remove help at start of turn.
-
+                
                 // Plays actions
                 Debug.println("Start of actions   : as " + role.name() + " " + action.name());
                 switch (role) {
@@ -286,8 +277,6 @@ public class RobotPlayer {
                         ActionFillSRP.run();
                         ActionMarkSRP.run();
 
-                        // End of turn update.
-                        // ActionMarkSRP.updateScores();
                         break;
 
 
@@ -349,11 +338,8 @@ public class RobotPlayer {
 
                     default:
                         Debug.println("No role corresponding to " + role.name());
-
                 }
 
-
-                ActionHelpSignal.run(); // Place MARK2 under unit to call help if needed.
                 Debug.println("End of actions     : with " + action.name());
                 Debug.println("Bytecodes : " + Clock.getBytecodeNum());
 
@@ -381,10 +367,9 @@ public class RobotPlayer {
                 Clock.yield();
             }
 
-            if (rc.getRoundNum() > 200) {
+            if (rc.getRoundNum() > 1000) {
                 rc.resign();
             }
-
         }
     }
 }

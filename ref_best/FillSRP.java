@@ -82,14 +82,14 @@ public class FillSRP extends RobotPlayer {
 
         if (mask_x < 0 || mask_x > 4 || mask_y < 0 || mask_y > 4) {
             // why does this happen??
-            // System.out.println("SRP deltas are off. curSRP: " + curSRP + ", nearestWrongInSRP: " + nearestWrongInSRP);
+            // System.out.println("SRP deltas are off. curSRP: " + curSRP + ", getNearestWrongInSrp: " + getNearestWrongInSrp);
             return;
         }
         boolean useSecondary = resourcePattern[mask_x][mask_y];
 
         // nearbyRuins = rc.senseNearbyRuins(-1);
         // for (MapLocation tileLoc : nearbyRuins) {
-        //     if (!rc.canSenseRobotAtLocation(tileLoc) && tileLoc.distanceSquaredTo(nearestWrongInSRP) <= 8) {
+        //     if (!rc.canSenseRobotAtLocation(tileLoc) && tileLoc.distanceSquaredTo(getNearestWrongInSrp) <= 8) {
         //         if (Utils.nearestEmptyOnRuinIfEnemyOrIsUndotted(tileLoc) == null) {
                     // isFillingSRP = false;
         //             return;

@@ -72,7 +72,6 @@ public class Soldiers extends RobotPlayer {
 
         // ImpureUtils.updateNearbyUnits();  // pending removal
 
-        ImpureUtils.tryUpgradeNearbyTowers();
         ImpureUtils.updateNearbyMask(false);
 
         // if (Utils.selfDestructRequirementsMet()) {
@@ -100,8 +99,8 @@ public class Soldiers extends RobotPlayer {
             curRuin = null;
         }
 
-
-        nearbyRuins = rc.senseNearbyRuins(-1);  // keep updated for SRP as well
+        ImpureUtils.tryUpgradeNearbyTowers();
+        // nearbyRuins = rc.senseNearbyRuins(-1);  // keep updated for SRP as well
         if (!isRefilling && rc.getNumberTowers() != GameConstants.MAX_NUMBER_OF_TOWERS) {
             int distance = (int)2e9;
             for (MapLocation tileLoc : nearbyRuins) {
@@ -118,6 +117,10 @@ public class Soldiers extends RobotPlayer {
                 // }
             }
         }
+
+
+
+
         if (rc.getNumberTowers() == GameConstants.MAX_NUMBER_OF_TOWERS) {
             isFillingRuin = false;
         }
@@ -196,7 +199,7 @@ public class Soldiers extends RobotPlayer {
         else if (isFillingSRP) {
             rc.setIndicatorDot(curSRP, 255, 0, 0);
             boolean noEnemyPaint = FillSRP.updateNearestWrongInSRP();
-            if (noEnemyPaint /*&& nearestWrongInSRP != null*/) {
+            if (noEnemyPaint /*&& getNearestWrongInSrp != null*/) {
                 HeuristicPath.moveToWrongInSRP();
                 FillSRP.updateNearestWrongInSRP();
 
@@ -218,6 +221,22 @@ public class Soldiers extends RobotPlayer {
             }
         }
 
+        // dot nearby empty/ enemy ruins
+        nearbyRuins = rc.senseNearbyRuins(-1);
+        if (rc.isActionReady()) {
+            MapLocation closestDot = null;
+            for (MapLocation tileLoc : nearbyRuins) {
+                MapLocation tentativeDot = Utils.nearestEmptyOnRuinIfEnemyOrIsUndotted(tileLoc);
+                if (tentativeDot != null) {
+                    if (closestDot == null || rc.getLocation().distanceSquaredTo(tentativeDot) < rc.getLocation().distanceSquaredTo(closestDot)) {
+                        closestDot = tentativeDot;
+                    }
+                }
+            }
+            if (rc.canAttack(closestDot)) {
+                rc.attack(closestDot);
+            }
+        }
 
         if (!rc.isMovementReady()) {
             nearbyTiles = rc.senseNearbyMapInfos();
@@ -239,22 +258,6 @@ public class Soldiers extends RobotPlayer {
             isRefilling = false;  // does not actually stop the refill because the move step already happened, but unlocks other options
         }
 
-        // dot nearby empty/ enemy ruins
-        nearbyRuins = rc.senseNearbyRuins(-1);
-        if (rc.isActionReady()) {
-            MapLocation closestDot = null;
-            for (MapLocation tileLoc : nearbyRuins) {
-                MapLocation tentativeDot = Utils.nearestEmptyOnRuinIfEnemyOrIsUndotted(tileLoc);
-                if (tentativeDot != null) {
-                    if (closestDot == null || rc.getLocation().distanceSquaredTo(tentativeDot) < rc.getLocation().distanceSquaredTo(closestDot)) {
-                        closestDot = tentativeDot;
-                    }
-                }
-            }
-            if (rc.canAttack(closestDot)) {
-                rc.attack(closestDot);
-            }
-        }
 
         wallAdjacent = false;
         for (MapInfo tile : rc.senseNearbyMapInfos(1)) {
@@ -357,12 +360,8 @@ public class Soldiers extends RobotPlayer {
                 target = Utils.randomLocationInQuadrant(Utils.currentQuadrant());
             else*/
 
-            MapLocation tentativeTarget = Utils.chooseTowerTarget();
 
-            if (rc.getRoundNum() >= fullAttackBasePhase && tentativeTarget != null && rc.getID() % 5 == 0) {
-                target = tentativeTarget;
-            } else
-                target = Utils.randomLocationInQuadrant(rng.nextInt(4));
+            target = Utils.randomLocationInQuadrant(rng.nextInt(4));
 
             lastTargetChangeRound = rc.getRoundNum();
         }
@@ -376,9 +375,16 @@ public class Soldiers extends RobotPlayer {
 
         // rc.setIndicatorDot(target, 200, 200, 200);
         if (rc.isMovementReady()) {
-            HeuristicPath.fullFill = fullFilling;
-            HeuristicPath.targetIncentive = 500;
-            HeuristicPath.move(target);
+
+            MapLocation tt = Utils.chooseTowerTarget();
+            if (tt != null && rc.getNumberTowers() > 8 && rc.isActionReady() && rc.getID() % 10 < 5) {
+                Pathfinder.move(tt);
+            } else {
+                HeuristicPath.fullFill = fullFilling;
+                HeuristicPath.targetIncentive = 500;
+                HeuristicPath.move(target);
+            }
+
             // nearbyTiles = rc.senseNearbyMapInfos();
         }
 

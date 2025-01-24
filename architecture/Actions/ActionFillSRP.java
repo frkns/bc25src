@@ -102,8 +102,6 @@ public class ActionFillSRP extends RobotPlayer {
         Debug.println("\tX - ACTION_FILL_SRP      : Playing!");
         RobotPlayer.action = Action.ACTION_FILL_SRP;
 
-        Pathfinder.move(target);
-
         // Calculate paint type to use
         boolean[][] towerPattern = rc.getResourcePattern();
         int delta_x = curSRP.x - target.x;
@@ -112,7 +110,7 @@ public class ActionFillSRP extends RobotPlayer {
         int mask_y = 2 - delta_y;
 
         if (mask_x < 0 || mask_x > 4 || mask_y < 0 || mask_y > 4) {
-            System.out.println("SRP deltas are off. curSRP: " + curSRP + ", nearestWrongInSRP: " + target);
+            System.out.println("SRP deltas are off. curSRP: " + curSRP + ", getNearestWrongInSrp: " + target);
             return;
         }
         boolean useSecondary = towerPattern[mask_x][mask_y];

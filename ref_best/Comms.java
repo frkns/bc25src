@@ -28,6 +28,13 @@ public class Comms extends RobotPlayer {
         Message[] msgs = rc.readMessages(round);
         for (Message msg : msgs) {
             int bits = msg.getBytes();
+
+            if (((bits >> (32 - 27)) & 1) == 1) {
+                rc.setIndicatorLine(new MapLocation(mapWidth-1, mapHeight-1), rc.getLocation(), 255, 0, 255);
+                System.out.println("-> killed by tower #" + rc.getID());
+                rc.disintegrate();  // tower sent a termination signal
+            }
+
             int fst = (bits >> (21 - 1)) & 0xFFF;
             int snd = (bits >> (21 - 14)) & 0xFFF;
             boolean fstType = ((bits >> (32 - 13)) & 1) == 1;
@@ -39,12 +46,12 @@ public class Comms extends RobotPlayer {
             sndLoc = snd == 0 ? null : Comms.intToLoc(snd);
 
 
-            if (fstLoc != null && fstLoc != fstTowerTarget && fstLoc != sndTowerTarget) {
+            if (fstLoc != null && !fstLoc.equals(fstTowerTarget) && !fstLoc.equals(sndTowerTarget)) {
                 visFstTowerTarget = false;
                 fstTowerTarget = fstLoc;
                 fstTowerTargetIsDefense = fstType;
             }
-            if (sndLoc != null && sndLoc != fstTowerTarget && sndLoc != sndTowerTarget) {
+            if (sndLoc != null && !sndLoc.equals(fstTowerTarget) && !sndLoc.equals(sndTowerTarget)) {
                 visSndTowerTarget = false;
                 sndTowerTarget = sndLoc;
                 sndTowerTargetIsDefense = sndType;
