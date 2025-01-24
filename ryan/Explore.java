@@ -49,6 +49,17 @@ public class Explore extends RobotPlayer {
             }
         }
 
-        return robotLoc.translate(bestDir.dx * 9, bestDir.dy * 9);
+        MapLocation targetExplore = robotLoc.translate(bestDir.dx * 9, bestDir.dy * 9);
+        if (!rc.onTheMap(targetExplore)) {
+            MapLocation indicatorExploreTarget = new MapLocation(
+                    Math.min(Math.max(targetExplore.x, 0), rc.getMapWidth() - 1),
+                    Math.min(Math.max(targetExplore.y, 0), rc.getMapHeight() - 1)
+            );
+            Debug.setIndicatorLine(rc.getLocation(), indicatorExploreTarget, 255, 255, 0);
+        } else {
+            Debug.setIndicatorLine(rc.getLocation(), targetExplore, 255, 255, 0);
+        }
+
+        return targetExplore;
     }
 }

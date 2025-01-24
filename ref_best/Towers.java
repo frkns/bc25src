@@ -31,6 +31,9 @@ public class Towers extends RobotPlayer {
 
     static UnitType spawn = UnitType.SOLDIER;
     static boolean canSpawnSplasher = false;
+    static int soldiersSpawned = 0;
+    static int moppersSpawned = 0;
+    static int splashersSpawned = 0;
 
     static boolean patternAroundSelfIsComplete;
     static int forceReserving = 0;  // reserve paint; only set this if you are a money tower that plans on self-destructing
@@ -197,11 +200,6 @@ public class Towers extends RobotPlayer {
         }
         return true;
     }
-
-
-    static int soldiersSpawned = 0;
-    static int moppersSpawned = 0;
-    static int splashersSpawned = 0;
 
     public static void run() throws GameActionException {
         assert(rc.getType().isTowerType());

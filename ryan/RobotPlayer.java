@@ -104,15 +104,27 @@ public class RobotPlayer {
         moneyPattern = rc.getTowerPattern(UnitType.LEVEL_ONE_MONEY_TOWER);
         defensePattern = rc.getTowerPattern(UnitType.LEVEL_ONE_DEFENSE_TOWER);
 
-        nearbyRuins = rc.senseNearbyRuins(-1);
-        spawnTowerLocation = rc.senseNearbyRuins(4)[0];
-        RobotInfo spawnTower = rc.senseRobotAtLocation(spawnTowerLocation);
-        if (spawnTower != null && spawnTower.getTeam() == rc.getTeam()) { // Technically spawn tower could be destroyed by enemy and built by them in the same round but very unlikely
-            spawnTowerType = rc.senseRobotAtLocation(spawnTowerLocation).getType();
+        nearbyRuins = rc.senseNearbyRuins(4);
+        for (MapLocation ruinLoc : nearbyRuins) {
+            if (!rc.canSenseRobotAtLocation(ruinLoc))
+                continue;
+            RobotInfo robot = rc.senseRobotAtLocation(ruinLoc);
+            if (robot.getTeam() == rc.getTeam()) {
+                if (robot.getType().isTowerType()) {
+                    // if (spawnTowerLocation == null || rc.getLocation().distanceSquaredTo(robot.getLocation()) < rc.getLocation().distanceSquaredTo(spawnTowerLocation)) {
+                        spawnTowerLocation = robot.getLocation();
+                        spawnTowerType = robot.getType().getBaseType();
+                    // }
+                    break;
+                }
+            }
         }
 
+        if (spawnTowerLocation == null)  // it is possible that spawn tower is destroyed in the middle of the turn
+            spawnTowerLocation = rc.getLocation();
 
 //        AttackBase.init();
+	Splashers.init();
 
         mx = Math.max(mapWidth, mapHeight);  // ~60 for huge ~35 for medium
         siegePhase = (int)(mx * 3);  // cast to int, will be useful for tuning later

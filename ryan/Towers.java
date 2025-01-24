@@ -29,6 +29,10 @@ public class Towers extends RobotPlayer {
 
     static UnitType spawn = UnitType.SOLDIER;
     static boolean canSpawnSplasher = false;
+    static int soldiersSpawned = 0;
+    static int moppersSpawned = 0;
+    static int splashersSpawned = 0;
+
 
     public static void readMessages(int round) throws GameActionException {
         Message[] receivedMsgs = rc.readMessages(round);
@@ -283,6 +287,12 @@ public class Towers extends RobotPlayer {
                     lastSummonDirection[rc.getLocation().directionTo(nextLoc).ordinal()] = rc.getRoundNum();
 
                     rc.buildRobot(spawn, nextLoc);
+
+                    switch (spawn) {
+                        case SOLDIER: soldiersSpawned++; break;
+                        case MOPPER: moppersSpawned++; break;
+                        case SPLASHER: splashersSpawned++; break;
+                    }
                     if (spawn == UnitType.MOPPER)
                         spawnedFirstMopper = true;
                     numSpawnedUnits++;

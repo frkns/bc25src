@@ -1,5 +1,7 @@
 package ryan;
+import architecture.Tools.Debug;
 import battlecode.common.*;
+import gavin.fast.FastMath;
 
 // these Utils are NOT pure functions (i.e. they modify state / change global variables, etc.)
 
@@ -287,4 +289,38 @@ public class ImpureUtils extends RobotPlayer {
         //     }
         // }
     }
+
+    public static MapLocation getBorderLocation() {
+        switch (FastMath.rand256() % 4) {
+            case 0: // Top
+                return new MapLocation(FastMath.rand256() % mapWidth, mapHeight - 1);
+            case 1: // Bottom
+                return new MapLocation(FastMath.rand256() % mapWidth, 0);
+            case 2: // Left
+                return new MapLocation(0, FastMath.rand256() % mapHeight);
+            case 3: // Top
+                return new MapLocation(mapWidth - 1, FastMath.rand256() % mapHeight);
+            default:
+                Debug.println("Init explore : Should not be possible.");
+                return null;
+        }
+    }
+
+    public static MapLocation initExploreTarget(){
+        // Explore in the direction given by the direction from tower to unit.
+        mapWidth = rc.getMapWidth();
+        mapHeight = rc.getMapHeight();
+
+        Direction dir = spawnTowerLocation.directionTo(rc.getLocation());
+
+        for(int i=0; i < 10; i++) {
+            MapLocation target = getBorderLocation();
+            if(rc.getLocation().directionTo(target) == dir){
+                return target;
+            }
+        }
+
+        return null; // Failled to have a target
+    }
+
 }
