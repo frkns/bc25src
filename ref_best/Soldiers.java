@@ -2,6 +2,8 @@ package ref_best;
 
 import battlecode.common.*;
 
+import static ref_best.ImpureUtils.initExploreTarget;
+
 public class Soldiers extends RobotPlayer {
 
     static MapLocation target;
@@ -46,6 +48,11 @@ public class Soldiers extends RobotPlayer {
     static boolean bypassIfPaint = false;  // however bypass strict build order if it is paint
 
     public static void run() throws GameActionException {
+        // Init target according to spawn direction
+        if(turnsAlive <= 1){
+            // Init target according to spawn orientation
+            target = initExploreTarget();
+        }
 
 
         if (lastRuinLocWithEnemyPaintCounter++ > 10) {  // reset ruin avoidance after some time has passed
@@ -195,6 +202,7 @@ public class Soldiers extends RobotPlayer {
                 nearestWrongInRuin = null;
             }
         }
+
         // SRP
         else if (isFillingSRP) {
             rc.setIndicatorDot(curSRP, 255, 0, 0);

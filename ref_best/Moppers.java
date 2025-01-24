@@ -2,6 +2,8 @@ package ref_best;
 
 import battlecode.common.*;
 
+import static ref_best.ImpureUtils.initExploreTarget;
+
 public class Moppers extends RobotPlayer {
 
     // Actions
@@ -44,6 +46,11 @@ public class Moppers extends RobotPlayer {
         ImpureUtils.updateNearestEnemyRobot();
 
         // Update target for explore
+        if(turnsAlive <= 1){
+            // Init target according to spawn orientation
+            target = initExploreTarget();
+        }
+
         if (target == null
                 || rc.getLocation().isWithinDistanceSquared(target, 9)
                 || rc.getRoundNum() - lastTargetChangeRound > targetChangeWaitTime) {

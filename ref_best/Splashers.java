@@ -1,16 +1,107 @@
 package ref_best;
 
 import battlecode.common.*;
-import ref_best.Pathfinder;
+
+import static ref_best.ImpureUtils.initExploreTarget;
 
 public class Splashers extends RobotPlayer {
 
     public static MapLocation target;
 
-    static int targetChangeWaitTime = mx;
+    // ---- Action variables ----
+    static MapLocation targetExplore;
+    static MapLocation targetSplash;
+    static char scoreTargetSplash;
     static int lastTargetChangeRound = 0;
+    static int targetChangeWaitTime = 20;
+
+    // ---- Constants and map infos ----
+    static char ZERO = '\u8000'; // Char is unsigned, need to define a zero. Max is \uffff, min is \u0000
+    static int[] PAINT_SCORE_IF_RECOVER = {0, 0, 0, 0, 0, 0};
+    static char MIN_SCORE_FOR_SPLASH = (char) (ZERO + 6);
+
+    // We consider a map of 64*64 where real map start at (2,2) to avoid going outside
+    static char[] scores = "\u8000".repeat(4096).toCharArray();
+    static char[] history = "\u0005".repeat(4096).toCharArray();
+
+    static char PAINT_SCORE_BONUS_ENEMY = '\u0002';
+    static char PAINT_SCORE_MINUS_BONUS_ENEMY = (char) (65536 - 2);
+    static char PAINT_MIN_SCORE = (char) (ZERO + 10);
+
+    public static void init() {
+        PAINT_SCORE_IF_RECOVER[PaintType.ALLY_PRIMARY.ordinal()] = 0; // Recover primary with primary -> score = 0
+        PAINT_SCORE_IF_RECOVER[PaintType.ALLY_SECONDARY.ordinal()] = -8; // Dont recover already patterns
+        PAINT_SCORE_IF_RECOVER[PaintType.EMPTY.ordinal()] = 1;
+        PAINT_SCORE_IF_RECOVER[PaintType.ENEMY_PRIMARY.ordinal()] = 3;
+        PAINT_SCORE_IF_RECOVER[PaintType.ENEMY_SECONDARY.ordinal()] = 5; // Assuming enemy use secondary for pattern
+        PAINT_SCORE_IF_RECOVER[5] = 0;
+    }
 
     public static void run() throws GameActionException {
+        //------------------------------------------------------------------------------//
+        // Init
+        //------------------------------------------------------------------------------//
+        Debug.println("Running.");
+        Debug.println("\tInit.");
+
+        int start = Clock.getBytecodeNum();
+        Debug.println("\t\tUpdate cells score");
+        int scoreInt;
+        char score;
+        int id;
+        for (MapInfo info : nearbyTiles) {
+            MapLocation locCenter = info.getMapLocation();
+            id = 130 + locCenter.x + 64 * locCenter.y; // 130 = id of (2, 2)
+
+            if(history[id] == info.getPaint().ordinal()){
+                continue; // Skip, already update
+            }
+
+            // New score - old score
+            scoreInt = -PAINT_SCORE_IF_RECOVER[history[id]];
+            history[id] = (char) info.getPaint().ordinal();
+            scoreInt += PAINT_SCORE_IF_RECOVER[history[id]];
+
+            // Can't paint on this zone
+            if (info.isWall() && info.hasRuin()) {
+                continue;
+            }
+
+            if(scoreInt < 0){
+                score = (char) (65536 + scoreInt); // Use overflow to subtract
+            }else{
+                score = (char) scoreInt;
+            }
+
+            /*
+            static int[] SHIFTS = {-2, -1, 0, 1, 2, 64 - 1, 64, 64 + 1, 128, -64 - 1, -64, -64 + 1, -128};
+            for (int shift : SHIFTS) {
+                scores[id + shift] += score;
+            }*/
+            scores[id - 2] += score;
+            scores[id - 1] += score;
+            scores[id] += score;
+            scores[id + 1] += score;
+            scores[id + 2] += score;
+            scores[id + 63] += score;
+            scores[id + 64] += score;
+            scores[id + 65] += score;
+            scores[id + 128] += score;
+            scores[id - 65] += score;
+            scores[id - 64] += score;
+            scores[id - 63] += score;
+            scores[id - 128] += score;
+        }
+        Debug.println("\t\t\tDone in " + (Clock.getBytecodeNum() - start) + " bytecodes.");
+
+
+        // Init target according to spawn direction
+        if (turnsAlive <= 1) {
+            // Init target according to spawn orientation
+            target = initExploreTarget();
+            Debug.println("\t\tInit target explore to : " + target);
+        }
+
         // nearest paint tower is updated by default
         ImpureUtils.updateNearbyMask(false);
         ImpureUtils.updateNearestEnemyTower();
@@ -59,6 +150,7 @@ public class Splashers extends RobotPlayer {
             // if (Utils.manhattanDistance(rc.getLocation(), target) > 50)
             // Pathfinder.move(target);
             // else
+            Debug.println("\t\tRefill to : " + target);
             HeuristicPath.refill(target); // 1.
             return;
         }
@@ -72,8 +164,99 @@ public class Splashers extends RobotPlayer {
                 || rc.getLocation().isWithinDistanceSquared(target, 9)
                 || rc.getRoundNum() - lastTargetChangeRound > targetChangeWaitTime) {
             target = Utils.randomLocationInQuadrant(rng.nextInt(4));
+            Debug.println("\t\tChange targetExplore to : " + target);
             lastTargetChangeRound = rc.getRoundNum();
         }
+
+        //------------------------------------------------------------------------------//
+        // Attack
+        //------------------------------------------------------------------------------//
+
+
+
+        // Robots score
+        Debug.println("\t\tUpdate enemy score.");
+        for (RobotInfo info : rc.senseNearbyRobots(-1, rc.getTeam().opponent())) {
+            MapLocation locCenter = info.getLocation();
+            id = 130 + locCenter.x + 64 * locCenter.y;
+
+            scores[id - 2] += PAINT_SCORE_BONUS_ENEMY;
+            scores[id - 1] += PAINT_SCORE_BONUS_ENEMY;
+            scores[id] += PAINT_SCORE_BONUS_ENEMY;
+            scores[id + 1] += PAINT_SCORE_BONUS_ENEMY;
+            scores[id + 2] += PAINT_SCORE_BONUS_ENEMY;
+            scores[id + 63] += PAINT_SCORE_BONUS_ENEMY;
+            scores[id + 64] += PAINT_SCORE_BONUS_ENEMY;
+            scores[id + 65] += PAINT_SCORE_BONUS_ENEMY;
+            scores[id + 128] += PAINT_SCORE_BONUS_ENEMY;
+            scores[id - 65] += PAINT_SCORE_BONUS_ENEMY;
+            scores[id - 64] += PAINT_SCORE_BONUS_ENEMY;
+            scores[id - 63] += PAINT_SCORE_BONUS_ENEMY;
+            scores[id - 128] += PAINT_SCORE_BONUS_ENEMY;
+        }
+
+        // Get Max
+        targetSplash = null;
+        scoreTargetSplash = 0;
+
+        for (MapInfo info : RobotPlayer.rc.senseNearbyMapInfos()) {
+            MapLocation locCenter = info.getMapLocation();
+            id = 130 + locCenter.x + 64 * locCenter.y;
+            if (scoreTargetSplash < scores[id]) {
+                if (!info.isWall() && !info.hasRuin()) {
+                    targetSplash = locCenter;
+                    scoreTargetSplash = scores[id];
+                }
+            }
+        }
+        Debug.println("\t\tBest score at " + targetSplash + " (" + (scoreTargetSplash - ZERO) + ")");
+
+        if(scoreTargetSplash < PAINT_MIN_SCORE){
+            Debug.println("\t\tBest score is under < " + (int) PAINT_MIN_SCORE + " (" + (PAINT_MIN_SCORE - ZERO) + "). Dont splash.");
+            targetSplash = null;
+        }
+
+        // Remove score from enemy, we consider they will move.
+        for (RobotInfo info : rc.senseNearbyRobots(-1, rc.getTeam().opponent())) {
+            MapLocation locCenter = info.getLocation();
+            id = 130 + locCenter.x + 64 * locCenter.y;
+
+            scores[id - 2] += PAINT_SCORE_MINUS_BONUS_ENEMY;
+            scores[id - 1] += PAINT_SCORE_MINUS_BONUS_ENEMY;
+            scores[id] += PAINT_SCORE_MINUS_BONUS_ENEMY;
+            scores[id + 1] += PAINT_SCORE_MINUS_BONUS_ENEMY;
+            scores[id + 2] += PAINT_SCORE_MINUS_BONUS_ENEMY;
+            scores[id + 63] += PAINT_SCORE_MINUS_BONUS_ENEMY;
+            scores[id + 64] += PAINT_SCORE_MINUS_BONUS_ENEMY;
+            scores[id + 65] += PAINT_SCORE_MINUS_BONUS_ENEMY;
+            scores[id + 128] += PAINT_SCORE_MINUS_BONUS_ENEMY;
+            scores[id - 65] += PAINT_SCORE_MINUS_BONUS_ENEMY;
+            scores[id - 64] += PAINT_SCORE_MINUS_BONUS_ENEMY;
+            scores[id - 63] += PAINT_SCORE_MINUS_BONUS_ENEMY;
+            scores[id - 128] += PAINT_SCORE_MINUS_BONUS_ENEMY;
+        }
+
+        if(targetSplash != null) {
+            // Attack without moving
+            if (rc.canAttack(targetSplash)) {
+                Debug.println("\t\tAttacking!");
+                rc.attack(targetSplash);
+            }else{
+                // Move
+                Debug.println("\t\tMoving");
+                HeuristicPath.splasherMove(targetSplash);
+
+                // Attack after move
+                if (rc.canAttack(targetSplash)) {
+                    Debug.println("\t\tAttacking!");
+                    rc.attack(targetSplash);
+                }
+            }
+        }
+
+        //------------------------------------------------------------------------------//
+        // Explore
+        //------------------------------------------------------------------------------//
 
         if (rc.isMovementReady()) {
             MapLocation tt = Utils.chooseTowerTarget();
@@ -86,292 +269,8 @@ public class Splashers extends RobotPlayer {
                 HeuristicPath.splasherMove(target);
             }
         }
-
-        // find best attack location
-
-        int scoreThreshold = 1200; // score must reach this number in order to be considered
-        if (rc.getMoney() > 5000) {
-            scoreThreshold = 800;
-        }
-
-        int[] locScores = new int[9];
-        MapLocation[] locs = new MapLocation[9]; // locations to splash, it should form a diamond, updated to include
-                                                 // center
-
-        /* */
-        // Unroll the first loop (i from 8 down to 0)
-        // i=7
-        Direction dir7 = directions[7];
-        MapLocation newLoc7 = rc.adjacentLocation(dir7);
-        if (dir7 == Direction.NORTH || dir7 == Direction.SOUTH || dir7 == Direction.WEST || dir7 == Direction.EAST) {
-            newLoc7 = newLoc7.add(dir7);
-        }
-        locs[7] = newLoc7;
-        if (!rc.canAttack(newLoc7)) {
-            locScores[7] = (int) -2e9;
-        }
-
-        // i=6
-        Direction dir6 = directions[6];
-        MapLocation newLoc6 = rc.adjacentLocation(dir6);
-        if (dir6 == Direction.NORTH || dir6 == Direction.SOUTH || dir6 == Direction.WEST || dir6 == Direction.EAST) {
-            newLoc6 = newLoc6.add(dir6);
-        }
-        locs[6] = newLoc6;
-        if (!rc.canAttack(newLoc6)) {
-            locScores[6] = (int) -2e9;
-        }
-
-        // i=5
-        Direction dir5 = directions[5];
-        MapLocation newLoc5 = rc.adjacentLocation(dir5);
-        if (dir5 == Direction.NORTH || dir5 == Direction.SOUTH || dir5 == Direction.WEST || dir5 == Direction.EAST) {
-            newLoc5 = newLoc5.add(dir5);
-        }
-        locs[5] = newLoc5;
-        if (!rc.canAttack(newLoc5)) {
-            locScores[5] = (int) -2e9;
-        }
-
-        // i=4
-        Direction dir4 = directions[4];
-        MapLocation newLoc4 = rc.adjacentLocation(dir4);
-        if (dir4 == Direction.NORTH || dir4 == Direction.SOUTH || dir4 == Direction.WEST || dir4 == Direction.EAST) {
-            newLoc4 = newLoc4.add(dir4);
-        }
-        locs[4] = newLoc4;
-        if (!rc.canAttack(newLoc4)) {
-            locScores[4] = (int) -2e9;
-        }
-
-        // i=3
-        Direction dir3 = directions[3];
-        MapLocation newLoc3 = rc.adjacentLocation(dir3);
-        if (dir3 == Direction.NORTH || dir3 == Direction.SOUTH || dir3 == Direction.WEST || dir3 == Direction.EAST) {
-            newLoc3 = newLoc3.add(dir3);
-        }
-        locs[3] = newLoc3;
-        if (!rc.canAttack(newLoc3)) {
-            locScores[3] = (int) -2e9;
-        }
-
-        // i=2
-        Direction dir2 = directions[2];
-        MapLocation newLoc2 = rc.adjacentLocation(dir2);
-        if (dir2 == Direction.NORTH || dir2 == Direction.SOUTH || dir2 == Direction.WEST || dir2 == Direction.EAST) {
-            newLoc2 = newLoc2.add(dir2);
-        }
-        locs[2] = newLoc2;
-        if (!rc.canAttack(newLoc2)) {
-            locScores[2] = (int) -2e9;
-        }
-
-        // i=1
-        Direction dir1 = directions[1];
-        MapLocation newLoc1 = rc.adjacentLocation(dir1);
-        if (dir1 == Direction.NORTH || dir1 == Direction.SOUTH || dir1 == Direction.WEST || dir1 == Direction.EAST) {
-            newLoc1 = newLoc1.add(dir1);
-        }
-        locs[1] = newLoc1;
-        if (!rc.canAttack(newLoc1)) {
-            locScores[1] = (int) -2e9;
-        }
-
-        // i=0
-        Direction dir0 = directions[0];
-        MapLocation newLoc0 = rc.adjacentLocation(dir0);
-        if (dir0 == Direction.NORTH || dir0 == Direction.SOUTH || dir0 == Direction.WEST || dir0 == Direction.EAST) {
-            newLoc0 = newLoc0.add(dir0);
-        }
-        locs[0] = newLoc0;
-        if (!rc.canAttack(newLoc0)) {
-            locScores[0] = (int) -2e9;
-        }
-
-        // Center location
-        locs[8] = rc.getLocation();
-        if (!rc.canAttack(rc.getLocation())) {
-            locScores[8] = (int) -2e9;
-        }
-
-        // Nearby tiles processing (kept as loop since variable length)
-        nearbyTiles = rc.senseNearbyMapInfos(18);
-        for (MapInfo tile : nearbyTiles) {
-            if (tile.isWall())
-                continue;
-
-            MapLocation tileLoc = tile.getMapLocation();
-            if (rc.canSenseRobotAtLocation(tileLoc)) {
-                RobotInfo robot = rc.senseRobotAtLocation(tileLoc);
-                if (robot.getTeam() != rc.getTeam() && robot.getType().isTowerType()) {
-                    // Unroll inner loop for tower scoring
-                    if (locs[8].isWithinDistanceSquared(tileLoc, 4))
-                        locScores[8] += 1500;
-                    if (locs[7].isWithinDistanceSquared(tileLoc, 4))
-                        locScores[7] += 1500;
-                    if (locs[6].isWithinDistanceSquared(tileLoc, 4))
-                        locScores[6] += 1500;
-                    if (locs[5].isWithinDistanceSquared(tileLoc, 4))
-                        locScores[5] += 1500;
-                    if (locs[4].isWithinDistanceSquared(tileLoc, 4))
-                        locScores[4] += 1500;
-                    if (locs[3].isWithinDistanceSquared(tileLoc, 4))
-                        locScores[3] += 1500;
-                    if (locs[2].isWithinDistanceSquared(tileLoc, 4))
-                        locScores[2] += 1500;
-                    if (locs[1].isWithinDistanceSquared(tileLoc, 4))
-                        locScores[1] += 1500;
-                    if (locs[0].isWithinDistanceSquared(tileLoc, 4))
-                        locScores[0] += 1500;
-                }
-                continue;
-            }
-
-            if (tile.hasRuin())
-                continue;
-
-            if (tile.getPaint().isEnemy()) {
-                // Unroll enemy paint scoring
-                if (locs[8].isWithinDistanceSquared(tileLoc, 2)) {
-                    locScores[8] += 200;
-                    if (rc.canSenseRobotAtLocation(tileLoc))
-                        locScores[8] += 50;
-                }
-                if (locs[7].isWithinDistanceSquared(tileLoc, 2)) {
-                    locScores[7] += 200;
-                    if (rc.canSenseRobotAtLocation(tileLoc))
-                        locScores[7] += 50;
-                }
-                if (locs[6].isWithinDistanceSquared(tileLoc, 2)) {
-                    locScores[6] += 200;
-                    if (rc.canSenseRobotAtLocation(tileLoc))
-                        locScores[6] += 50;
-                }
-                if (locs[5].isWithinDistanceSquared(tileLoc, 2)) {
-                    locScores[5] += 200;
-                    if (rc.canSenseRobotAtLocation(tileLoc))
-                        locScores[5] += 50;
-                }
-                if (locs[4].isWithinDistanceSquared(tileLoc, 2)) {
-                    locScores[4] += 200;
-                    if (rc.canSenseRobotAtLocation(tileLoc))
-                        locScores[4] += 50;
-                }
-                if (locs[3].isWithinDistanceSquared(tileLoc, 2)) {
-                    locScores[3] += 200;
-                    if (rc.canSenseRobotAtLocation(tileLoc))
-                        locScores[3] += 50;
-                }
-                if (locs[2].isWithinDistanceSquared(tileLoc, 2)) {
-                    locScores[2] += 200;
-                    if (rc.canSenseRobotAtLocation(tileLoc))
-                        locScores[2] += 50;
-                }
-                if (locs[1].isWithinDistanceSquared(tileLoc, 2)) {
-                    locScores[1] += 200;
-                    if (rc.canSenseRobotAtLocation(tileLoc))
-                        locScores[1] += 50;
-                }
-                if (locs[0].isWithinDistanceSquared(tileLoc, 2)) {
-                    locScores[0] += 200;
-                    if (rc.canSenseRobotAtLocation(tileLoc))
-                        locScores[0] += 50;
-                }
-            } else if (tile.getPaint() == PaintType.EMPTY) {
-                // Unroll neutral paint scoring
-                if (locs[8].isWithinDistanceSquared(tileLoc, 4)) {
-                    locScores[8] += 100;
-                    if (rc.canSenseRobotAtLocation(tileLoc))
-                        locScores[8] += 50;
-                }
-                if (locs[7].isWithinDistanceSquared(tileLoc, 4)) {
-                    locScores[7] += 100;
-                    if (rc.canSenseRobotAtLocation(tileLoc))
-                        locScores[7] += 50;
-                }
-                if (locs[6].isWithinDistanceSquared(tileLoc, 4)) {
-                    locScores[6] += 100;
-                    if (rc.canSenseRobotAtLocation(tileLoc))
-                        locScores[6] += 50;
-                }
-                if (locs[5].isWithinDistanceSquared(tileLoc, 4)) {
-                    locScores[5] += 100;
-                    if (rc.canSenseRobotAtLocation(tileLoc))
-                        locScores[5] += 50;
-                }
-                if (locs[4].isWithinDistanceSquared(tileLoc, 4)) {
-                    locScores[4] += 100;
-                    if (rc.canSenseRobotAtLocation(tileLoc))
-                        locScores[4] += 50;
-                }
-                if (locs[3].isWithinDistanceSquared(tileLoc, 4)) {
-                    locScores[3] += 100;
-                    if (rc.canSenseRobotAtLocation(tileLoc))
-                        locScores[3] += 50;
-                }
-                if (locs[2].isWithinDistanceSquared(tileLoc, 4)) {
-                    locScores[2] += 100;
-                    if (rc.canSenseRobotAtLocation(tileLoc))
-                        locScores[2] += 50;
-                }
-                if (locs[1].isWithinDistanceSquared(tileLoc, 4)) {
-                    locScores[1] += 100;
-                    if (rc.canSenseRobotAtLocation(tileLoc))
-                        locScores[1] += 50;
-                }
-                if (locs[0].isWithinDistanceSquared(tileLoc, 4)) {
-                    locScores[0] += 100;
-                    if (rc.canSenseRobotAtLocation(tileLoc))
-                        locScores[0] += 50;
-                }
-            }
-        }
-
-        // Unroll max score calculation
-        int mxScore = scoreThreshold;
-        MapLocation mxLoc = null;
-
-        if (locScores[8] >= mxScore) {
-            mxScore = locScores[8];
-            mxLoc = locs[8];
-        }
-        if (locScores[7] >= mxScore) {
-            mxScore = locScores[7];
-            mxLoc = locs[7];
-        }
-        if (locScores[6] >= mxScore) {
-            mxScore = locScores[6];
-            mxLoc = locs[6];
-        }
-        if (locScores[5] >= mxScore) {
-            mxScore = locScores[5];
-            mxLoc = locs[5];
-        }
-        if (locScores[4] >= mxScore) {
-            mxScore = locScores[4];
-            mxLoc = locs[4];
-        }
-        if (locScores[3] >= mxScore) {
-            mxScore = locScores[3];
-            mxLoc = locs[3];
-        }
-        if (locScores[2] >= mxScore) {
-            mxScore = locScores[2];
-            mxLoc = locs[2];
-        }
-        if (locScores[1] >= mxScore) {
-            mxScore = locScores[1];
-            mxLoc = locs[1];
-        }
-        if (locScores[0] >= mxScore) {
-            mxScore = locScores[0];
-            mxLoc = locs[0];
-        }
-
-        if (mxLoc != null)
-            rc.attack(mxLoc);
-        /* */
-
+        Debug.println("End.");
+        Debug.println("");
+        Debug.println("");
     }
-
 }
