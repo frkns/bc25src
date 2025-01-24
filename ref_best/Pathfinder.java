@@ -358,7 +358,8 @@ public class Pathfinder extends RobotPlayer{
             if (rc.canSenseLocation(newLoc)) {
                 return rc.senseMapInfo(newLoc).isPassable();
             } else {
-                return true;
+                return false;
+                // return MapRecorder.getPassible(newLoc);
             }
         }
     }

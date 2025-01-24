@@ -28,6 +28,13 @@ public class Comms extends RobotPlayer {
         Message[] msgs = rc.readMessages(round);
         for (Message msg : msgs) {
             int bits = msg.getBytes();
+
+            if (((bits >> (32 - 27)) & 1) == 1) {
+                rc.setIndicatorLine(new MapLocation(mapWidth-1, mapHeight-1), rc.getLocation(), 255, 0, 255);
+                System.out.println("-> killed by tower #" + rc.getID());
+                rc.disintegrate();  // tower sent a termination signal
+            }
+
             int fst = (bits >> (21 - 1)) & 0xFFF;
             int snd = (bits >> (21 - 14)) & 0xFFF;
             boolean fstType = ((bits >> (32 - 13)) & 1) == 1;
