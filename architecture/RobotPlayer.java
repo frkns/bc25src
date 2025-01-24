@@ -317,6 +317,7 @@ public class RobotPlayer {
 
                         // Basic
                         ActionRemoveEnemyPaint.run();
+                        ActionGivePaint.run();
 
                         // End of turn update.
                         ActionMarkSRP.updateScores();
@@ -351,8 +352,10 @@ public class RobotPlayer {
 
                 }
 
+
                 ActionHelpSignal.run(); // Place MARK2 under unit to call help if needed.
                 Debug.println("End of actions     : with " + action.name());
+                Debug.println("Bytecodes : " + Clock.getBytecodeNum());
 
                 if (action == Action.ACTION_WAITING_FOR_ACTION) {
                     ActionExplore.run();

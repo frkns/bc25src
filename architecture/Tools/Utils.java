@@ -1,7 +1,10 @@
 package architecture.Tools;
 
 import architecture.RobotPlayer;
-import battlecode.common.*;
+import battlecode.common.GameActionException;
+import battlecode.common.MapLocation;
+import battlecode.common.PaintType;
+import battlecode.common.UnitType;
 
 // these Utils are pure functions - no side-effects, they don't change variables or modify game state in any way
 
@@ -9,32 +12,24 @@ public class Utils extends RobotPlayer {
     public static UnitType[] TOWERS = {UnitType.LEVEL_ONE_PAINT_TOWER, UnitType.LEVEL_ONE_DEFENSE_TOWER, UnitType.LEVEL_ONE_MONEY_TOWER};
 
     public static UnitType getBuildType(MapLocation ruinLoc) throws GameActionException {
+        if (rc.getNumberTowers() < 5) {
+            return AuxConstants.buildOrder[rc.getNumberTowers()];
+        }
+
         int minCost = 1000;
         UnitType bestType = null;
 
-        // Update nearby units
-        boolean isMopperNearby = false;
-        for(RobotInfo ally: rc.senseNearbyRobots(ruinLoc, 36, rc.getTeam())){
-            switch (ally.type){
-                case UnitType.MOPPER: isMopperNearby = true; break;
-            }
-        }
 
-
-        for(UnitType tower: TOWERS){
+        for (UnitType tower : TOWERS) {
             PatternReport repport = CheckPattern.analyseTowerPatern(ruinLoc, tower);
 
             int cost = repport.numWrongTiles;
 
-            if(repport.nearestWrongEnemies != null && !isMopperNearby){
-                cost += 5;
-            }
-
-            if(tower == AuxConstants.buildOrder[rc.getNumberTowers()]){
+            if (tower == AuxConstants.buildOrder[rc.getNumberTowers()]) {
                 cost -= 10;
             }
 
-            if(cost < minCost){
+            if (cost < minCost) {
                 minCost = cost;
                 bestType = tower;
             }
@@ -59,12 +54,10 @@ public class Utils extends RobotPlayer {
                 PaintType paint = rc.senseMapInfo(loc).getPaint();
                 if (paint.isEnemy()) {
                     hasEnemyPaint = true;
-                }
-                else if (paint.isAlly()) {
+                } else if (paint.isAlly()) {
                     hasAllyPaint = true;
-                }
-                else  {
-                    assert(paint == PaintType.EMPTY);
+                } else {
+                    assert (paint == PaintType.EMPTY);
                     if (nearestEmpty == null || rc.getLocation().distanceSquaredTo(loc) < rc.getLocation().distanceSquaredTo(nearestEmpty)) {
                         nearestEmpty = loc;
                     }
@@ -80,10 +73,10 @@ public class Utils extends RobotPlayer {
     }
 
 
-
     public static int chessDistance(MapLocation A, MapLocation B) {
         return Math.max(Math.abs(A.x - B.x), Math.abs(A.y - B.y));
     }
+
     static int manhattanDistance(MapLocation A, MapLocation B) {
         return Math.abs(A.x - B.x) + Math.abs(A.y - B.y);
     }
@@ -95,9 +88,11 @@ public class Utils extends RobotPlayer {
     public static MapLocation mirror(MapLocation loc) {  // rotational
         return new MapLocation(mapWidth - loc.x - 1, mapHeight - loc.y - 1);
     }
+
     public static MapLocation verticalMirror(MapLocation loc) {
         return new MapLocation(loc.x, mapHeight - loc.y - 1);
     }
+
     public static MapLocation horizontalMirror(MapLocation loc) {
         return new MapLocation(mapWidth - loc.x - 1, loc.y);
     }

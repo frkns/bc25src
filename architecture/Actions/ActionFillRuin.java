@@ -37,9 +37,9 @@ public class ActionFillRuin extends RobotPlayer {
             return;
         }
 
-        // Get tower for this ruins
         UnitType towerType = Utils.getBuildType(nearestEmptyRuin);
 
+        // Check tower type to build
         if(towerType == null){
             Debug.println("\tE - ACTION_FILL_RUIN     : Can't build null tower type");
             action = Action.ACTION_WAITING_FOR_ACTION;
