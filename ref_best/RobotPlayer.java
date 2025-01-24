@@ -175,6 +175,7 @@ public class RobotPlayer {
         }
 
         AttackBase.init();
+        Splashers.init();
 
         mx = Math.max(mapWidth, mapHeight);  // ~60 for huge ~35 for medium
         siegePhase = (int)(mx * 3);  // cast to int, will be useful for tuning later

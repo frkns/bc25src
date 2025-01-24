@@ -234,7 +234,7 @@ public class RobotPlayer {
 
                 if (!rc.getType().isTowerType())
                     ImpureUtils.updateNearestPaintTower();
-                
+
                 // Plays actions
                 Debug.println("Start of actions   : as " + role.name() + " " + action.name());
                 switch (role) {
@@ -339,7 +339,12 @@ public class RobotPlayer {
                     default:
                         Debug.println("No role corresponding to " + role.name());
                 }
+<<<<<<< HEAD
 
+
+                ActionHelpSignal.run(); // Place MARK2 under unit to call help if needed.
+=======
+>>>>>>> refs/remotes/origin/main
                 Debug.println("End of actions     : with " + action.name());
                 Debug.println("Bytecodes : " + Clock.getBytecodeNum());
 
