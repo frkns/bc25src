@@ -204,7 +204,7 @@ public class Soldiers extends RobotPlayer {
 
     public static void explore() throws GameActionException {
         if (exploreTarget == null || rc.getLocation().distanceSquaredTo(exploreTarget) <= 9 || (Explore.nearBoundary(3) && !rc.onTheMap(exploreTarget))) {
-            exploreTarget = Explore.getExploreTarget();
+            exploreTarget = Explore.getExploreTarget(); // Move a specified number of tiles in the direction with the most empty tiles. Bias toward center for ties.
         }
 
         if (rc.isMovementReady() && rc.getPaint() > 0) {

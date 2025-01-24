@@ -49,6 +49,6 @@ public class Explore extends RobotPlayer {
             }
         }
 
-        return robotLoc.translate(bestDir.dx * 12, bestDir.dy * 12);
+        return robotLoc.translate(bestDir.dx * 9, bestDir.dy * 9);
     }
 }
