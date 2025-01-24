@@ -199,7 +199,7 @@ public class Soldiers extends RobotPlayer {
         else if (isFillingSRP) {
             rc.setIndicatorDot(curSRP, 255, 0, 0);
             boolean noEnemyPaint = FillSRP.updateNearestWrongInSRP();
-            if (noEnemyPaint /*&& nearestWrongInSRP != null*/) {
+            if (noEnemyPaint /*&& getNearestWrongInSrp != null*/) {
                 HeuristicPath.moveToWrongInSRP();
                 FillSRP.updateNearestWrongInSRP();
 

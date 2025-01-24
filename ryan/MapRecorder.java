@@ -175,7 +175,7 @@ public class MapRecorder extends RobotPlayer {
                 break;
         }
         
-        Debug.println(Debug.INFO, String.format("eliminate sym %d at %d %d now sym=%d", sym, loc.x, loc.y, symmetry));
+//        Debug.println(Debug.INFO, String.format("eliminate sym %d at %d %d now sym=%d", sym, loc.x, loc.y, symmetry));
     }
 
     // Get symmetric location for a given symmetry type

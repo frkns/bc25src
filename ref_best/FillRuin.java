@@ -85,7 +85,7 @@ public class FillRuin extends RobotPlayer {
 
         if (mask_x < 0 || mask_x > 4 || mask_y < 0 || mask_y > 4) {
             // why does this happen??
-            // System.out.println("ruin deltas are off. curRuin: " + ruinLoc + ", nearestWrongInRuin: " + nearestWrongInRuin);
+            // System.out.println("ruin deltas are off. curRuin: " + ruinLoc + ", getNearestWrongInRuin: " + getNearestWrongInRuin);
             return;
         }
         boolean useSecondary = towerPattern[mask_x][mask_y];

@@ -76,7 +76,7 @@ public class ActionFillRuin extends RobotPlayer {
         int mask_y = 2 - delta_y;
 
         if (mask_x < 0 || mask_x > 4 || mask_y < 0 || mask_y > 4) {
-            System.out.println("ruin deltas are off. curRuin: " + nearestEmptyRuin + ", nearestWrongInRuin: " + target);
+            System.out.println("ruin deltas are off. curRuin: " + nearestEmptyRuin + ", getNearestWrongInRuin: " + target);
             return;
         }
         boolean useSecondary = towerPattern[mask_x][mask_y];

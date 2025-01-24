@@ -7,14 +7,14 @@
 //    static MapLocation target;
 //    static int targetChangeWaitTime = mx;
 //    static int lastTargetChangeRound = 0;
-//    static boolean wasFillingSRPlastRound = false;
-//    static int consecutiveRoundsFillingSRP = 0;
-//    static MapLocation avoidSRPloc;
-//    static MapLocation lastSRPloc;
-//    static int lastSRProundNum = 0;
+//    static boolean wasFillingSrplastRound = false;
+//    static int consecutiveRoundsFillingSrp = 0;
+//    static MapLocation avoidSrploc;
+//    static MapLocation lastSrploc;
+//    static int lastSrproundNum = 0;
 //    static int numWrongTilesInRuin;
-//    static int numWrongTilesInSRP;
-//    static int noSRPuntil = 3;
+//    static int numWrongTilesInSrp;
+//    static int noSrpuntil = 3;
 //    static int noFullFillUntil = 4;
 //    static MapInfo[] _attackableNearbyTiles;
 //    static MapLocation lastRuinLocWithEnemyPaint;
@@ -97,14 +97,14 @@
 //            boolean noEnemyPaint = buildTowerType != null;
 //            if (noEnemyPaint) {
 //                FillRuin.updateNearestWrongInRuin(buildTowerType);
-//                if (nearestWrongInRuin != null) {
-//                    Pathfinder.move(nearestWrongInRuin);
+//                if (getNearestWrongInRuin != null) {
+//                    Pathfinder.move(getNearestWrongInRuin);
 //                }
 //                FillRuin.updateNearestWrongInRuin(buildTowerType);
 //                if (rc.canCompleteTowerPattern(buildTowerType, curRuin.getMapLocation())) {
 //                    rc.completeTowerPattern(buildTowerType, curRuin.getMapLocation());
 //                }
-//                if (nearestWrongInRuin != null) rc.setIndicatorDot(nearestWrongInRuin, 255, 255, 0);
+//                if (getNearestWrongInRuin != null) rc.setIndicatorDot(getNearestWrongInRuin, 255, 255, 0);
 //                FillRuin.tryToPaintRuin(buildTowerType, true);
 //                if (rc.getPaint() < 5 * numWrongTilesInRuin) {
 //                    isFillingRuin = false;
@@ -115,55 +115,55 @@
 //                lastRuinLocWithEnemyPaint = curRuin.getMapLocation();
 //                lastRuinLocWithEnemyPaintCounter = 0;
 //                isFillingRuin = false;
-//                nearestWrongInRuin = null;
+//                getNearestWrongInRuin = null;
 //            }
 //        }
 //        //#endregion
 //
-//        //#region SRP Management
-//        if (!isRefilling && !isFillingRuin && rc.getNumberTowers() >= noSRPuntil) {
+//        //#region Srp Management
+//        if (!isRefilling && !isFillingRuin && rc.getNumberTowers() >= noSrpuntil) {
 //            int distance = (int)2e9;
 //            for (MapInfo tile : nearbyTiles) {
 //                if (tile.getMark() == PaintType.ALLY_PRIMARY) {
 //                    MapLocation tileLoc = tile.getMapLocation();
-//                    if (avoidSRPloc != null && tileLoc.equals(avoidSRPloc))
+//                    if (avoidSrploc != null && tileLoc.equals(avoidSrploc))
 //                       continue;
 //                    if (alreadyTryingBuild != null && Utils.chessDistance(tileLoc, alreadyTryingBuild) <= 3)
 //                        continue;
 //                    if (tileLoc.distanceSquaredTo(rc.getLocation()) < distance) {
-//                        MapLocation nearestWrongOnIt = FillSRP.pureNearestWrongInSRP(tileLoc);
+//                        MapLocation nearestWrongOnIt = FillSrp.pureNearestWrongInSrp(tileLoc);
 //                        if (nearestWrongOnIt != null) {
 //                            boolean canDo = true;
 //                            if (canDo) {
 //                                distance = tileLoc.distanceSquaredTo(rc.getLocation());
-//                                curSRP = tileLoc;
-//                                isFillingSRP = true;
+//                                curSrp = tileLoc;
+//                                isFillingSrp = true;
 //                            }
 //                        }
 //                    }
 //                }
 //            }
 //        }
-//        if (isFillingSRP) {
-//            rc.setIndicatorDot(curSRP, 255, 0, 0);
-//            boolean noEnemyPaint = FillSRP.updateNearestWrongInSRP();
+//        if (isFillingSrp) {
+//            rc.setIndicatorDot(curSrp, 255, 0, 0);
+//            boolean noEnemyPaint = FillSrp.getNearestWrongInSrp();
 //            if (noEnemyPaint) {
-//                if (nearestWrongInSRP != null) {
-//                    Pathfinder.move(nearestWrongInSRP);
+//                if (getNearestWrongInSrp != null) {
+//                    Pathfinder.move(getNearestWrongInSrp);
 //                }
-//                FillSRP.updateNearestWrongInSRP();
-//                if (nearestWrongInSRP != null)
-//                    rc.setIndicatorDot(nearestWrongInSRP, 255, 255, 0);
-//                FillSRP.tryToPaintSRP();
-//                if (rc.getPaint() < 5 * numWrongTilesInSRP) {
+//                FillSrp.getNearestWrongInSrp();
+//                if (getNearestWrongInSrp != null)
+//                    rc.setIndicatorDot(getNearestWrongInSrp, 255, 255, 0);
+//                FillSrp.paintSrp();
+//                if (rc.getPaint() < 5 * numWrongTilesInSrp) {
 //                    isFillingRuin = false;
-//                    isFillingSRP = false;
+//                    isFillingSrp = false;
 //                    isRefilling = true;
 //                }
 //                return;
 //            } else {
-//                isFillingSRP = false;
-//                nearestWrongInSRP = null;
+//                isFillingSrp = false;
+//                getNearestWrongInSrp = null;
 //            }
 //        }
 //        //#endregion
@@ -172,7 +172,7 @@
 //        if (!rc.isMovementReady()) {
 //            nearbyTiles = rc.senseNearbyMapInfos();
 //        }
-//        ImpureUtils.tryMarkSRP();
+//        ImpureUtils.tryMarkSrp();
 //        isRefilling = rc.getPaint() < 100;
 //        MapLocation paintTarget = nearestPaintTower;
 //        if (paintTarget != null) {

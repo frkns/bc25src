@@ -8,34 +8,45 @@ public class Soldiers extends RobotPlayer {
     // -------- Tower building variables -------------
     public static MapLocation[] nearbyRuins;
     public static FastLocSet ruinsWithEnemyPaint = new FastLocSet();
-    public static MapLocation currentRuinLoc = null;
     public static UnitType buildTowerType;
+    public static MapLocation currentRuinLoc;
+    public static MapLocation nearestWrongInRuin;
     public static int numWrongTilesInRuin = 0; // Used to determine if there is enough paint to complete
     public static int strictFollowBuildOrderNumTowers;
-    // -------- SRP building variables -----------
-    public static int numWrongTilesInSRP;
+    // -------- Srp building variables -----------
+    public static FastLocSet invalidSrp = new FastLocSet();
+    public static MapLocation currentSrpLoc;
+    public static MapLocation nearestWrongInSrp;
+    public static int numWrongTilesInSrp;
     // -------- Enemy tower attack variables -----------
     // -------- Exploration variables ------------
     public static MapLocation exploreTarget;
 
-    public static void run() throws GameActionException {
-        
-        
+
+    public static void initTurn() throws GameActionException {
+        // Initialize variables
         nearbyRuins = rc.senseNearbyRuins(-1);
+        MapRecorder.initTurn();
+    }
 
-
-        // Try each action in priority order
+    public static void playTurn() throws GameActionException {
+                // Try each action in priority order
         if (shouldRefillPaint()) {
             refillPaint();
         } else if (shouldCompleteTower()) {
             completeTower();
-        } else if (shouldCompleteSRP()) {
-            completeSRP();
+        } else if (shouldCompleteSrp()) {
+            completeSrp();
         } else if (shouldAttackEnemyTower()) {
             attackEnemyTower();
         } else {
             explore();
         }
+    }
+
+    public static void endTurn() throws GameActionException {
+        ImpureUtils.tryMarkSrp();
+        MapRecorder.recordSym(1000);
     }
 
 
@@ -91,7 +102,7 @@ public class Soldiers extends RobotPlayer {
                 return falseCompleteTower();
             }
         }
-        return falseCompleteTower();
+        return falseCompleteTower(); // If the code has reached this, there are ruins nearby, but they are all marked by enemy paint.
     }
     public static boolean falseCompleteTower(){ // Ensures we don't forget to set currentRuinLoc to false!
         currentRuinLoc = null;
@@ -105,7 +116,7 @@ public class Soldiers extends RobotPlayer {
      */
     public static void completeTower() throws GameActionException {
         // Try to paint wrong tiles
-        MapLocation nearestWrongInRuin = CompleteTower.nearestWrongInRuin(buildTowerType, currentRuinLoc); // Returns null if no wrong tiles OR enemy paint
+        nearestWrongInRuin = CompleteTower.getNearestWrongInRuin(buildTowerType, currentRuinLoc); // Returns null if no wrong tiles. Returns MapLocation(-1, -1) if enemy paint
         if (rc.isMovementReady() && rc.getPaint() > 0) {
             if (nearestWrongInRuin != null) {
                 Pathfinder.move(nearestWrongInRuin);
@@ -113,7 +124,7 @@ public class Soldiers extends RobotPlayer {
                 Pathfinder.move(currentRuinLoc);
             }
         }
-        if (nearestWrongInRuin != null) {
+        if (nearestWrongInRuin != null) { // Omitting the check for enemy paint after moving leads to painting 1 extra tile but not important enough to rewrite
             Debug.setIndicatorLine(rc.getLocation(), nearestWrongInRuin, 0, 255, 0);
             CompleteTower.paintTower(buildTowerType, currentRuinLoc, nearestWrongInRuin);
         } else {
@@ -123,16 +134,63 @@ public class Soldiers extends RobotPlayer {
             Debug.setIndicatorLine(rc.getLocation(), currentRuinLoc, 0, 255, 0);
         }
         rc.setIndicatorString("completeTower");
-    }
+        }
 
-    public static boolean shouldCompleteSRP() throws GameActionException {
-        return false; // TODO: Implement nearby SRP check
-    }
-    public static void completeSRP() throws GameActionException {
-        // Find nearest incomplete SRP
-        // Move towards SRP
-        // Complete construction when in range
-    }
+
+    public static boolean shouldCompleteSrp() throws GameActionException {
+        // If no target Srp, find the nearest possible center of Srp
+        if (currentSrpLoc == null) {
+            for (MapInfo tile : nearbyTiles) {
+                if (tile.getMark() == PaintType.ALLY_PRIMARY && !invalidSrp.contains(tile.getMapLocation())) {
+                    currentSrpLoc = tile.getMapLocation();
+                }
+            }
+        }
+        
+        // Check if the Srp we've found or our old target is still valid (no enemy paint)
+        if (currentSrpLoc != null) {
+            nearestWrongInSrp = CompleteSrp.getNearestWrongInSrp(currentSrpLoc); // Returns null if no wrong tiles. Returns MapLocation(-1, -1) if enemy paint
+            if (nearestWrongInSrp != null && nearestWrongInSrp.equals(new MapLocation(-1, -1))){
+                invalidSrp.add(currentSrpLoc);
+                return falseCompleteSrp();
+            } else if (nearestWrongInSrp == null && rc.getLocation().isWithinDistanceSquared(currentSrpLoc, 4) && !rc.canCompleteResourcePattern(currentSrpLoc) && rc.getChips() > 200){
+                invalidSrp.add(currentSrpLoc);
+                return falseCompleteSrp(); // The Srp must be completed, since it is close enough to confirm there are no wrong tiles in the entire SRP, and canComplete returns false.
+            } else {
+                return true; // We are not in range to see all the tiles
+            }
+        }
+        return falseCompleteSrp();  // If the code has reached this, there are marked Srp centers nearby, but they are all marked by enemy paint.
+        }
+
+        public static boolean falseCompleteSrp(){ // Ensures we don't forget to set currentSrpLoc to false!
+            currentSrpLoc = null;
+            return false;
+        }
+
+        public static void completeSrp() throws GameActionException {
+
+        
+            if (rc.isMovementReady() && rc.getPaint() > 0) {
+                if (nearestWrongInSrp != null && !nearestWrongInSrp.equals(new MapLocation(-1, -1))){
+                Pathfinder.move(nearestWrongInSrp);
+                } else {
+                Pathfinder.move(currentSrpLoc);
+                }
+            }
+
+            if (nearestWrongInSrp != null && !nearestWrongInSrp.equals(new MapLocation(-1, -1))) {
+                Debug.setIndicatorLine(rc.getLocation(), nearestWrongInSrp, 0, 0, 255);
+                CompleteSrp.paintSrp(currentSrpLoc, nearestWrongInSrp);
+            } else {
+                if (rc.canCompleteResourcePattern(currentSrpLoc)) {
+                    invalidSrp.add(currentSrpLoc);
+                    rc.completeResourcePattern(currentSrpLoc);
+                }
+                Debug.setIndicatorLine(rc.getLocation(), currentSrpLoc, 0, 0, 255);
+            }
+            rc.setIndicatorString("completeSrp");
+            }
 
     public static boolean shouldAttackEnemyTower() throws GameActionException {
         return false; // TODO: Implement enemy tower detection
@@ -145,8 +203,8 @@ public class Soldiers extends RobotPlayer {
 
 
     public static void explore() throws GameActionException {
-        if (exploreTarget == null || rc.getLocation().distanceSquaredTo(exploreTarget) <= 9 || nearBoundary(3)) {
-            exploreTarget = getExploreTarget();
+        if (exploreTarget == null || rc.getLocation().distanceSquaredTo(exploreTarget) <= 9 || (Explore.nearBoundary(3) && !rc.onTheMap(exploreTarget))) {
+            exploreTarget = Explore.getExploreTarget();
         }
 
         if (rc.isMovementReady() && rc.getPaint() > 0) {
@@ -160,58 +218,15 @@ public class Soldiers extends RobotPlayer {
                 }
             }
         }
-        Debug.setIndicatorLine(rc.getLocation(), exploreTarget, 255, 255, 0);
+        if (!rc.onTheMap(exploreTarget)) {
+            MapLocation indicatorExploreTarget = new MapLocation(
+                Math.min(Math.max(exploreTarget.x, 0), rc.getMapWidth() - 1),
+                Math.min(Math.max(exploreTarget.y, 0), rc.getMapHeight() - 1)
+            );
+            Debug.setIndicatorLine(rc.getLocation(), indicatorExploreTarget, 255, 255, 0);
+        } else {
+            Debug.setIndicatorLine(rc.getLocation(), exploreTarget, 255, 255, 0);
+        }
         rc.setIndicatorString("Explore");
-        }
-    public static boolean nearBoundary(int tilesFromEdge) throws GameActionException {
-        MapLocation loc = rc.getLocation();
-        return loc.x < tilesFromEdge || loc.x >= rc.getMapWidth() - tilesFromEdge || 
-               loc.y < tilesFromEdge || loc.y >= rc.getMapHeight() - tilesFromEdge;
-    }
-    public static MapLocation getExploreTarget() throws GameActionException {
-        int[] directionScores = new int[8];
-
-        MapLocation checkLoc;
-        MapLocation robotLoc = rc.getLocation();
-        // Add bias towards center
-        directionScores[robotLoc.directionTo(mapCenter).ordinal()] += 3;
-        directionScores[robotLoc.directionTo(mapCenter).rotateLeft().ordinal()] += 2;
-        directionScores[robotLoc.directionTo(mapCenter).rotateRight().ordinal()] += 2;
-        directionScores[robotLoc.directionTo(mapCenter).rotateLeft().rotateLeft().ordinal()] += 1;
-        directionScores[robotLoc.directionTo(mapCenter).rotateRight().rotateRight().ordinal()] += 1;
-
-        // Check 2 tiles away
-        checkLoc = robotLoc.translate(2, 0); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY) directionScores[Direction.EAST.ordinal()] += 5;
-        checkLoc = robotLoc.translate(-2, 0); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY) directionScores[Direction.WEST.ordinal()] += 5;
-        checkLoc = robotLoc.translate(0, 2); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY) directionScores[Direction.NORTH.ordinal()] += 5;
-        checkLoc = robotLoc.translate(0, -2); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY) directionScores[Direction.SOUTH.ordinal()] += 5;
-        checkLoc = robotLoc.translate(2, 2); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY) directionScores[Direction.NORTHEAST.ordinal()] += 5;
-        checkLoc = robotLoc.translate(-2, 2); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY) directionScores[Direction.NORTHWEST.ordinal()] += 5;
-        checkLoc = robotLoc.translate(2, -2); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY) directionScores[Direction.SOUTHEAST.ordinal()] += 5;
-        checkLoc = robotLoc.translate(-2, -2); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY) directionScores[Direction.SOUTHWEST.ordinal()] += 5;
-
-        // Check 3 tiles away
-        checkLoc = robotLoc.translate(3, 0); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY) directionScores[Direction.EAST.ordinal()] += 5;
-        checkLoc = robotLoc.translate(-3, 0); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY) directionScores[Direction.WEST.ordinal()] += 5;
-        checkLoc = robotLoc.translate(0, 3); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY) directionScores[Direction.NORTH.ordinal()] += 5;
-        checkLoc = robotLoc.translate(0, -3); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY) directionScores[Direction.SOUTH.ordinal()] += 5;
-        checkLoc = robotLoc.translate(3, 3); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY) directionScores[Direction.NORTHEAST.ordinal()] += 5;
-        checkLoc = robotLoc.translate(-3, 3); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY) directionScores[Direction.NORTHWEST.ordinal()] += 5;
-        checkLoc = robotLoc.translate(3, -3); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY) directionScores[Direction.SOUTHEAST.ordinal()] += 5;
-        checkLoc = robotLoc.translate(-3, -3); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY) directionScores[Direction.SOUTHWEST.ordinal()] += 5;
-
-        Direction bestDir = directions[0];
-        int bestScore = directionScores[0];
-        for (int i = 7; i >= 0; i--) {
-            if (directionScores[i] > bestScore) {
-                bestScore = directionScores[i];
-                bestDir = directions[i];
-            }
-        }
-
-        // We translate exactly 12 tiles because it ensures the robot gets a completely new field of vision by the time it reaches the target
-        // It is 12 tiles instead of 9 because we stop moving once we SEE the target, not when we reach it. 
-        // That way if the target is unreachable, we don't get stuck trying to reach it
-        return robotLoc.translate(bestDir.dx * 12, bestDir.dy * 12);
     }
 }

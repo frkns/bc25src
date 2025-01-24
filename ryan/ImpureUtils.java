@@ -211,18 +211,18 @@ public class ImpureUtils extends RobotPlayer {
         }
     }
 
-    public static void tryMarkSRP() throws GameActionException {
+    public static void tryMarkSrp() throws GameActionException {
         int cx = rc.getLocation().x;
         int cy = rc.getLocation().y;
         if (cx - 2 < 0 || cy - 2 < 0 || cx + 2 >= mapWidth || cy + 2 >= mapHeight) {
             return;
         }
-        boolean possibleSRP = true;
+        boolean possibleSrp = true;
         for (MapInfo tile : nearbyTiles) {
             MapLocation tileLoc = tile.getMapLocation();
             if (!tile.isPassable()) {
                 if (Utils.chessDistance(rc.getLocation(), tileLoc) <= 2) {
-                    possibleSRP = false;
+                    possibleSrp = false;
                     break;
                 }
             }
@@ -232,11 +232,11 @@ public class ImpureUtils extends RobotPlayer {
                 if ((abs_diff_x == 4 && abs_diff_y == 0) || (abs_diff_x == 0 && abs_diff_y == 4)) {
                     continue;
                 }
-                possibleSRP = false;
+                possibleSrp = false;
                 break;
             }
         }
-        if (possibleSRP) {
+        if (possibleSrp) {
             if (rc.canMark(rc.getLocation())) {
                 rc.mark(rc.getLocation(), false);
             } else {
@@ -271,9 +271,9 @@ public class ImpureUtils extends RobotPlayer {
         // rc.setIndicatorDot(avgClump, 0, 0, 255);
     }
 
-    public static void checkAndCompleteNearbySRPs() throws GameActionException {
+    public static void checkAndCompleteNearbySrps() throws GameActionException {
         // actually don't need this --
-        // CAN BE REACHED can be reached because it might complete *another* robot's SRP
+        // CAN BE REACHED can be reached because it might complete *another* robot's Srp
         // that they would've completed anyway on their turn
 
         // for (MapInfo tile : nearbyTiles) {

@@ -6,8 +6,6 @@ public class RuinDotter extends RobotPlayer {
 
     static MapLocation target;
 
-    static MapInfo[] _attackableNearbyTiles;  // var names that start with an underscore are set static to save bytecode
-
 
     static void init() throws GameActionException {
         potentialEnemySpawnLocations[0] = Utils.mirror(spawnTowerLocation);

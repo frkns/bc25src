@@ -50,11 +50,6 @@ public class RobotPlayer {
     static MapLocation sndNearestEnemyTower;  // if there is a second one
     static UnitType sndNearestEnemyTowerType;
 
-    static MapLocation nearestWrongInRuin;
-
-    static MapLocation curSRP;
-    static boolean isFillingSRP = false;
-    static MapLocation nearestWrongInSRP;
 
     static int siegePhase;
     static int mopperPhase;
@@ -160,16 +155,25 @@ public class RobotPlayer {
             try {
                 turnsAlive++;
                 roundNum = rc.getRoundNum();
-
-                // roundsSpentInQuadrant[Utils.currentQuadrant()]++;
-
-                // update stuff
                 locationHistory[rc.getRoundNum() % locationHistory.length] = rc.getLocation();
                 nearbyRobots = rc.senseNearbyRobots();
                 nearbyTiles = rc.senseNearbyMapInfos();
 
                 if (!rc.getType().isTowerType())
                     ImpureUtils.updateNearestPaintSource();
+                // should be ok not to update nearbyRobots because we only do one nearest enemy tower update anyways
+                for (MapLocation tileLoc : nearbyRuins) {
+                    if (!rc.canSenseRobotAtLocation(tileLoc))
+                        continue;
+                    RobotInfo robot = rc.senseRobotAtLocation(tileLoc);
+                    if (robot.getType().isTowerType() && robot.getTeam() == rc.getTeam()
+                            && rc.canSendMessage(robot.getLocation())) {
+                        Comms.reportToTower(robot.getLocation());
+                        break;
+                    }
+                }
+
+
 
                 switch (rc.getType()) {
                     case SOLDIER: {
@@ -188,20 +192,6 @@ public class RobotPlayer {
                     case SPLASHER: runSplasher(); break;
                     default: runTower(); break;
                 }
-
-                // should be ok not to update nearbyRobots because we only do one nearest enemy tower update anyways
-                for (MapLocation tileLoc : rc.senseNearbyRuins(-1)) {
-                    if (!rc.canSenseRobotAtLocation(tileLoc))
-                        continue;
-                    RobotInfo robot = rc.senseRobotAtLocation(tileLoc);
-                    if (robot.getType().isTowerType() && robot.getTeam() == rc.getTeam()
-                            && rc.canSendMessage(robot.getLocation())) {
-                        Comms.reportToTower(robot.getLocation());
-                        break;
-                    }
-                }
-
-
             } catch (GameActionException e) {
                 System.out.println("GameActionException");
                 e.printStackTrace();
@@ -228,7 +218,9 @@ public class RobotPlayer {
     }
 
     public static void runSoldier() throws GameActionException {
-        Soldiers.run();
+        Soldiers.initTurn();
+        Soldiers.playTurn();
+        Soldiers.endTurn();
     }
 
     public static void runMopper() throws GameActionException {

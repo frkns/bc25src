@@ -5,10 +5,10 @@ import battlecode.common.*;
 public class CompleteTower extends RobotPlayer {
 
 
-    public static MapLocation nearestWrongInRuin(UnitType towerType, MapLocation ruinLoc) throws GameActionException {
+    public static MapLocation getNearestWrongInRuin(UnitType towerType, MapLocation ruinLoc) throws GameActionException {
         Soldiers.numWrongTilesInRuin = 0;
         boolean[][] towerPattern = rc.getTowerPattern(towerType);
-        nearestWrongInRuin = null;
+        MapLocation nearestWrongInRuin = null;
 
         for (int i = 4; i >= 0; i--) {
             for (int j = 4; j >= 0; j--) {
@@ -19,7 +19,7 @@ public class CompleteTower extends RobotPlayer {
                     continue;
                 PaintType paint = rc.senseMapInfo(loc).getPaint();
                 if (paint.isEnemy()) {
-                    return null;
+                    return new MapLocation(-1, -1);
                 }
                 if (paint == PaintType.EMPTY
                 || (paint == PaintType.ALLY_SECONDARY && !towerPattern[i][j])

@@ -82,7 +82,6 @@ public class AttackBase extends RobotPlayer {
             }
             if (rc.getHealth() < 31) {  // stop attacking if low health, 30 or less means we die to level 1 paint/money tower shot + AoE
                 role = 0;
-                Soldiers.run();
                 return;
             }
 
@@ -163,7 +162,6 @@ public class AttackBase extends RobotPlayer {
         if (rc.isMovementReady()) {
             if (target == null) {
                 role = 0;
-                Soldiers.run();
                 return;
             }
 

@@ -21,24 +21,24 @@ public class Explore extends RobotPlayer {
         directionScores[robotLoc.directionTo(mapCenter).rotateRight().rotateRight().ordinal()] += 1;
 
         // Check 2 tiles away
-        checkLoc = robotLoc.translate(2, 0); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY) directionScores[Direction.EAST.ordinal()] += 5;
-        checkLoc = robotLoc.translate(-2, 0); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY) directionScores[Direction.WEST.ordinal()] += 5;
-        checkLoc = robotLoc.translate(0, 2); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY) directionScores[Direction.NORTH.ordinal()] += 5;
-        checkLoc = robotLoc.translate(0, -2); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY) directionScores[Direction.SOUTH.ordinal()] += 5;
-        checkLoc = robotLoc.translate(2, 2); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY) directionScores[Direction.NORTHEAST.ordinal()] += 5;
-        checkLoc = robotLoc.translate(-2, 2); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY) directionScores[Direction.NORTHWEST.ordinal()] += 5;
-        checkLoc = robotLoc.translate(2, -2); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY) directionScores[Direction.SOUTHEAST.ordinal()] += 5;
-        checkLoc = robotLoc.translate(-2, -2); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY) directionScores[Direction.SOUTHWEST.ordinal()] += 5;
+        checkLoc = robotLoc.translate(2, 0); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY && rc.senseMapInfo(checkLoc).isPassable()) directionScores[Direction.EAST.ordinal()] += 5;
+        checkLoc = robotLoc.translate(-2, 0); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY && rc.senseMapInfo(checkLoc).isPassable()) directionScores[Direction.WEST.ordinal()] += 5;
+        checkLoc = robotLoc.translate(0, 2); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY && rc.senseMapInfo(checkLoc).isPassable()) directionScores[Direction.NORTH.ordinal()] += 5;
+        checkLoc = robotLoc.translate(0, -2); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY && rc.senseMapInfo(checkLoc).isPassable()) directionScores[Direction.SOUTH.ordinal()] += 5;
+        checkLoc = robotLoc.translate(2, 2); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY && rc.senseMapInfo(checkLoc).isPassable()) directionScores[Direction.NORTHEAST.ordinal()] += 5;
+        checkLoc = robotLoc.translate(-2, 2); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY && rc.senseMapInfo(checkLoc).isPassable()) directionScores[Direction.NORTHWEST.ordinal()] += 5;
+        checkLoc = robotLoc.translate(2, -2); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY && rc.senseMapInfo(checkLoc).isPassable()) directionScores[Direction.SOUTHEAST.ordinal()] += 5;
+        checkLoc = robotLoc.translate(-2, -2); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY && rc.senseMapInfo(checkLoc).isPassable()) directionScores[Direction.SOUTHWEST.ordinal()] += 5;
 
         // Check 3 tiles away
-        checkLoc = robotLoc.translate(3, 0); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY) directionScores[Direction.EAST.ordinal()] += 5;
-        checkLoc = robotLoc.translate(-3, 0); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY) directionScores[Direction.WEST.ordinal()] += 5;
-        checkLoc = robotLoc.translate(0, 3); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY) directionScores[Direction.NORTH.ordinal()] += 5;
-        checkLoc = robotLoc.translate(0, -3); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY) directionScores[Direction.SOUTH.ordinal()] += 5;
-        checkLoc = robotLoc.translate(3, 3); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY) directionScores[Direction.NORTHEAST.ordinal()] += 5;
-        checkLoc = robotLoc.translate(-3, 3); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY) directionScores[Direction.NORTHWEST.ordinal()] += 5;
-        checkLoc = robotLoc.translate(3, -3); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY) directionScores[Direction.SOUTHEAST.ordinal()] += 5;
-        checkLoc = robotLoc.translate(-3, -3); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY) directionScores[Direction.SOUTHWEST.ordinal()] += 5;
+        checkLoc = robotLoc.translate(3, 0); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY && rc.senseMapInfo(checkLoc).isPassable()) directionScores[Direction.EAST.ordinal()] += 5;
+        checkLoc = robotLoc.translate(-3, 0); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY && rc.senseMapInfo(checkLoc).isPassable()) directionScores[Direction.WEST.ordinal()] += 5;
+        checkLoc = robotLoc.translate(0, 3); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY && rc.senseMapInfo(checkLoc).isPassable()) directionScores[Direction.NORTH.ordinal()] += 5;
+        checkLoc = robotLoc.translate(0, -3); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY && rc.senseMapInfo(checkLoc).isPassable()) directionScores[Direction.SOUTH.ordinal()] += 5;
+        checkLoc = robotLoc.translate(3, 3); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY && rc.senseMapInfo(checkLoc).isPassable()) directionScores[Direction.NORTHEAST.ordinal()] += 5;
+        checkLoc = robotLoc.translate(-3, 3); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY && rc.senseMapInfo(checkLoc).isPassable()) directionScores[Direction.NORTHWEST.ordinal()] += 5;
+        checkLoc = robotLoc.translate(3, -3); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY && rc.senseMapInfo(checkLoc).isPassable()) directionScores[Direction.SOUTHEAST.ordinal()] += 5;
+        checkLoc = robotLoc.translate(-3, -3); if (rc.onTheMap(checkLoc) && rc.senseMapInfo(checkLoc).getPaint() == PaintType.EMPTY && rc.senseMapInfo(checkLoc).isPassable()) directionScores[Direction.SOUTHWEST.ordinal()] += 5;
 
         Direction bestDir = directions[0];
         int bestScore = directionScores[0];
@@ -49,9 +49,6 @@ public class Explore extends RobotPlayer {
             }
         }
 
-        // We translate exactly 12 tiles because it ensures the robot gets a completely new field of vision by the time it reaches the target
-        // It is 12 tiles instead of 9 because we stop moving once we SEE the target, not when we reach it. 
-        // That way if the target is unreachable, we don't get stuck trying to reach it
         return robotLoc.translate(bestDir.dx * 12, bestDir.dy * 12);
     }
 }

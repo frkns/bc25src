@@ -359,7 +359,7 @@ public class HeuristicPath extends RobotPlayer {
             if (nearestWrongInSRP != null) {
                 // add cost for moving in a direction that gets us further away from nearest
                 // empty tile
-                // directionCost[i] += Utils.manhattanDistance(newLoc, nearestWrongInSRP) * 500;
+                // directionCost[i] += Utils.manhattanDistance(newLoc, getNearestWrongInSrp) * 500;
                 directionCost[i] += Math.max(9, newLoc.distanceSquaredTo(nearestWrongInSRP)) * 500;
             }
 
