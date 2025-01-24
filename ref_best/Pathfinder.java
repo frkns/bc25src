@@ -27,12 +27,14 @@ public class Pathfinder extends RobotPlayer{
     }
 
     public static void move(MapLocation loc, boolean _ignoreTowers) throws GameActionException {
-        ignoreTowers = _ignoreTowers;
         if (!rc.isMovementReady() || loc == null)
             return;
+
+        ignoreTowers = _ignoreTowers;
         target = loc;
         stayawayFrom = null;
         Direction dir = BugNav.getMoveDir();
+
         if (dir == null)
             return;
         tryMove(dir);

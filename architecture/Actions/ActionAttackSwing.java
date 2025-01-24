@@ -109,6 +109,7 @@ public class ActionAttackSwing extends RobotPlayer {
             Debug.println("\tW - ACTION_ATTACK_SWING  : not action ready, keep moving in direction of enemy.");
         }
     }
+
     public static void addMoperScore(MapLocation loc){
         MapLocation myLoc = RobotPlayer.rc.getLocation();
         int shift = (loc.x - myLoc.x) + (loc.y - myLoc.y) * 1000;
