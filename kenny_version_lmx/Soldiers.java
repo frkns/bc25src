@@ -1,7 +1,6 @@
-package lmx;
+package kenny_version_lmx;
 
 import battlecode.common.*;
-
 
 public class Soldiers extends RobotPlayer {
 
@@ -47,8 +46,6 @@ public class Soldiers extends RobotPlayer {
     static boolean bypassIfPaint = false;  // however bypass strict build order if it is paint
 
     public static void run() throws GameActionException {
-        // Init target according to spawn direction
-
 
 
         if (lastRuinLocWithEnemyPaintCounter++ > 10) {  // reset ruin avoidance after some time has passed
@@ -120,6 +117,8 @@ public class Soldiers extends RobotPlayer {
                 // }
             }
         }
+
+
 
 
         if (rc.getNumberTowers() == GameConstants.MAX_NUMBER_OF_TOWERS) {
@@ -196,12 +195,11 @@ public class Soldiers extends RobotPlayer {
                 nearestWrongInRuin = null;
             }
         }
-
         // SRP
         else if (isFillingSRP) {
             rc.setIndicatorDot(curSRP, 255, 0, 0);
             boolean noEnemyPaint = FillSRP.updateNearestWrongInSRP();
-            if (noEnemyPaint /*&& getNearestWrongInSrp != null*/) {
+            if (noEnemyPaint /*&& nearestWrongInSRP != null*/) {
                 HeuristicPath.moveToWrongInSRP();
                 FillSRP.updateNearestWrongInSRP();
 
@@ -365,6 +363,13 @@ public class Soldiers extends RobotPlayer {
 
             target = Utils.randomLocationInQuadrant(rng.nextInt(4));
 
+            /* */
+            if (rc.getRoundNum() > mx * 2) {
+                Pathfinder.BugNav.resetPathfinding();  // clear residual infos
+                locationHistory = new MapLocation[8];
+            }
+            /* */
+            sqDistanceToTargetOnWallTouch = 9999;
             lastTargetChangeRound = rc.getRoundNum();
         }
 
