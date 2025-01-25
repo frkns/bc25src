@@ -847,15 +847,6 @@ if (directionCost[0] < minCost) {
     public static void mopperMove(MapLocation targetLoc) throws GameActionException {
         int[] directionCost = new int[8];
         MapLocation nearbyEnemyTowerLoc = nearestEnemyTower;
-        boolean[] enemyPaint =  new boolean[8];
-
-        for(MapInfo tile : nearbyTiles) {
-            if(rc.getLocation().distanceSquaredTo(tile.getMapLocation()) != 2) {
-                int dir = rc.getLocation().directionTo(tile.getMapLocation()).ordinal();
-
-                if(dir != 8) {enemyPaint[rc.getLocation().directionTo(tile.getMapLocation()).ordinal()] = true;}
-            }
-        }
 
         int INF = (int) 2e9;
         for (int i = 8; i-- > 0;) {
@@ -888,7 +879,6 @@ if (directionCost[0] < minCost) {
             MapLocation newLoc = rc.adjacentLocation(dir);
             MapInfo tileInfo = rc.senseMapInfo(newLoc);
 
-
             // add a cost if the tile is enemy paint
             if (tileInfo.getPaint().isEnemy()) {
                 if (rc.getNumberTowers() >= startPaintingFloorTowerNum) {
@@ -906,7 +896,7 @@ if (directionCost[0] < minCost) {
             // add a cost if the tile is neutral paint
             else if (tileInfo.getPaint() == PaintType.EMPTY) {
                 if (rc.getNumberTowers() >= startPaintingFloorTowerNum) {
-                    directionCost[i] += 1400;
+                    directionCost[i] += 2500;
                 } else {
                     directionCost[i] += 1400;
                 }
@@ -1220,25 +1210,9 @@ if (directionCost[0] < minCost) {
     public static void splasherMove(MapLocation targetLoc) throws GameActionException {
         int[] directionCost = new int[8];
 
-        boolean[] enemyPaint =  new boolean[8];
-
-        for(MapInfo tile : nearbyTiles) {
-            if(rc.getLocation().distanceSquaredTo(tile.getMapLocation()) != 2) {
-                int dir = rc.getLocation().directionTo(tile.getMapLocation()).ordinal();
-
-                if(dir != 8) {enemyPaint[rc.getLocation().directionTo(tile.getMapLocation()).ordinal()] = true;}
-            }
-        }
-
         int INF = (int) 2e9;
         for (int i = 8; i-- > 0;) {
             Direction dir = directions[i];
-
-            //add cost in directions that don't lead to enemy paint
-            if(!enemyPaint[i]) {
-                directionCost[i] += 400;
-            }
-
             // if we can't move there, set the cost to infinity
             if (!rc.canMove(dir)) {
                 directionCost[i] = INF;
