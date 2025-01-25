@@ -1,8 +1,8 @@
 package ryan;
-import architecture.Tools.Debug;
-import battlecode.common.*;
-import gavin.fast.FastMath;
 
+import battlecode.common.*;
+
+import ryan.fast.*;
 // these Utils are NOT pure functions (i.e. they modify state / change global variables, etc.)
 
 public class ImpureUtils extends RobotPlayer {
@@ -198,6 +198,40 @@ public class ImpureUtils extends RobotPlayer {
             int transferAmt = Math.min(paintTowerPaintAmt, rc.getType().paintCapacity - rc.getPaint());
             if (rc.canTransferPaint(withdrawTarget, -transferAmt))
                 rc.transferPaint(withdrawTarget, -transferAmt);
+        }
+    }
+
+    public static void tryMarkSRP() throws GameActionException {
+        int cx = rc.getLocation().x;
+        int cy = rc.getLocation().y;
+        if (cx - 2 < 0 || cy - 2 < 0 || cx + 2 >= mapWidth || cy + 2 >= mapHeight) {
+            return;
+        }
+        boolean possibleSRP = true;
+        for (MapInfo tile : nearbyTiles) {
+            MapLocation tileLoc = tile.getMapLocation();
+            if (!tile.isPassable()) {
+                if (Utils.chessDistance(rc.getLocation(), tileLoc) <= 2) {
+                    possibleSRP = false;
+                    break;
+                }
+            }
+            int abs_diff_x = Math.abs(cx - tileLoc.x);
+            int abs_diff_y = Math.abs(cy - tileLoc.y);
+            if (tile.getMark() == PaintType.ALLY_PRIMARY) {
+                if ((abs_diff_x == 4 && abs_diff_y == 0) || (abs_diff_x == 0 && abs_diff_y == 4)) {
+                    continue;
+                }
+                possibleSRP = false;
+                break;
+            }
+        }
+        if (possibleSRP) {
+            if (rc.canMark(rc.getLocation())) {
+                rc.mark(rc.getLocation(), false);
+            } else {
+                System.out.println("Couldn't mark " + rc.getLocation());
+            }
         }
     }
 
