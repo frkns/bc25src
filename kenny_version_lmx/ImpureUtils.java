@@ -1,7 +1,5 @@
-package lmx;
-import architecture.Tools.Debug;
+package kenny_version_lmx;
 import battlecode.common.*;
-import gavin.fast.FastMath;
 
 // these Utils are NOT pure functions (i.e. they modify state / change global variables, etc.)
 
@@ -132,6 +130,18 @@ public class ImpureUtils extends RobotPlayer {
         }
     }
 
+    // static void updateNearestEnemyTower() throws GameActionException {
+    //     nearestEnemyTower = null;
+    //     for (RobotInfo robot : nearbyRobots) {  // assumes non-defense tower
+    //         if (robot.getTeam() != rc.getTeam() && robot.getType().isTowerType()) {
+    //             MapLocation robotLoc = robot.getLocation();
+    //             if (nearestEnemyTower == null || rc.getLocation().distanceSquaredTo(robotLoc) < rc.getLocation().distanceSquaredTo(nearestEnemyTower)) {
+    //                 nearestEnemyTower = robot.getLocation();
+    //                 nearestEnemyTowerType = robot.getType().getBaseType();
+    //             }
+    //         }
+    //     }
+    // }
 
     // updates two towers now!
     static void updateNearestEnemyTower() throws GameActionException {
@@ -287,22 +297,4 @@ public class ImpureUtils extends RobotPlayer {
         //     }
         // }
     }
-
-    public static MapLocation getBorderLocation() {
-        switch (FastMath.rand256() % 4) {
-            case 0: // Top
-                return new MapLocation(FastMath.rand256() % mapWidth, mapHeight - 1);
-            case 1: // Bottom
-                return new MapLocation(FastMath.rand256() % mapWidth, 0);
-            case 2: // Left
-                return new MapLocation(0, FastMath.rand256() % mapHeight);
-            case 3: // Top
-                return new MapLocation(mapWidth - 1, FastMath.rand256() % mapHeight);
-            default:
-                Debug.println("Init explore : Should not be possible.");
-                return null;
-        }
-    }
-
-
 }

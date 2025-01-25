@@ -1,4 +1,4 @@
-package lmx;
+package kenny_version_lmx;
 
 import battlecode.common.*;
 
@@ -112,9 +112,7 @@ public class Splashers extends RobotPlayer {
             scores[id - 128] += PAINT_SCORE_BONUS_RUINS;
         }
         Debug.println("\t\t\tDone in " + (Clock.getBytecodeNum() - start) + " bytecodes.");
-
-
-
+        
 
         // nearest paint tower is updated by default
         ImpureUtils.updateNearbyMask(false);
