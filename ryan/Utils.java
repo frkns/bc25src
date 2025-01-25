@@ -132,6 +132,18 @@ public class Utils extends RobotPlayer {
         return nearestEmpty;
     }
 
+    static MapLocation randomLocationInQuadrant(int Q) {  // 0-indexed
+        int offsetx = rng.nextInt(mapWidth/2) - mapWidth/4;
+        int offsety = rng.nextInt(mapHeight/2) - mapHeight/4;
+
+        if (offsetx > 0) offsetx -= 2;  // doing this because i don't want to do the math to get it exact
+        else offsetx += 2;
+        if (offsety > 0) offsety -= 2;
+        else offsety += 2;
+
+        return new MapLocation(quadrantCenters[Q].x + offsetx, quadrantCenters[Q].y + offsety);
+    }
+
     static int chessDistance(MapLocation A, MapLocation B) {
         return Math.max(Math.abs(A.x - B.x), Math.abs(A.y - B.y));
     }

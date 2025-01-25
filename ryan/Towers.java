@@ -190,15 +190,15 @@ public class Towers extends RobotPlayer {
 
         spawn = UnitType.SOLDIER;
         if (rc.getRoundNum() >= mopperPhase && rc.getPaint() < 700) {
-            if (r < 0) {
+            if (r < 50) {
                 spawn = UnitType.MOPPER;
             }
         } else if (rc.getRoundNum() >= splasherPhase) {
-            if (r < 0) {
+            if (r < 50) {
                 spawn = UnitType.MOPPER;
             }
             else
-            if (r < 0) {
+            if (r < 70) {
                 spawn = UnitType.SPLASHER;
             }
         }

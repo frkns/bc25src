@@ -80,12 +80,12 @@ public class ImpureUtils extends RobotPlayer {
 
 
 
-    static void updateNearestPaintSource() throws GameActionException {
-        if (nearestPaintSource != null && rc.getLocation().distanceSquaredTo(nearestPaintSource) <= 20) {
+    static void updateNearestPaintTower() throws GameActionException {
+        if (nearestPaintTower != null && rc.getLocation().distanceSquaredTo(nearestPaintTower) <= 20) {
             // if tower is destroyed or it's not a paint tower and there's no paint left
-            if (!rc.canSenseRobotAtLocation(nearestPaintSource) || rc.senseRobotAtLocation(nearestPaintSource).getPaintAmount() == 0) {
-                nearestPaintSource = null;
-                nearestPaintSourceIsPaintTower = false;
+            if (!rc.canSenseRobotAtLocation(nearestPaintTower) || rc.senseRobotAtLocation(nearestPaintTower).getPaintAmount() == 0) {
+                nearestPaintTower = null;
+                nearestPaintTowerIsPaintTower = false;
             }
         }
         for (MapLocation ruinLoc : rc.senseNearbyRuins(-1)) {
@@ -94,15 +94,15 @@ public class ImpureUtils extends RobotPlayer {
             RobotInfo robot = rc.senseRobotAtLocation(ruinLoc);
             if (robot.getTeam() == rc.getTeam() && (robot.getType().isTowerType())) {
                 if (robot.getType().getBaseType() == UnitType.LEVEL_ONE_PAINT_TOWER) {
-                    if (nearestPaintSource == null || rc.getLocation().distanceSquaredTo(robot.getLocation()) < rc
-                            .getLocation().distanceSquaredTo(nearestPaintSource)) {
-                        nearestPaintSource = robot.getLocation();
-                        nearestPaintSourceIsPaintTower = true;
+                    if (nearestPaintTower == null || rc.getLocation().distanceSquaredTo(robot.getLocation()) < rc
+                            .getLocation().distanceSquaredTo(nearestPaintTower)) {
+                        nearestPaintTower = robot.getLocation();
+                        nearestPaintTowerIsPaintTower = true;
                     }
-                } else if (!nearestPaintSourceIsPaintTower) {
-                    if ((nearestPaintSource == null || rc.getLocation().distanceSquaredTo(robot.getLocation()) < rc
-                            .getLocation().distanceSquaredTo(nearestPaintSource)) && robot.getPaintAmount() > 0) {
-                        nearestPaintSource = robot.getLocation();
+                } else if (!nearestPaintTowerIsPaintTower) {
+                    if ((nearestPaintTower == null || rc.getLocation().distanceSquaredTo(robot.getLocation()) < rc
+                            .getLocation().distanceSquaredTo(nearestPaintTower)) && robot.getPaintAmount() > 0) {
+                        nearestPaintTower = robot.getLocation();
                     }
                 }
             }
@@ -150,7 +150,7 @@ public class ImpureUtils extends RobotPlayer {
                     nearestEnemyTowerType = robot.getType().getBaseType();
                 }
                 // Check if this tower is closer than the current second nearest tower but not closer than the nearest tower
-                else if (sndNearestEnemyTower == null || distanceSquared < rc.getLocation().distanceSquaredTo(sndNearestEnemyTower)) {
+                else if ((sndNearestEnemyTower == null || distanceSquared < rc.getLocation().distanceSquaredTo(sndNearestEnemyTower)) && !robotLoc.equals(nearestEnemyTower)) {
                     // Update the second nearest tower to be this tower
                     sndNearestEnemyTower = robotLoc;
                     sndNearestEnemyTowerType = robot.getType().getBaseType();
