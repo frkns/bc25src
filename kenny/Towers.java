@@ -390,7 +390,6 @@ public class Towers extends RobotPlayer {
             if (spawn == UnitType.MOPPER)
                 spawnedFirstMopper = true;
             numSpawnedUnits++;
-
         }
 
         rc.attack(null);

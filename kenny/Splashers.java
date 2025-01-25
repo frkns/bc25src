@@ -284,7 +284,7 @@ public class Splashers extends RobotPlayer {
                     if (rc.canSenseRobotAtLocation(tileLoc))
                         locScores[0] += 50;
                 }
-            } /*else if (tile.getPaint() == PaintType.EMPTY) {
+            } else if (tile.getPaint() == PaintType.EMPTY) {
                 // Unroll neutral paint scoring
                 if (locs[8].isWithinDistanceSquared(tileLoc, 4)) {
                     locScores[8] += 100;
@@ -332,7 +332,6 @@ public class Splashers extends RobotPlayer {
                         locScores[0] += 50;
                 }
             }
-            */
         }
 
         // Unroll max score calculation
