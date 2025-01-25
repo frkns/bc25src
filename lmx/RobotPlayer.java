@@ -1,4 +1,4 @@
-package ref_best;
+package lmx;
 
 import battlecode.common.*;
 
@@ -187,6 +187,7 @@ public class RobotPlayer {
         reservePaintPhase = (int)(mx * 1.5);
         reserveMorePaintPhase = (int)(mx * 10);
         alwaysBuildDefenseTowerPhase = (int)(mx * 10);
+
 
         /*
         // Remove rush, but RuinDotter is a good idea !

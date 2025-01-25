@@ -1,4 +1,4 @@
-package ryan;
+package lmx;
 import architecture.Tools.Debug;
 import battlecode.common.*;
 import gavin.fast.FastMath;
@@ -32,9 +32,17 @@ public class ImpureUtils extends RobotPlayer {
         }
     }
 
-    static void tryUpgradeNearbyTowers() throws GameActionException {
-        if (rc.getMoney() > 3000)
-        for (RobotInfo robot : nearbyRobots) {
+    static void tryUpgradeNearbyTowers() throws GameActionException {  // updates nearest ruins as well
+        nearbyRuins = rc.senseNearbyRuins(-1);
+        if (rc.getMoney() < 3000)
+            return;
+
+        for (MapLocation ruinLoc : nearbyRuins) {
+            if (!rc.canSenseRobotAtLocation(ruinLoc))
+                continue;
+            RobotInfo robot = rc.senseRobotAtLocation(ruinLoc);
+            if (robot.getType() == UnitType.LEVEL_ONE_MONEY_TOWER && (rc.getMoney() < 15000 || robot.getPaintAmount() >= 100))  // experimental testing
+                continue;
             if (rc.canUpgradeTower(robot.getLocation())) {
                 if (rc.getMoney() < 6000) {
                     if (robot.getType().getBaseType() == UnitType.LEVEL_ONE_DEFENSE_TOWER) {
@@ -79,7 +87,7 @@ public class ImpureUtils extends RobotPlayer {
     }
 
 
-
+    // really, after the change, this should be called updateNearestPaintTarget, because moppers/money/defense towers are inlcuded
     static void updateNearestPaintTower() throws GameActionException {
         if (nearestPaintTower != null && rc.getLocation().distanceSquaredTo(nearestPaintTower) <= 20) {
             // if tower is destroyed or it's not a paint tower and there's no paint left
@@ -93,6 +101,8 @@ public class ImpureUtils extends RobotPlayer {
                 continue;
             RobotInfo robot = rc.senseRobotAtLocation(ruinLoc);
             if (robot.getTeam() == rc.getTeam() && (robot.getType().isTowerType())) {
+                // if (robot.getType() == UnitType.LEVEL_ONE_MONEY_TOWER)  // experimental
+                //     continue;
                 if (robot.getType().getBaseType() == UnitType.LEVEL_ONE_PAINT_TOWER) {
                     if (nearestPaintTower == null || rc.getLocation().distanceSquaredTo(robot.getLocation()) < rc
                             .getLocation().distanceSquaredTo(nearestPaintTower)) {
@@ -150,7 +160,7 @@ public class ImpureUtils extends RobotPlayer {
                     nearestEnemyTowerType = robot.getType().getBaseType();
                 }
                 // Check if this tower is closer than the current second nearest tower but not closer than the nearest tower
-                else if ((sndNearestEnemyTower == null || distanceSquared < rc.getLocation().distanceSquaredTo(sndNearestEnemyTower)) && !robotLoc.equals(nearestEnemyTower)) {
+                else if (sndNearestEnemyTower == null || distanceSquared < rc.getLocation().distanceSquaredTo(sndNearestEnemyTower)) {
                     // Update the second nearest tower to be this tower
                     sndNearestEnemyTower = robotLoc;
                     sndNearestEnemyTowerType = robot.getType().getBaseType();
@@ -201,6 +211,40 @@ public class ImpureUtils extends RobotPlayer {
         }
     }
 
+    public static void tryMarkSRP() throws GameActionException {
+        int cx = rc.getLocation().x;
+        int cy = rc.getLocation().y;
+        if (cx - 2 < 0 || cy - 2 < 0 || cx + 2 >= mapWidth || cy + 2 >= mapHeight) {
+            return;
+        }
+        boolean possibleSRP = true;
+        for (MapInfo tile : nearbyTiles) {
+            MapLocation tileLoc = tile.getMapLocation();
+            if (!tile.isPassable()) {
+                if (Utils.chessDistance(rc.getLocation(), tileLoc) <= 2) {
+                    possibleSRP = false;
+                    break;
+                }
+            }
+            int abs_diff_x = Math.abs(cx - tileLoc.x);
+            int abs_diff_y = Math.abs(cy - tileLoc.y);
+            if (tile.getMark() == PaintType.ALLY_PRIMARY) {
+                if ((abs_diff_x == 4 && abs_diff_y == 0) || (abs_diff_x == 0 && abs_diff_y == 4)) {
+                    continue;
+                }
+                possibleSRP = false;
+                break;
+            }
+        }
+        if (possibleSRP) {
+            if (rc.canMark(rc.getLocation())) {
+                rc.mark(rc.getLocation(), false);
+            } else {
+                System.out.println("Couldn't mark " + rc.getLocation());
+            }
+        }
+    }
+
     public static void updateNearbyUnits() throws GameActionException {
         // pending deletion
         // // post Sprint 1 balance change: avoid clumping of units
@@ -227,9 +271,9 @@ public class ImpureUtils extends RobotPlayer {
         // rc.setIndicatorDot(avgClump, 0, 0, 255);
     }
 
-    public static void checkAndCompleteNearbySrps() throws GameActionException {
+    public static void checkAndCompleteNearbySRPs() throws GameActionException {
         // actually don't need this --
-        // CAN BE REACHED can be reached because it might complete *another* robot's Srp
+        // CAN BE REACHED can be reached because it might complete *another* robot's SRP
         // that they would've completed anyway on their turn
 
         // for (MapInfo tile : nearbyTiles) {
@@ -276,5 +320,4 @@ public class ImpureUtils extends RobotPlayer {
 
         return null; // Failled to have a target
     }
-
 }

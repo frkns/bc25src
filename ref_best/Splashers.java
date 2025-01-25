@@ -18,22 +18,23 @@ public class Splashers extends RobotPlayer {
     // ---- Constants and map infos ----
     static char ZERO = '\u8000'; // Char is unsigned, need to define a zero. Max is \uffff, min is \u0000
     static int[] PAINT_SCORE_IF_RECOVER = {0, 0, 0, 0, 0, 0};
-    static char MIN_SCORE_FOR_SPLASH = (char) (ZERO + 6);
 
     // We consider a map of 64*64 where real map start at (2,2) to avoid going outside
     static char[] scores = "\u8000".repeat(4096).toCharArray();
     static char[] history = "\u0005".repeat(4096).toCharArray();
+    static char[] ruins = "\u0000".repeat(4096).toCharArray();
 
-    static char PAINT_SCORE_BONUS_ENEMY = '\u0002';
+    static char PAINT_SCORE_BONUS_ENEMY = '\u0003';
     static char PAINT_SCORE_MINUS_BONUS_ENEMY = (char) (65536 - 2);
-    static char PAINT_MIN_SCORE = (char) (ZERO + 10);
+    static char PAINT_MIN_SCORE = (char) (ZERO + 12);
+    static char PAINT_SCORE_BONUS_RUINS = '\u0001';
 
     public static void init() {
         PAINT_SCORE_IF_RECOVER[PaintType.ALLY_PRIMARY.ordinal()] = 0; // Recover primary with primary -> score = 0
         PAINT_SCORE_IF_RECOVER[PaintType.ALLY_SECONDARY.ordinal()] = -8; // Dont recover already patterns
         PAINT_SCORE_IF_RECOVER[PaintType.EMPTY.ordinal()] = 1;
         PAINT_SCORE_IF_RECOVER[PaintType.ENEMY_PRIMARY.ordinal()] = 3;
-        PAINT_SCORE_IF_RECOVER[PaintType.ENEMY_SECONDARY.ordinal()] = 5; // Assuming enemy use secondary for pattern
+        PAINT_SCORE_IF_RECOVER[PaintType.ENEMY_SECONDARY.ordinal()] = 4; // Assuming enemy use secondary for pattern
         PAINT_SCORE_IF_RECOVER[5] = 0;
     }
 
@@ -53,7 +54,7 @@ public class Splashers extends RobotPlayer {
             MapLocation locCenter = info.getMapLocation();
             id = 130 + locCenter.x + 64 * locCenter.y; // 130 = id of (2, 2)
 
-            if(history[id] == info.getPaint().ordinal()){
+            if (history[id] == info.getPaint().ordinal()) {
                 continue; // Skip, already update
             }
 
@@ -62,14 +63,9 @@ public class Splashers extends RobotPlayer {
             history[id] = (char) info.getPaint().ordinal();
             scoreInt += PAINT_SCORE_IF_RECOVER[history[id]];
 
-            // Can't paint on this zone
-            if (info.isWall() && info.hasRuin()) {
-                continue;
-            }
-
-            if(scoreInt < 0){
+            if (scoreInt < 0) {
                 score = (char) (65536 + scoreInt); // Use overflow to subtract
-            }else{
+            } else {
                 score = (char) scoreInt;
             }
 
@@ -91,6 +87,30 @@ public class Splashers extends RobotPlayer {
             scores[id - 64] += score;
             scores[id - 63] += score;
             scores[id - 128] += score;
+        }
+
+        Debug.println("\t\tUpdate Ruins.");
+        for (MapLocation locCenter : rc.senseNearbyRuins(-1)) {
+            id = 130 + locCenter.x + 64 * locCenter.y;
+
+            if(ruins[id] != 0){
+                break;
+            }
+            ruins[id] = '\u0001';
+
+            scores[id - 2] += PAINT_SCORE_BONUS_RUINS;
+            scores[id - 1] += PAINT_SCORE_BONUS_RUINS;
+            scores[id] += PAINT_SCORE_BONUS_RUINS;
+            scores[id + 1] += PAINT_SCORE_BONUS_RUINS;
+            scores[id + 2] += PAINT_SCORE_BONUS_RUINS;
+            scores[id + 63] += PAINT_SCORE_BONUS_RUINS;
+            scores[id + 64] += PAINT_SCORE_BONUS_RUINS;
+            scores[id + 65] += PAINT_SCORE_BONUS_RUINS;
+            scores[id + 128] += PAINT_SCORE_BONUS_RUINS;
+            scores[id - 65] += PAINT_SCORE_BONUS_RUINS;
+            scores[id - 64] += PAINT_SCORE_BONUS_RUINS;
+            scores[id - 63] += PAINT_SCORE_BONUS_RUINS;
+            scores[id - 128] += PAINT_SCORE_BONUS_RUINS;
         }
         Debug.println("\t\t\tDone in " + (Clock.getBytecodeNum() - start) + " bytecodes.");
 
@@ -173,7 +193,6 @@ public class Splashers extends RobotPlayer {
         //------------------------------------------------------------------------------//
 
 
-
         // Robots score
         Debug.println("\t\tUpdate enemy score.");
         for (RobotInfo info : rc.senseNearbyRobots(-1, rc.getTeam().opponent())) {
@@ -203,15 +222,13 @@ public class Splashers extends RobotPlayer {
             MapLocation locCenter = info.getMapLocation();
             id = 130 + locCenter.x + 64 * locCenter.y;
             if (scoreTargetSplash < scores[id]) {
-                if (!info.isWall() && !info.hasRuin()) {
-                    targetSplash = locCenter;
-                    scoreTargetSplash = scores[id];
-                }
+                targetSplash = locCenter;
+                scoreTargetSplash = scores[id];
             }
         }
         Debug.println("\t\tBest score at " + targetSplash + " (" + (scoreTargetSplash - ZERO) + ")");
 
-        if(scoreTargetSplash < PAINT_MIN_SCORE){
+        if (scoreTargetSplash < PAINT_MIN_SCORE) {
             Debug.println("\t\tBest score is under < " + (int) PAINT_MIN_SCORE + " (" + (PAINT_MIN_SCORE - ZERO) + "). Dont splash.");
             targetSplash = null;
         }
@@ -236,12 +253,12 @@ public class Splashers extends RobotPlayer {
             scores[id - 128] += PAINT_SCORE_MINUS_BONUS_ENEMY;
         }
 
-        if(targetSplash != null) {
+        if (targetSplash != null) {
             // Attack without moving
             if (rc.canAttack(targetSplash)) {
                 Debug.println("\t\tAttacking!");
                 rc.attack(targetSplash);
-            }else{
+            } else {
                 // Move
                 Debug.println("\t\tMoving");
                 HeuristicPath.splasherMove(targetSplash);
