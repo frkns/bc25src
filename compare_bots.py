@@ -22,7 +22,7 @@ if not (JAVA_DIR / GRADLEW).exists():
     if not (JAVA_DIR / GRADLEW).exists():
         raise FileNotFoundError(f"Could not find 'gradlew.bat' or 'gradlew' in the Java directory: {JAVA_DIR}")
 
-NUM_CORES = 6
+NUM_CORES = int(input("Num cores : "))
 assert NUM_CORES % 2 == 0
 NUM_CORES_PER_SIDE = NUM_CORES // 2
 
