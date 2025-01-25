@@ -1,9 +1,6 @@
-package ref_best_tmp;
+package ryan;
 
-import battlecode.common.GameActionException;
-import battlecode.common.MapLocation;
-import battlecode.common.Message;
-import battlecode.common.UnitType;
+import battlecode.common.*;
 
 
 public class Comms extends RobotPlayer {
@@ -31,13 +28,6 @@ public class Comms extends RobotPlayer {
         Message[] msgs = rc.readMessages(round);
         for (Message msg : msgs) {
             int bits = msg.getBytes();
-
-            if (((bits >> (32 - 27)) & 1) == 1) {
-                rc.setIndicatorLine(new MapLocation(mapWidth-1, mapHeight-1), rc.getLocation(), 255, 0, 255);
-                System.out.println("-> killed by tower #" + rc.getID());
-                rc.disintegrate();  // tower sent a termination signal
-            }
-
             int fst = (bits >> (21 - 1)) & 0xFFF;
             int snd = (bits >> (21 - 14)) & 0xFFF;
             boolean fstType = ((bits >> (32 - 13)) & 1) == 1;
@@ -64,11 +54,22 @@ public class Comms extends RobotPlayer {
         }
     }
 
+    /**
+     * Converts an integer position to a MapLocation.
+     *
+     * @param i The integer representing a position (x + y * mapWidth)
+     * @return MapLocation corresponding to the integer position
+     */
     public static MapLocation intToLoc(int i) {
         return new MapLocation(i % mapWidth, i / mapWidth);
     }
 
-
+    /**
+     * Converts a MapLocation to an integer position.
+     *
+     * @param loc The MapLocation to convert
+     * @return Integer representation of the location
+     */
     public static int locToInt(MapLocation loc) {
         return loc.x + loc.y * mapWidth;
     }

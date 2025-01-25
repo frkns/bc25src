@@ -1,6 +1,7 @@
-package ref_best_tmp;
+package ryan;
 
 import battlecode.common.*;
+
 
 public class Splashers extends RobotPlayer {
 
@@ -55,10 +56,17 @@ public class Splashers extends RobotPlayer {
         }
 
         if (isRefilling && target != null) {
-            HeuristicPath.refill(target);
+            // if (Utils.manhattanDistance(rc.getLocation(), target) > 50)
+            // Pathfinder.move(target);
+            // else
+            HeuristicPath.refill(target); // 1.
             return;
         }
 
+        // if (nearestPaintTower != null && Utils.manhattanDistance(rc.getLocation(),
+        // nearestPaintTower) > refillDistLimit) {
+        // isRefilling = false;
+        // }
 
         if (target == null
                 || rc.getLocation().isWithinDistanceSquared(target, 9)
@@ -273,6 +281,53 @@ public class Splashers extends RobotPlayer {
                 }
                 if (locs[0].isWithinDistanceSquared(tileLoc, 2)) {
                     locScores[0] += 200;
+                    if (rc.canSenseRobotAtLocation(tileLoc))
+                        locScores[0] += 50;
+                }
+            } else if (tile.getPaint() == PaintType.EMPTY) {
+                // Unroll neutral paint scoring
+                if (locs[8].isWithinDistanceSquared(tileLoc, 4)) {
+                    locScores[8] += 100;
+                    if (rc.canSenseRobotAtLocation(tileLoc))
+                        locScores[8] += 50;
+                }
+                if (locs[7].isWithinDistanceSquared(tileLoc, 4)) {
+                    locScores[7] += 100;
+                    if (rc.canSenseRobotAtLocation(tileLoc))
+                        locScores[7] += 50;
+                }
+                if (locs[6].isWithinDistanceSquared(tileLoc, 4)) {
+                    locScores[6] += 100;
+                    if (rc.canSenseRobotAtLocation(tileLoc))
+                        locScores[6] += 50;
+                }
+                if (locs[5].isWithinDistanceSquared(tileLoc, 4)) {
+                    locScores[5] += 100;
+                    if (rc.canSenseRobotAtLocation(tileLoc))
+                        locScores[5] += 50;
+                }
+                if (locs[4].isWithinDistanceSquared(tileLoc, 4)) {
+                    locScores[4] += 100;
+                    if (rc.canSenseRobotAtLocation(tileLoc))
+                        locScores[4] += 50;
+                }
+                if (locs[3].isWithinDistanceSquared(tileLoc, 4)) {
+                    locScores[3] += 100;
+                    if (rc.canSenseRobotAtLocation(tileLoc))
+                        locScores[3] += 50;
+                }
+                if (locs[2].isWithinDistanceSquared(tileLoc, 4)) {
+                    locScores[2] += 100;
+                    if (rc.canSenseRobotAtLocation(tileLoc))
+                        locScores[2] += 50;
+                }
+                if (locs[1].isWithinDistanceSquared(tileLoc, 4)) {
+                    locScores[1] += 100;
+                    if (rc.canSenseRobotAtLocation(tileLoc))
+                        locScores[1] += 50;
+                }
+                if (locs[0].isWithinDistanceSquared(tileLoc, 4)) {
+                    locScores[0] += 100;
                     if (rc.canSenseRobotAtLocation(tileLoc))
                         locScores[0] += 50;
                 }

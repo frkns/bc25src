@@ -48,19 +48,6 @@ public class FillRuin extends RobotPlayer {
                     Soldiers.inStasis = true;
                 }
             } else {
-                // designate the lowest/higest paint soldier in range to complete it
-                // i.e. there is another soldier with lower/higher paint in the ruin, then leave the ruin
-                // it might be better for higher paint because repainting
-
-                // changed to if you are not adjacent, don't try to complete it
-                // changed again to if > ~4 dist, stop
-                // if (rc.getLocation().distanceSquaredTo(ruinLoc) > 7) {
-                //     isFillingRuin = false;
-                //     Soldiers.stayAwayRuin = ruinLoc;
-                //     return;
-                // }
-
-                // changed back, think it's fixed
                 for (RobotInfo robot : nearbyRobots) {
                     if (robot.getType() != UnitType.SOLDIER)
                         continue;

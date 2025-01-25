@@ -1,4 +1,4 @@
-package ref_best_tmp;
+package ryan;
 
 import battlecode.common.*;
 
@@ -21,6 +21,25 @@ public class Moppers extends RobotPlayer {
 
     public static void run() throws GameActionException {
 
+        // no bug nav for mopper
+        // wallAdjacent = false;
+        // for (MapInfo tile : rc.senseNearbyMapInfos(1)) {
+        //     if (tile.isWall()) {
+        //         wallAdjacent = true;
+        //         break;
+        //     }
+        // }
+        // if (wallAdjacent) {
+        //     if (wallRounds++ == 0 && target != null) {
+        //         sqDistanceToTargetOnWallTouch = rc.getLocation().distanceSquaredTo(target);
+        //     }
+        // } else {
+        //     wallRounds = 0;
+        //     if (target != null)
+        //         sqDistanceToTargetOnWallTouch = rc.getLocation().distanceSquaredTo(target);
+        // }
+
+
         ImpureUtils.tryUpgradeNearbyTowers();
 
         ImpureUtils.updateNearbyMask(true);
@@ -29,10 +48,26 @@ public class Moppers extends RobotPlayer {
         ImpureUtils.updateNearestEnemyPaintOnRuin();
         ImpureUtils.updateNearestEnemyRobot();
 
+        // if (Utils.selfDestructRequirementsMet()) {
+        //     System.out.println("Self destructing...  Type: " + rc.getType() + ", Round: " + rc.getRoundNum()
+        //             + ", Nearby Friend Robots: " + nearbyFriendlyRobots + ", Paint: " + rc.getPaint());
+        //     rc.disintegrate();
+        // }
+
         if (target == null
                 || rc.getLocation().isWithinDistanceSquared(target, 9)
                 || rc.getRoundNum() - lastTargetChangeRound > targetChangeWaitTime) {
-          {
+            // selecting a random target location on the map has an inherent bias towards
+            // the center if e.g. we are in a corner
+            // this is more of a problem on big maps
+            // try to combat this but also instead sometimes selecting a location in our
+            // current quadrant
+            /*
+             * if (rc.getRoundNum() % 2 == 0 && rc.getRoundNum() <
+             * stopQuadrantModifierPhase)
+             * target = Utils.randomLocationInQuadrant(Utils.currentQuadrant());
+             * else
+             */ {
                 target = Utils.randomLocationInQuadrant(rng.nextInt(4));
             }
             lastTargetChangeRound = rc.getRoundNum();
@@ -113,6 +148,17 @@ public class Moppers extends RobotPlayer {
 
         ImpureUtils.updateNearbyMask(true);
 
+        // for (int i = 0; i < 5; i++) {
+        // for (int j = 0; j < 5; j++) {
+        // int x = rc.getLocation().x + i - 2;
+        // int y = rc.getLocation().y + j - 2;
+        // rc.setIndicatorDot(new MapLocation(x, y), 0, 0, 0);
+        // if (nearbyAlliesMask[i][j]) {
+        // rc.setIndicatorDot(new MapLocation(x, y), 0, 255, 0);
+        // }
+        // }
+        // }
+
         Direction bestSwingDir = null;
         int bestSwingScore = 0;
 
@@ -129,6 +175,12 @@ public class Moppers extends RobotPlayer {
         score = 0;
         for (int i = 1; i < 4; i++) {
             score += (nearbyEnemiesMask[i][3] ? 1 : 0) + (nearbyEnemiesMask[i][4] ? 1 : 0);
+            // int x = rc.getLocation().x + i - 2;
+            // int y = rc.getLocation().y + 3 - 2;
+            // rc.setIndicatorDot(new MapLocation(x, y), 0, 0, 0);
+            // x = rc.getLocation().x + i - 2;
+            // y = rc.getLocation().y + 4 - 2;
+            // rc.setIndicatorDot(new MapLocation(x, y), 0, 0, 0);
         }
         if (score > bestSwingScore) {
             if (rc.canMopSwing(Direction.NORTH)) {
@@ -157,6 +209,11 @@ public class Moppers extends RobotPlayer {
             }
         }
 
+        // if (rc.canMopSwing(Direction.NORTH)) {
+        // assert (rc.canMopSwing(Direction.SOUTH)); // assertion fails!
+        // assert (rc.canMopSwing(Direction.EAST));
+        // assert (rc.canMopSwing(Direction.WEST));
+        // }
 
         // must be able to hit ~2 robots with sweep for it to trigger
 
