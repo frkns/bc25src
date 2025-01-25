@@ -43,14 +43,11 @@ public class RuinDotter extends RobotPlayer {
 
 
         if (visited[0] && visited[1] && visited[2]) {
-            System.out.println("Ruin Dotter visited all 3 syms");
+//            System.out.println("Ruin Dotter visited all 3 syms");
             HeuristicPath.move();
         } else {
             Pathfinder.move(target, false);
             assert(potentialEnemySpawnLocations[0].equals(Utils.mirror(spawnTowerLocation)));
-            // rc.setIndicatorDot(potentialEnemySpawnLocations[0], 255, 0, 255);
-            // rc.setIndicatorDot(Utils.mirror(spawnTowerLocation), 255, 0, 255);
-            // rc.setIndicatorDot(spawnTowerLocation, 255, 0, 255);
             rc.setIndicatorLine(rc.getLocation(), target, 255, 0, 255);
         }
 
