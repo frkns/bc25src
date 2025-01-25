@@ -362,14 +362,15 @@ public class Pathfinder extends RobotPlayer{
                         MapLocation E = loc.add(Direction.EAST);
                         MapLocation S = loc.add(Direction.SOUTH);
                         MapLocation W = loc.add(Direction.WEST);
-                        boolean canN = rc.canSenseLocation(N) && (!rc.senseMapInfo(N).getPaint().isEnemy() || rc.sensePassability(N));
-                        boolean canE = rc.canSenseLocation(E) && (!rc.senseMapInfo(E).getPaint().isEnemy() || rc.sensePassability(E));
-                        boolean canS = rc.canSenseLocation(S) && (!rc.senseMapInfo(E).getPaint().isEnemy() || rc.sensePassability(S));
-                        boolean canW = rc.canSenseLocation(W) && (!rc.senseMapInfo(E).getPaint().isEnemy() || rc.sensePassability(W));
+                        boolean canN = rc.canSenseLocation(N) && (!rc.senseMapInfo(N).getPaint().isEnemy() && rc.sensePassability(N));
+                        boolean canE = rc.canSenseLocation(E) && (!rc.senseMapInfo(E).getPaint().isEnemy() && rc.sensePassability(E));
+                        boolean canS = rc.canSenseLocation(S) && (!rc.senseMapInfo(E).getPaint().isEnemy() && rc.sensePassability(S));
+                        boolean canW = rc.canSenseLocation(W) && (!rc.senseMapInfo(E).getPaint().isEnemy() && rc.sensePassability(W));
                         if (!canN && !canS) return true;
                         if (!canE && !canW) return true;
                         return false;
                     }
+                    return true;
                 }
                 return false;
             }
