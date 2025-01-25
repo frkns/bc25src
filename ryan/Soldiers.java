@@ -22,10 +22,16 @@ public class Soldiers extends RobotPlayer {
     // -------- Exploration variables ------------
     public static MapLocation exploreTarget;
 
+    
+    public static void run() throws GameActionException {
+        initTurn();
+        playTurn();
+        endTurn();
+    }
     public static void initTurn() throws GameActionException {
         // Initialize variables
         nearbyRuins = rc.senseNearbyRuins(-1);
-        ImpureUtils.updateNearestPaintSource();
+        ImpureUtils.updateNearestPaintTower();
         ImpureUtils.updateNearestEnemyTower();
     }
 
@@ -61,18 +67,18 @@ public class Soldiers extends RobotPlayer {
     }
 
     public static boolean shouldRefillPaint() throws GameActionException {
-        if (rc.getPaint() < 50 && nearestPaintSource != null) {
+        if (rc.getPaint() < 50 && nearestPaintTower != null) {
             return true;
         }
         return false;
     }
 
     public static void refillPaint() throws GameActionException {
-        ImpureUtils.withdrawPaintIfPossible(nearestPaintSource);
+        ImpureUtils.withdrawPaintIfPossible(nearestPaintTower);
         if (rc.isMovementReady() && rc.getPaint() > 0) {
-            Pathfinder.move(nearestPaintSource);
+            Pathfinder.move(nearestPaintTower);
         }
-        Debug.setIndicatorLine(rc.getLocation(), nearestPaintSource, 0, 255, 255);
+        Debug.setIndicatorLine(rc.getLocation(), nearestPaintTower, 0, 255, 255);
         rc.setIndicatorString("refillPaint");
     }
 
@@ -254,7 +260,7 @@ public class Soldiers extends RobotPlayer {
             rc.attack(nearestEnemyTower);
         // Otherwise we move in range to attack the tower
         } else if (rc.isMovementReady() && rc.isActionReady() && rc.getPaint() > 5) {
-            HeuristicPath.towerMicro(false);
+            AttackTower.towerMicro(false);
             if (rc.canAttack(nearestEnemyTower)) { // Should only return false if robot was unable to get in range. Otherwise robot should always be able to attack
                 rc.attack(nearestEnemyTower);
             }
@@ -262,7 +268,7 @@ public class Soldiers extends RobotPlayer {
         // This ensures we retreat even if we weren't able to attack the tower
         if (rc.isMovementReady() && rc.getPaint() > 0) {
             Direction retreatDir = rc.getLocation().directionTo(nearestEnemyTower).opposite();
-            HeuristicPath.towerMicro(true);
+            AttackTower.towerMicro(true);
         }
     }
 

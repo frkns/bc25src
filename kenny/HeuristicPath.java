@@ -62,8 +62,8 @@ public class HeuristicPath extends RobotPlayer {
                 if (rc.canSenseLocation(newLoc.add(dir)))
                     nextnext = rc.senseMapInfo(newLoc.add(dir));
                 if (nextnext != null && nextnext.isPassable() && !nextnext.getPaint().isEnemy()) { // don't add the big
-                                                                                                   // cost if it's only
-                                                                                                   // 1 layer
+                    // cost if it's only
+                    // 1 layer
 
                     directionCost[i] += 1000;
                 } else {
@@ -93,28 +93,28 @@ public class HeuristicPath extends RobotPlayer {
             if (wallAdjacent && rc.getLocation().distanceSquaredTo(targetLoc) > sqDistanceToTargetOnWallTouch) {
                 boolean newLocIsWallAdjacent = false;
 // Check direction4[0]
-if (rc.canSenseLocation(newLoc.add(directions4[0]))
-    && rc.senseMapInfo(newLoc.add(directions4[0])).isWall()) {
-    newLocIsWallAdjacent = true;
-}
+                if (rc.canSenseLocation(newLoc.add(directions4[0]))
+                        && rc.senseMapInfo(newLoc.add(directions4[0])).isWall()) {
+                    newLocIsWallAdjacent = true;
+                }
 // Check direction4[1] only if not already wall-adjacent
-if (!newLocIsWallAdjacent
-    && rc.canSenseLocation(newLoc.add(directions4[1]))
-    && rc.senseMapInfo(newLoc.add(directions4[1])).isWall()) {
-    newLocIsWallAdjacent = true;
-}
+                if (!newLocIsWallAdjacent
+                        && rc.canSenseLocation(newLoc.add(directions4[1]))
+                        && rc.senseMapInfo(newLoc.add(directions4[1])).isWall()) {
+                    newLocIsWallAdjacent = true;
+                }
 // Check direction4[2] only if not already wall-adjacent
-if (!newLocIsWallAdjacent
-    && rc.canSenseLocation(newLoc.add(directions4[2]))
-    && rc.senseMapInfo(newLoc.add(directions4[2])).isWall()) {
-    newLocIsWallAdjacent = true;
-}
+                if (!newLocIsWallAdjacent
+                        && rc.canSenseLocation(newLoc.add(directions4[2]))
+                        && rc.senseMapInfo(newLoc.add(directions4[2])).isWall()) {
+                    newLocIsWallAdjacent = true;
+                }
 // Check direction4[3] only if not already wall-adjacent
-if (!newLocIsWallAdjacent
-    && rc.canSenseLocation(newLoc.add(directions4[3]))
-    && rc.senseMapInfo(newLoc.add(directions4[3])).isWall()) {
-    newLocIsWallAdjacent = true;
-}
+                if (!newLocIsWallAdjacent
+                        && rc.canSenseLocation(newLoc.add(directions4[3]))
+                        && rc.senseMapInfo(newLoc.add(directions4[3])).isWall()) {
+                    newLocIsWallAdjacent = true;
+                }
                 if (newLocIsWallAdjacent)
                     directionCost[i] -= 10000;
             } else {
@@ -146,30 +146,30 @@ if (!newLocIsWallAdjacent
             int maskx = dir.dx + 2;
             int masky = dir.dy + 2;
             int allyRobotsInNewLoc = 0;
-if (nearbyAlliesMask[maskx + dx8[7]][masky + dy8[7]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[6]][masky + dy8[6]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[5]][masky + dy8[5]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[4]][masky + dy8[4]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[3]][masky + dy8[3]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[2]][masky + dy8[2]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[1]][masky + dy8[1]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[0]][masky + dy8[0]]) {
-    allyRobotsInNewLoc++;
-}
+            if (nearbyAlliesMask[maskx + dx8[7]][masky + dy8[7]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[6]][masky + dy8[6]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[5]][masky + dy8[5]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[4]][masky + dy8[4]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[3]][masky + dy8[3]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[2]][masky + dy8[2]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[1]][masky + dy8[1]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[0]][masky + dy8[0]]) {
+                allyRobotsInNewLoc++;
+            }
             directionCost[i] += allyRobotsInNewLoc * 1000;
 
             // add a stacking cost for staying current quadrant for too long (doesnt seem to
@@ -187,45 +187,45 @@ if (nearbyAlliesMask[maskx + dx8[0]][masky + dy8[0]]) {
         int minCost = INF;
         Direction minDir = null;
 // Check d = 7
-if (directionCost[7] < minCost) {
-    minCost = directionCost[7];
-    minDir = directions[7];
-}
+        if (directionCost[7] < minCost) {
+            minCost = directionCost[7];
+            minDir = directions[7];
+        }
 // Check d = 6
-if (directionCost[6] < minCost) {
-    minCost = directionCost[6];
-    minDir = directions[6];
-}
+        if (directionCost[6] < minCost) {
+            minCost = directionCost[6];
+            minDir = directions[6];
+        }
 // Check d = 5
-if (directionCost[5] < minCost) {
-    minCost = directionCost[5];
-    minDir = directions[5];
-}
+        if (directionCost[5] < minCost) {
+            minCost = directionCost[5];
+            minDir = directions[5];
+        }
 // Check d = 4
-if (directionCost[4] < minCost) {
-    minCost = directionCost[4];
-    minDir = directions[4];
-}
+        if (directionCost[4] < minCost) {
+            minCost = directionCost[4];
+            minDir = directions[4];
+        }
 // Check d = 3
-if (directionCost[3] < minCost) {
-    minCost = directionCost[3];
-    minDir = directions[3];
-}
+        if (directionCost[3] < minCost) {
+            minCost = directionCost[3];
+            minDir = directions[3];
+        }
 // Check d = 2
-if (directionCost[2] < minCost) {
-    minCost = directionCost[2];
-    minDir = directions[2];
-}
+        if (directionCost[2] < minCost) {
+            minCost = directionCost[2];
+            minDir = directions[2];
+        }
 // Check d = 1
-if (directionCost[1] < minCost) {
-    minCost = directionCost[1];
-    minDir = directions[1];
-}
+        if (directionCost[1] < minCost) {
+            minCost = directionCost[1];
+            minDir = directions[1];
+        }
 // Check d = 0
-if (directionCost[0] < minCost) {
-    minCost = directionCost[0];
-    minDir = directions[0];
-}
+        if (directionCost[0] < minCost) {
+            minCost = directionCost[0];
+            minDir = directions[0];
+        }
         if (minDir != null && rc.canMove(minDir))  // because of negative costs, we have to put canMove check
             rc.move(minDir);
     }
@@ -280,28 +280,28 @@ if (directionCost[0] < minCost) {
             if (wallAdjacent && rc.getLocation().distanceSquaredTo(targetLoc) > sqDistanceToTargetOnWallTouch) {
                 boolean newLocIsWallAdjacent = false;
 // Check direction4[0]
-if (rc.canSenseLocation(newLoc.add(directions4[0]))
-    && rc.senseMapInfo(newLoc.add(directions4[0])).isWall()) {
-    newLocIsWallAdjacent = true;
-}
+                if (rc.canSenseLocation(newLoc.add(directions4[0]))
+                        && rc.senseMapInfo(newLoc.add(directions4[0])).isWall()) {
+                    newLocIsWallAdjacent = true;
+                }
 // Check direction4[1] only if not already wall-adjacent
-if (!newLocIsWallAdjacent
-    && rc.canSenseLocation(newLoc.add(directions4[1]))
-    && rc.senseMapInfo(newLoc.add(directions4[1])).isWall()) {
-    newLocIsWallAdjacent = true;
-}
+                if (!newLocIsWallAdjacent
+                        && rc.canSenseLocation(newLoc.add(directions4[1]))
+                        && rc.senseMapInfo(newLoc.add(directions4[1])).isWall()) {
+                    newLocIsWallAdjacent = true;
+                }
 // Check direction4[2] only if not already wall-adjacent
-if (!newLocIsWallAdjacent
-    && rc.canSenseLocation(newLoc.add(directions4[2]))
-    && rc.senseMapInfo(newLoc.add(directions4[2])).isWall()) {
-    newLocIsWallAdjacent = true;
-}
+                if (!newLocIsWallAdjacent
+                        && rc.canSenseLocation(newLoc.add(directions4[2]))
+                        && rc.senseMapInfo(newLoc.add(directions4[2])).isWall()) {
+                    newLocIsWallAdjacent = true;
+                }
 // Check direction4[3] only if not already wall-adjacent
-if (!newLocIsWallAdjacent
-    && rc.canSenseLocation(newLoc.add(directions4[3]))
-    && rc.senseMapInfo(newLoc.add(directions4[3])).isWall()) {
-    newLocIsWallAdjacent = true;
-}
+                if (!newLocIsWallAdjacent
+                        && rc.canSenseLocation(newLoc.add(directions4[3]))
+                        && rc.senseMapInfo(newLoc.add(directions4[3])).isWall()) {
+                    newLocIsWallAdjacent = true;
+                }
                 if (newLocIsWallAdjacent)
                     directionCost[i] -= 10000;
             } else {
@@ -329,30 +329,30 @@ if (!newLocIsWallAdjacent
             int maskx = dir.dx + 2;
             int masky = dir.dy + 2;
             int allyRobotsInNewLoc = 0;
-if (nearbyAlliesMask[maskx + dx8[7]][masky + dy8[7]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[6]][masky + dy8[6]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[5]][masky + dy8[5]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[4]][masky + dy8[4]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[3]][masky + dy8[3]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[2]][masky + dy8[2]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[1]][masky + dy8[1]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[0]][masky + dy8[0]]) {
-    allyRobotsInNewLoc++;
-}
+            if (nearbyAlliesMask[maskx + dx8[7]][masky + dy8[7]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[6]][masky + dy8[6]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[5]][masky + dy8[5]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[4]][masky + dy8[4]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[3]][masky + dy8[3]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[2]][masky + dy8[2]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[1]][masky + dy8[1]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[0]][masky + dy8[0]]) {
+                allyRobotsInNewLoc++;
+            }
             directionCost[i] += allyRobotsInNewLoc * 1000;
 
         }
@@ -361,45 +361,45 @@ if (nearbyAlliesMask[maskx + dx8[0]][masky + dy8[0]]) {
         int minCost = INF;
         Direction minDir = null;
 // Check d = 7
-if (directionCost[7] < minCost) {
-    minCost = directionCost[7];
-    minDir = directions[7];
-}
+        if (directionCost[7] < minCost) {
+            minCost = directionCost[7];
+            minDir = directions[7];
+        }
 // Check d = 6
-if (directionCost[6] < minCost) {
-    minCost = directionCost[6];
-    minDir = directions[6];
-}
+        if (directionCost[6] < minCost) {
+            minCost = directionCost[6];
+            minDir = directions[6];
+        }
 // Check d = 5
-if (directionCost[5] < minCost) {
-    minCost = directionCost[5];
-    minDir = directions[5];
-}
+        if (directionCost[5] < minCost) {
+            minCost = directionCost[5];
+            minDir = directions[5];
+        }
 // Check d = 4
-if (directionCost[4] < minCost) {
-    minCost = directionCost[4];
-    minDir = directions[4];
-}
+        if (directionCost[4] < minCost) {
+            minCost = directionCost[4];
+            minDir = directions[4];
+        }
 // Check d = 3
-if (directionCost[3] < minCost) {
-    minCost = directionCost[3];
-    minDir = directions[3];
-}
+        if (directionCost[3] < minCost) {
+            minCost = directionCost[3];
+            minDir = directions[3];
+        }
 // Check d = 2
-if (directionCost[2] < minCost) {
-    minCost = directionCost[2];
-    minDir = directions[2];
-}
+        if (directionCost[2] < minCost) {
+            minCost = directionCost[2];
+            minDir = directions[2];
+        }
 // Check d = 1
-if (directionCost[1] < minCost) {
-    minCost = directionCost[1];
-    minDir = directions[1];
-}
+        if (directionCost[1] < minCost) {
+            minCost = directionCost[1];
+            minDir = directions[1];
+        }
 // Check d = 0
-if (directionCost[0] < minCost) {
-    minCost = directionCost[0];
-    minDir = directions[0];
-}
+        if (directionCost[0] < minCost) {
+            minCost = directionCost[0];
+            minDir = directions[0];
+        }
         if (minDir != null)
             rc.move(minDir);
     }
@@ -449,30 +449,30 @@ if (directionCost[0] < minCost) {
             int maskx = dir.dx + 2;
             int masky = dir.dy + 2;
             int allyRobotsInNewLoc = 0;
-if (nearbyAlliesMask[maskx + dx8[7]][masky + dy8[7]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[6]][masky + dy8[6]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[5]][masky + dy8[5]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[4]][masky + dy8[4]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[3]][masky + dy8[3]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[2]][masky + dy8[2]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[1]][masky + dy8[1]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[0]][masky + dy8[0]]) {
-    allyRobotsInNewLoc++;
-}
+            if (nearbyAlliesMask[maskx + dx8[7]][masky + dy8[7]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[6]][masky + dy8[6]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[5]][masky + dy8[5]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[4]][masky + dy8[4]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[3]][masky + dy8[3]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[2]][masky + dy8[2]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[1]][masky + dy8[1]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[0]][masky + dy8[0]]) {
+                allyRobotsInNewLoc++;
+            }
             directionCost[i] += allyRobotsInNewLoc * 1000;
         }
 
@@ -480,45 +480,45 @@ if (nearbyAlliesMask[maskx + dx8[0]][masky + dy8[0]]) {
         int minCost = INF;
         Direction minDir = null;
 // Check d = 7
-if (directionCost[7] < minCost) {
-    minCost = directionCost[7];
-    minDir = directions[7];
-}
+        if (directionCost[7] < minCost) {
+            minCost = directionCost[7];
+            minDir = directions[7];
+        }
 // Check d = 6
-if (directionCost[6] < minCost) {
-    minCost = directionCost[6];
-    minDir = directions[6];
-}
+        if (directionCost[6] < minCost) {
+            minCost = directionCost[6];
+            minDir = directions[6];
+        }
 // Check d = 5
-if (directionCost[5] < minCost) {
-    minCost = directionCost[5];
-    minDir = directions[5];
-}
+        if (directionCost[5] < minCost) {
+            minCost = directionCost[5];
+            minDir = directions[5];
+        }
 // Check d = 4
-if (directionCost[4] < minCost) {
-    minCost = directionCost[4];
-    minDir = directions[4];
-}
+        if (directionCost[4] < minCost) {
+            minCost = directionCost[4];
+            minDir = directions[4];
+        }
 // Check d = 3
-if (directionCost[3] < minCost) {
-    minCost = directionCost[3];
-    minDir = directions[3];
-}
+        if (directionCost[3] < minCost) {
+            minCost = directionCost[3];
+            minDir = directions[3];
+        }
 // Check d = 2
-if (directionCost[2] < minCost) {
-    minCost = directionCost[2];
-    minDir = directions[2];
-}
+        if (directionCost[2] < minCost) {
+            minCost = directionCost[2];
+            minDir = directions[2];
+        }
 // Check d = 1
-if (directionCost[1] < minCost) {
-    minCost = directionCost[1];
-    minDir = directions[1];
-}
+        if (directionCost[1] < minCost) {
+            minCost = directionCost[1];
+            minDir = directions[1];
+        }
 // Check d = 0
-if (directionCost[0] < minCost) {
-    minCost = directionCost[0];
-    minDir = directions[0];
-}
+        if (directionCost[0] < minCost) {
+            minCost = directionCost[0];
+            minDir = directions[0];
+        }
         if (minDir != null)
             rc.move(minDir);
     }
@@ -567,30 +567,30 @@ if (directionCost[0] < minCost) {
             int maskx = dir.dx + 2;
             int masky = dir.dy + 2;
             int allyRobotsInNewLoc = 0;
-if (nearbyAlliesMask[maskx + dx8[7]][masky + dy8[7]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[6]][masky + dy8[6]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[5]][masky + dy8[5]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[4]][masky + dy8[4]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[3]][masky + dy8[3]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[2]][masky + dy8[2]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[1]][masky + dy8[1]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[0]][masky + dy8[0]]) {
-    allyRobotsInNewLoc++;
-}
+            if (nearbyAlliesMask[maskx + dx8[7]][masky + dy8[7]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[6]][masky + dy8[6]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[5]][masky + dy8[5]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[4]][masky + dy8[4]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[3]][masky + dy8[3]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[2]][masky + dy8[2]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[1]][masky + dy8[1]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[0]][masky + dy8[0]]) {
+                allyRobotsInNewLoc++;
+            }
             directionCost[i] += allyRobotsInNewLoc * 1000;
         }
 
@@ -598,131 +598,49 @@ if (nearbyAlliesMask[maskx + dx8[0]][masky + dy8[0]]) {
         int minCost = INF;
         Direction minDir = null;
 // Check d = 7
-if (directionCost[7] < minCost) {
-    minCost = directionCost[7];
-    minDir = directions[7];
-}
-// Check d = 6
-if (directionCost[6] < minCost) {
-    minCost = directionCost[6];
-    minDir = directions[6];
-}
-// Check d = 5
-if (directionCost[5] < minCost) {
-    minCost = directionCost[5];
-    minDir = directions[5];
-}
-// Check d = 4
-if (directionCost[4] < minCost) {
-    minCost = directionCost[4];
-    minDir = directions[4];
-}
-// Check d = 3
-if (directionCost[3] < minCost) {
-    minCost = directionCost[3];
-    minDir = directions[3];
-}
-// Check d = 2
-if (directionCost[2] < minCost) {
-    minCost = directionCost[2];
-    minDir = directions[2];
-}
-// Check d = 1
-if (directionCost[1] < minCost) {
-    minCost = directionCost[1];
-    minDir = directions[1];
-}
-// Check d = 0
-if (directionCost[0] < minCost) {
-    minCost = directionCost[0];
-    minDir = directions[0];
-}
-        if (minDir != null)
-            rc.move(minDir);
-    }
-
-    public static void circleSRP() throws GameActionException {
-        int[] directionCost = new int[8];
-
-        int INF = (int) 2e9;
-        for (int i = 8; i-- > 0;) {
-            Direction dir = directions[i];
-
-            // if we can't move there, set the cost to infinity
-            if (!rc.canMove(dir)) {
-                directionCost[i] = INF;
-                continue;
-            }
-
-            MapLocation newLoc = rc.adjacentLocation(dir);
-            MapInfo tileInfo = rc.senseMapInfo(newLoc);
-
-            // add a cost if new location is the previous one
-            MapLocation lastLoc = locationHistory[(rc.getRoundNum() - 1 + 8) % 8];
-            if (newLoc.equals(lastLoc)) {
-                directionCost[i] += 500;
-            }
-
-            // add a cost if the tile is enemy paint
-            if (tileInfo.getPaint().isEnemy()) {
-                directionCost[i] += 3000;
-            }
-
-            // add a cost if new location is not in a circle around it
-            if (Utils.chessDistance(Soldiers.lastSRPloc, newLoc) != 3) {
-                directionCost[i] += 5500;
-            }
-
-            // add cost for moving in a direction that gets us further away from target
-            directionCost[i] += Utils.manhattanDistance(Soldiers.lastSRPloc, newLoc) * 500;
+        if (directionCost[7] < minCost) {
+            minCost = directionCost[7];
+            minDir = directions[7];
         }
-
-        // find the minimum cost Direction and move there
-        int minCost = INF;
-        Direction minDir = null;
-// Check d = 7
-if (directionCost[7] < minCost) {
-    minCost = directionCost[7];
-    minDir = directions[7];
-}
 // Check d = 6
-if (directionCost[6] < minCost) {
-    minCost = directionCost[6];
-    minDir = directions[6];
-}
+        if (directionCost[6] < minCost) {
+            minCost = directionCost[6];
+            minDir = directions[6];
+        }
 // Check d = 5
-if (directionCost[5] < minCost) {
-    minCost = directionCost[5];
-    minDir = directions[5];
-}
+        if (directionCost[5] < minCost) {
+            minCost = directionCost[5];
+            minDir = directions[5];
+        }
 // Check d = 4
-if (directionCost[4] < minCost) {
-    minCost = directionCost[4];
-    minDir = directions[4];
-}
+        if (directionCost[4] < minCost) {
+            minCost = directionCost[4];
+            minDir = directions[4];
+        }
 // Check d = 3
-if (directionCost[3] < minCost) {
-    minCost = directionCost[3];
-    minDir = directions[3];
-}
+        if (directionCost[3] < minCost) {
+            minCost = directionCost[3];
+            minDir = directions[3];
+        }
 // Check d = 2
-if (directionCost[2] < minCost) {
-    minCost = directionCost[2];
-    minDir = directions[2];
-}
+        if (directionCost[2] < minCost) {
+            minCost = directionCost[2];
+            minDir = directions[2];
+        }
 // Check d = 1
-if (directionCost[1] < minCost) {
-    minCost = directionCost[1];
-    minDir = directions[1];
-}
+        if (directionCost[1] < minCost) {
+            minCost = directionCost[1];
+            minDir = directions[1];
+        }
 // Check d = 0
-if (directionCost[0] < minCost) {
-    minCost = directionCost[0];
-    minDir = directions[0];
-}
+        if (directionCost[0] < minCost) {
+            minCost = directionCost[0];
+            minDir = directions[0];
+        }
         if (minDir != null)
             rc.move(minDir);
     }
+
 
     public static void towerMicro() throws GameActionException {
         int[] directionCost = new int[8];
@@ -770,30 +688,30 @@ if (directionCost[0] < minCost) {
             int maskx = dir.dx + 2;
             int masky = dir.dy + 2;
             int allyRobotsInNewLoc = 0;
-if (nearbyAlliesMask[maskx + dx8[7]][masky + dy8[7]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[6]][masky + dy8[6]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[5]][masky + dy8[5]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[4]][masky + dy8[4]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[3]][masky + dy8[3]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[2]][masky + dy8[2]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[1]][masky + dy8[1]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[0]][masky + dy8[0]]) {
-    allyRobotsInNewLoc++;
-}
+            if (nearbyAlliesMask[maskx + dx8[7]][masky + dy8[7]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[6]][masky + dy8[6]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[5]][masky + dy8[5]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[4]][masky + dy8[4]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[3]][masky + dy8[3]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[2]][masky + dy8[2]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[1]][masky + dy8[1]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[0]][masky + dy8[0]]) {
+                allyRobotsInNewLoc++;
+            }
             directionCost[i] += allyRobotsInNewLoc * 1000;
         }
 
@@ -801,45 +719,45 @@ if (nearbyAlliesMask[maskx + dx8[0]][masky + dy8[0]]) {
         int minCost = INF;
         Direction minDir = null;
 // Check d = 7
-if (directionCost[7] < minCost) {
-    minCost = directionCost[7];
-    minDir = directions[7];
-}
+        if (directionCost[7] < minCost) {
+            minCost = directionCost[7];
+            minDir = directions[7];
+        }
 // Check d = 6
-if (directionCost[6] < minCost) {
-    minCost = directionCost[6];
-    minDir = directions[6];
-}
+        if (directionCost[6] < minCost) {
+            minCost = directionCost[6];
+            minDir = directions[6];
+        }
 // Check d = 5
-if (directionCost[5] < minCost) {
-    minCost = directionCost[5];
-    minDir = directions[5];
-}
+        if (directionCost[5] < minCost) {
+            minCost = directionCost[5];
+            minDir = directions[5];
+        }
 // Check d = 4
-if (directionCost[4] < minCost) {
-    minCost = directionCost[4];
-    minDir = directions[4];
-}
+        if (directionCost[4] < minCost) {
+            minCost = directionCost[4];
+            minDir = directions[4];
+        }
 // Check d = 3
-if (directionCost[3] < minCost) {
-    minCost = directionCost[3];
-    minDir = directions[3];
-}
+        if (directionCost[3] < minCost) {
+            minCost = directionCost[3];
+            minDir = directions[3];
+        }
 // Check d = 2
-if (directionCost[2] < minCost) {
-    minCost = directionCost[2];
-    minDir = directions[2];
-}
+        if (directionCost[2] < minCost) {
+            minCost = directionCost[2];
+            minDir = directions[2];
+        }
 // Check d = 1
-if (directionCost[1] < minCost) {
-    minCost = directionCost[1];
-    minDir = directions[1];
-}
+        if (directionCost[1] < minCost) {
+            minCost = directionCost[1];
+            minDir = directions[1];
+        }
 // Check d = 0
-if (directionCost[0] < minCost) {
-    minCost = directionCost[0];
-    minDir = directions[0];
-}
+        if (directionCost[0] < minCost) {
+            minCost = directionCost[0];
+            minDir = directions[0];
+        }
         if (minDir != null)
             rc.move(minDir);
     }
@@ -942,15 +860,15 @@ if (directionCost[0] < minCost) {
             if (nearestEnemyPaint != null) {
                 if (nearestEnemyRobot == null || rc.getLocation().distanceSquaredTo(nearestEnemyRobot) > 8
                         || nearestEnemyRobotInfo.getPaintAmount() == 0) // only take this into account if we don't have
-                                                                    // really nearby enemy robots
-                if (Moppers.nearestEnemyPaintOnRuin == null) {
-                    directionCost[i] += Math.max(1, Utils.manhattanDistance(newLoc, nearestEnemyPaint)) * 1000;
-                } else {
-                    directionCost[i] += Math.max(1, Utils.manhattanDistance(newLoc, nearestEnemyPaint)) * 400;
-                    directionCost[i] += Math.max(1, Utils.manhattanDistance(newLoc, Moppers.nearestEnemyPaintOnRuin))
-                            * 700;
-                    rc.setIndicatorDot(Moppers.nearestEnemyPaintOnRuin, 255, 0, 255);
-                }
+                    // really nearby enemy robots
+                    if (Moppers.nearestEnemyPaintOnRuin == null) {
+                        directionCost[i] += Math.max(1, Utils.manhattanDistance(newLoc, nearestEnemyPaint)) * 1000;
+                    } else {
+                        directionCost[i] += Math.max(1, Utils.manhattanDistance(newLoc, nearestEnemyPaint)) * 400;
+                        directionCost[i] += Math.max(1, Utils.manhattanDistance(newLoc, Moppers.nearestEnemyPaintOnRuin))
+                                * 700;
+                        rc.setIndicatorDot(Moppers.nearestEnemyPaintOnRuin, 255, 0, 255);
+                    }
             }
 
             if (nearestEnemyRobot != null && nearestEnemyRobotInfo.getPaintAmount() > 0) {
@@ -972,30 +890,30 @@ if (directionCost[0] < minCost) {
             int maskx = dir.dx + 2;
             int masky = dir.dy + 2;
             int allyRobotsInNewLoc = 0;
-if (nearbyAlliesMask[maskx + dx8[7]][masky + dy8[7]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[6]][masky + dy8[6]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[5]][masky + dy8[5]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[4]][masky + dy8[4]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[3]][masky + dy8[3]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[2]][masky + dy8[2]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[1]][masky + dy8[1]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[0]][masky + dy8[0]]) {
-    allyRobotsInNewLoc++;
-}
+            if (nearbyAlliesMask[maskx + dx8[7]][masky + dy8[7]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[6]][masky + dy8[6]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[5]][masky + dy8[5]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[4]][masky + dy8[4]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[3]][masky + dy8[3]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[2]][masky + dy8[2]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[1]][masky + dy8[1]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[0]][masky + dy8[0]]) {
+                allyRobotsInNewLoc++;
+            }
             directionCost[i] += allyRobotsInNewLoc * 500;
 
         }
@@ -1004,45 +922,45 @@ if (nearbyAlliesMask[maskx + dx8[0]][masky + dy8[0]]) {
         int minCost = INF;
         Direction minDir = null;
 // Check d = 7
-if (directionCost[7] < minCost) {
-    minCost = directionCost[7];
-    minDir = directions[7];
-}
+        if (directionCost[7] < minCost) {
+            minCost = directionCost[7];
+            minDir = directions[7];
+        }
 // Check d = 6
-if (directionCost[6] < minCost) {
-    minCost = directionCost[6];
-    minDir = directions[6];
-}
+        if (directionCost[6] < minCost) {
+            minCost = directionCost[6];
+            minDir = directions[6];
+        }
 // Check d = 5
-if (directionCost[5] < minCost) {
-    minCost = directionCost[5];
-    minDir = directions[5];
-}
+        if (directionCost[5] < minCost) {
+            minCost = directionCost[5];
+            minDir = directions[5];
+        }
 // Check d = 4
-if (directionCost[4] < minCost) {
-    minCost = directionCost[4];
-    minDir = directions[4];
-}
+        if (directionCost[4] < minCost) {
+            minCost = directionCost[4];
+            minDir = directions[4];
+        }
 // Check d = 3
-if (directionCost[3] < minCost) {
-    minCost = directionCost[3];
-    minDir = directions[3];
-}
+        if (directionCost[3] < minCost) {
+            minCost = directionCost[3];
+            minDir = directions[3];
+        }
 // Check d = 2
-if (directionCost[2] < minCost) {
-    minCost = directionCost[2];
-    minDir = directions[2];
-}
+        if (directionCost[2] < minCost) {
+            minCost = directionCost[2];
+            minDir = directions[2];
+        }
 // Check d = 1
-if (directionCost[1] < minCost) {
-    minCost = directionCost[1];
-    minDir = directions[1];
-}
+        if (directionCost[1] < minCost) {
+            minCost = directionCost[1];
+            minDir = directions[1];
+        }
 // Check d = 0
-if (directionCost[0] < minCost) {
-    minCost = directionCost[0];
-    minDir = directions[0];
-}
+        if (directionCost[0] < minCost) {
+            minCost = directionCost[0];
+            minDir = directions[0];
+        }
         if (minDir != null)
             rc.move(minDir);
     }
@@ -1094,28 +1012,28 @@ if (directionCost[0] < minCost) {
             if (wallAdjacent && rc.getLocation().distanceSquaredTo(targetLoc) > sqDistanceToTargetOnWallTouch) {
                 boolean newLocIsWallAdjacent = false;
 // Check direction4[0]
-if (rc.canSenseLocation(newLoc.add(directions4[0]))
-    && rc.senseMapInfo(newLoc.add(directions4[0])).isWall()) {
-    newLocIsWallAdjacent = true;
-}
+                if (rc.canSenseLocation(newLoc.add(directions4[0]))
+                        && rc.senseMapInfo(newLoc.add(directions4[0])).isWall()) {
+                    newLocIsWallAdjacent = true;
+                }
 // Check direction4[1] only if not already wall-adjacent
-if (!newLocIsWallAdjacent
-    && rc.canSenseLocation(newLoc.add(directions4[1]))
-    && rc.senseMapInfo(newLoc.add(directions4[1])).isWall()) {
-    newLocIsWallAdjacent = true;
-}
+                if (!newLocIsWallAdjacent
+                        && rc.canSenseLocation(newLoc.add(directions4[1]))
+                        && rc.senseMapInfo(newLoc.add(directions4[1])).isWall()) {
+                    newLocIsWallAdjacent = true;
+                }
 // Check direction4[2] only if not already wall-adjacent
-if (!newLocIsWallAdjacent
-    && rc.canSenseLocation(newLoc.add(directions4[2]))
-    && rc.senseMapInfo(newLoc.add(directions4[2])).isWall()) {
-    newLocIsWallAdjacent = true;
-}
+                if (!newLocIsWallAdjacent
+                        && rc.canSenseLocation(newLoc.add(directions4[2]))
+                        && rc.senseMapInfo(newLoc.add(directions4[2])).isWall()) {
+                    newLocIsWallAdjacent = true;
+                }
 // Check direction4[3] only if not already wall-adjacent
-if (!newLocIsWallAdjacent
-    && rc.canSenseLocation(newLoc.add(directions4[3]))
-    && rc.senseMapInfo(newLoc.add(directions4[3])).isWall()) {
-    newLocIsWallAdjacent = true;
-}
+                if (!newLocIsWallAdjacent
+                        && rc.canSenseLocation(newLoc.add(directions4[3]))
+                        && rc.senseMapInfo(newLoc.add(directions4[3])).isWall()) {
+                    newLocIsWallAdjacent = true;
+                }
                 if (newLocIsWallAdjacent)
                     directionCost[i] -= 10000;
                 // add a cost if new location is the previous one
@@ -1131,75 +1049,75 @@ if (!newLocIsWallAdjacent
             int maskx = dir.dx + 2;
             int masky = dir.dy + 2;
             int allyRobotsInNewLoc = 0;
-if (nearbyAlliesMask[maskx + dx8[7]][masky + dy8[7]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[6]][masky + dy8[6]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[5]][masky + dy8[5]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[4]][masky + dy8[4]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[3]][masky + dy8[3]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[2]][masky + dy8[2]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[1]][masky + dy8[1]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[0]][masky + dy8[0]]) {
-    allyRobotsInNewLoc++;
-}
+            if (nearbyAlliesMask[maskx + dx8[7]][masky + dy8[7]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[6]][masky + dy8[6]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[5]][masky + dy8[5]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[4]][masky + dy8[4]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[3]][masky + dy8[3]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[2]][masky + dy8[2]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[1]][masky + dy8[1]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[0]][masky + dy8[0]]) {
+                allyRobotsInNewLoc++;
+            }
             directionCost[i] += allyRobotsInNewLoc * 1000;
         }
         // find the minimum cost Direction and move there
         int minCost = INF;
         Direction minDir = null;
 // Check d = 7
-if (directionCost[7] < minCost) {
-    minCost = directionCost[7];
-    minDir = directions[7];
-}
+        if (directionCost[7] < minCost) {
+            minCost = directionCost[7];
+            minDir = directions[7];
+        }
 // Check d = 6
-if (directionCost[6] < minCost) {
-    minCost = directionCost[6];
-    minDir = directions[6];
-}
+        if (directionCost[6] < minCost) {
+            minCost = directionCost[6];
+            minDir = directions[6];
+        }
 // Check d = 5
-if (directionCost[5] < minCost) {
-    minCost = directionCost[5];
-    minDir = directions[5];
-}
+        if (directionCost[5] < minCost) {
+            minCost = directionCost[5];
+            minDir = directions[5];
+        }
 // Check d = 4
-if (directionCost[4] < minCost) {
-    minCost = directionCost[4];
-    minDir = directions[4];
-}
+        if (directionCost[4] < minCost) {
+            minCost = directionCost[4];
+            minDir = directions[4];
+        }
 // Check d = 3
-if (directionCost[3] < minCost) {
-    minCost = directionCost[3];
-    minDir = directions[3];
-}
+        if (directionCost[3] < minCost) {
+            minCost = directionCost[3];
+            minDir = directions[3];
+        }
 // Check d = 2
-if (directionCost[2] < minCost) {
-    minCost = directionCost[2];
-    minDir = directions[2];
-}
+        if (directionCost[2] < minCost) {
+            minCost = directionCost[2];
+            minDir = directions[2];
+        }
 // Check d = 1
-if (directionCost[1] < minCost) {
-    minCost = directionCost[1];
-    minDir = directions[1];
-}
+        if (directionCost[1] < minCost) {
+            minCost = directionCost[1];
+            minDir = directions[1];
+        }
 // Check d = 0
-if (directionCost[0] < minCost) {
-    minCost = directionCost[0];
-    minDir = directions[0];
-}
+        if (directionCost[0] < minCost) {
+            minCost = directionCost[0];
+            minDir = directions[0];
+        }
         if (minDir != null)
             rc.move(minDir);
 
@@ -1241,8 +1159,8 @@ if (directionCost[0] < minCost) {
                 if (rc.canSenseLocation(newLoc.add(dir)))
                     nextnext = rc.senseMapInfo(newLoc.add(dir));
                 if (nextnext != null && nextnext.isPassable() && !nextnext.getPaint().isEnemy()) { // don't add the big
-                                                                                                   // cost if it's only
-                                                                                                   // 1 layer
+                    // cost if it's only
+                    // 1 layer
 
                     directionCost[i] += 100;
                 } else {
@@ -1281,38 +1199,38 @@ if (directionCost[0] < minCost) {
 
             if (nearestEnemyTower != null && nearestEnemyTowerType != UnitType.LEVEL_ONE_DEFENSE_TOWER) {
                 if (rc.getActionCooldownTurns() < 20)
-                if (newLoc.isWithinDistanceSquared(nearestEnemyTower, 16)) {
-                    rc.setIndicatorLine(newLoc, nearestEnemyTower, 255, 0, 255);
-                    directionCost[i] -= 6000;
-                }
+                    if (newLoc.isWithinDistanceSquared(nearestEnemyTower, 16)) {
+                        rc.setIndicatorLine(newLoc, nearestEnemyTower, 255, 0, 255);
+                        directionCost[i] -= 6000;
+                    }
             }
 
             // bug nav?
             if (wallAdjacent && rc.getLocation().distanceSquaredTo(targetLoc) > sqDistanceToTargetOnWallTouch) {
                 boolean newLocIsWallAdjacent = false;
 // Check direction4[0]
-if (rc.canSenseLocation(newLoc.add(directions4[0]))
-    && rc.senseMapInfo(newLoc.add(directions4[0])).isWall()) {
-    newLocIsWallAdjacent = true;
-}
+                if (rc.canSenseLocation(newLoc.add(directions4[0]))
+                        && rc.senseMapInfo(newLoc.add(directions4[0])).isWall()) {
+                    newLocIsWallAdjacent = true;
+                }
 // Check direction4[1] only if not already wall-adjacent
-if (!newLocIsWallAdjacent
-    && rc.canSenseLocation(newLoc.add(directions4[1]))
-    && rc.senseMapInfo(newLoc.add(directions4[1])).isWall()) {
-    newLocIsWallAdjacent = true;
-}
+                if (!newLocIsWallAdjacent
+                        && rc.canSenseLocation(newLoc.add(directions4[1]))
+                        && rc.senseMapInfo(newLoc.add(directions4[1])).isWall()) {
+                    newLocIsWallAdjacent = true;
+                }
 // Check direction4[2] only if not already wall-adjacent
-if (!newLocIsWallAdjacent
-    && rc.canSenseLocation(newLoc.add(directions4[2]))
-    && rc.senseMapInfo(newLoc.add(directions4[2])).isWall()) {
-    newLocIsWallAdjacent = true;
-}
+                if (!newLocIsWallAdjacent
+                        && rc.canSenseLocation(newLoc.add(directions4[2]))
+                        && rc.senseMapInfo(newLoc.add(directions4[2])).isWall()) {
+                    newLocIsWallAdjacent = true;
+                }
 // Check direction4[3] only if not already wall-adjacent
-if (!newLocIsWallAdjacent
-    && rc.canSenseLocation(newLoc.add(directions4[3]))
-    && rc.senseMapInfo(newLoc.add(directions4[3])).isWall()) {
-    newLocIsWallAdjacent = true;
-}
+                if (!newLocIsWallAdjacent
+                        && rc.canSenseLocation(newLoc.add(directions4[3]))
+                        && rc.senseMapInfo(newLoc.add(directions4[3])).isWall()) {
+                    newLocIsWallAdjacent = true;
+                }
                 if (newLocIsWallAdjacent)
                     directionCost[i] -= 10000;
             } else {
@@ -1325,9 +1243,9 @@ if (!newLocIsWallAdjacent
 
             // add cost for moving in a direction that gets us further away from enemyPaint,
             if (rc.getRoundNum() < fullFillPhase)
-            if (nearestEnemyPaint != null) {
-                directionCost[i] += Math.max(1, Utils.manhattanDistance(newLoc, nearestEnemyPaint)) * 700;
-            }
+                if (nearestEnemyPaint != null) {
+                    directionCost[i] += Math.max(1, Utils.manhattanDistance(newLoc, nearestEnemyPaint)) * 700;
+                }
 
             // try to attack the target our towers tell us to
             // if (rc.getRoundNum() >= fullAttackBasePhase && role == 1) {
@@ -1342,30 +1260,30 @@ if (!newLocIsWallAdjacent
             int maskx = dir.dx + 2;
             int masky = dir.dy + 2;
             int allyRobotsInNewLoc = 0;
-if (nearbyAlliesMask[maskx + dx8[7]][masky + dy8[7]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[6]][masky + dy8[6]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[5]][masky + dy8[5]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[4]][masky + dy8[4]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[3]][masky + dy8[3]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[2]][masky + dy8[2]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[1]][masky + dy8[1]]) {
-    allyRobotsInNewLoc++;
-}
-if (nearbyAlliesMask[maskx + dx8[0]][masky + dy8[0]]) {
-    allyRobotsInNewLoc++;
-}
+            if (nearbyAlliesMask[maskx + dx8[7]][masky + dy8[7]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[6]][masky + dy8[6]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[5]][masky + dy8[5]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[4]][masky + dy8[4]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[3]][masky + dy8[3]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[2]][masky + dy8[2]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[1]][masky + dy8[1]]) {
+                allyRobotsInNewLoc++;
+            }
+            if (nearbyAlliesMask[maskx + dx8[0]][masky + dy8[0]]) {
+                allyRobotsInNewLoc++;
+            }
             directionCost[i] += allyRobotsInNewLoc * 300;
 
         }
@@ -1374,45 +1292,45 @@ if (nearbyAlliesMask[maskx + dx8[0]][masky + dy8[0]]) {
         int minCost = INF;
         Direction minDir = null;
 // Check d = 7
-if (directionCost[7] < minCost) {
-    minCost = directionCost[7];
-    minDir = directions[7];
-}
+        if (directionCost[7] < minCost) {
+            minCost = directionCost[7];
+            minDir = directions[7];
+        }
 // Check d = 6
-if (directionCost[6] < minCost) {
-    minCost = directionCost[6];
-    minDir = directions[6];
-}
+        if (directionCost[6] < minCost) {
+            minCost = directionCost[6];
+            minDir = directions[6];
+        }
 // Check d = 5
-if (directionCost[5] < minCost) {
-    minCost = directionCost[5];
-    minDir = directions[5];
-}
+        if (directionCost[5] < minCost) {
+            minCost = directionCost[5];
+            minDir = directions[5];
+        }
 // Check d = 4
-if (directionCost[4] < minCost) {
-    minCost = directionCost[4];
-    minDir = directions[4];
-}
+        if (directionCost[4] < minCost) {
+            minCost = directionCost[4];
+            minDir = directions[4];
+        }
 // Check d = 3
-if (directionCost[3] < minCost) {
-    minCost = directionCost[3];
-    minDir = directions[3];
-}
+        if (directionCost[3] < minCost) {
+            minCost = directionCost[3];
+            minDir = directions[3];
+        }
 // Check d = 2
-if (directionCost[2] < minCost) {
-    minCost = directionCost[2];
-    minDir = directions[2];
-}
+        if (directionCost[2] < minCost) {
+            minCost = directionCost[2];
+            minDir = directions[2];
+        }
 // Check d = 1
-if (directionCost[1] < minCost) {
-    minCost = directionCost[1];
-    minDir = directions[1];
-}
+        if (directionCost[1] < minCost) {
+            minCost = directionCost[1];
+            minDir = directions[1];
+        }
 // Check d = 0
-if (directionCost[0] < minCost) {
-    minCost = directionCost[0];
-    minDir = directions[0];
-}
+        if (directionCost[0] < minCost) {
+            minCost = directionCost[0];
+            minDir = directions[0];
+        }
         if (minDir != null)
             rc.move(minDir);
 

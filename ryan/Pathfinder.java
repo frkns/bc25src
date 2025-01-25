@@ -63,6 +63,7 @@ public class Pathfinder extends RobotPlayer{
         }
 
         static Direction getMoveDir() throws GameActionException {
+            int id = rc.getID();
             if (rc.getRoundNum() == lastMoveRound) {
                 Debug.println(Debug.PATHFINDER, "Null return: Already moved this round");
                 return null;

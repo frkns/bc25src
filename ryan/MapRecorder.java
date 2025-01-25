@@ -114,13 +114,13 @@ public class MapRecorder extends RobotPlayer {
                 MapLocation loc = knownRuins.locs[ruinFlipIndex];
                 MapLocation symloc = getSymmetricLoc(loc);
                 knownRuins.add(symloc);
-                vals[Utils.loc2int(symloc)] = WALL_BIT;
                 if (Clock.getBytecodesLeft() <= leaveBytecodeCnt) {
                     return;
                 }
             }
             needWallFlip = false;
         }
+
 
         // Scan and process nearby map information
         MapInfo[] infos = rc.senseNearbyMapInfos();
@@ -133,17 +133,15 @@ public class MapRecorder extends RobotPlayer {
 
 
             int locID = Utils.loc2int(loc);
-            if (vals[locID] != 0)
+            if (vals[locID] != 0) // We can skip if we've already seen the wall because walls never change
                 continue;
 
-            // Record ruin locations
+            // Record ruin locations. Leave them marked as unseen as they are constantly updated
             if (info.hasRuin()) {
-                vals[locID] = WALL_BIT;
                 knownRuins.add(loc);
                 if (symConfirmed) {
                     MapLocation symloc = getSymmetricLoc(loc);
                     knownRuins.add(symloc);
-                    vals[Utils.loc2int(symloc)] = WALL_BIT;
                 }
                 // Is it an allied tower, enemy tower, or empty ruin
                 RobotInfo robot = rc.senseRobotAtLocation(loc);
@@ -162,7 +160,9 @@ public class MapRecorder extends RobotPlayer {
                     knownAlliedTowers.remove(loc);
                     knownEnemyTowers.remove(loc);
                 }
-            } else if (info.isWall()) { // Record walls
+            }
+
+            if (info.isWall()) { // Record walls
                 vals[locID] = WALL_BIT;
                 knownWalls.add(loc);
                 if (symConfirmed) {
