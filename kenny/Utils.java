@@ -90,6 +90,9 @@ public class Utils extends RobotPlayer {
 
         // if roughly same num of wrong tiles, follow the build order
         if (Math.abs(numWrongInPaint - numWrongInMoney) < 3 && Math.abs(numWrongInMoney - numWrongInDefense) < 3) {
+            if (rc.getNumberTowers() >= 3 && ruinLoc.distanceSquaredTo(mapCenter) <= mx/3) {
+                return UnitType.LEVEL_ONE_DEFENSE_TOWER;
+            }
             return AuxConstants.buildOrder[rc.getNumberTowers()];
         }
         if (numWrongInMoney <= numWrongInPaint && numWrongInMoney <= numWrongInDefense && rc.getMoney() < 10000)

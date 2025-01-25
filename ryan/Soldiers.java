@@ -6,14 +6,14 @@ import battlecode.common.*;
 public class Soldiers extends RobotPlayer {
     // -------- Tower building variables -------------
     public static MapLocation[] nearbyRuins;
-    public static FastLocSet ruinsWithEnemyPaint = new FastLocSet();
+    public static MapLocation ruinWithEnemyPaint;
     public static UnitType buildTowerType;
     public static MapLocation currentRuinLoc;
     public static MapLocation nearestWrongInRuin;
     public static int numWrongTilesInRuin = 0; // Used to determine if there is enough paint to complete
     public static int strictFollowBuildOrderNumTowers;
     // -------- Srp building variables -----------
-    public static FastLocSet invalidSrp = new FastLocSet();
+    public static MapLocation invalidSrp;
     public static MapLocation currentSrpLoc;
     public static MapLocation nearestWrongInSrp;
     public static int numWrongTilesInSrp;
@@ -98,7 +98,7 @@ public class Soldiers extends RobotPlayer {
         // If no target ruin, find the nearest ruin without enemy paint
         if (currentRuinLoc == null) {
             for (MapLocation ruinLoc : nearbyRuins) {
-                if (!rc.canSenseRobotAtLocation(ruinLoc) && !ruinsWithEnemyPaint.contains(ruinLoc)) {
+                if (!rc.canSenseRobotAtLocation(ruinLoc) && !ruinWithEnemyPaint.equals(ruinLoc)) {
                     currentRuinLoc = ruinLoc;
                 }
             }
@@ -113,7 +113,7 @@ public class Soldiers extends RobotPlayer {
             if (buildTowerType != null) {
                 return true;
             } else {
-                ruinsWithEnemyPaint.add(currentRuinLoc);
+                ruinWithEnemyPaint = currentRuinLoc;
                 return falseCompleteTower();
             }
         }
@@ -157,7 +157,7 @@ public class Soldiers extends RobotPlayer {
         // If no target Srp, find the nearest possible center of Srp
         if (currentSrpLoc == null) {
             for (MapInfo tile : nearbyTiles) {
-                if (tile.getMark() == PaintType.ALLY_PRIMARY && !invalidSrp.contains(tile.getMapLocation())) {
+                if (tile.getMark() == PaintType.ALLY_PRIMARY && !invalidSrp.equals(tile.getMapLocation())) {
                     currentSrpLoc = tile.getMapLocation();
                 }
             }
@@ -167,10 +167,10 @@ public class Soldiers extends RobotPlayer {
         if (currentSrpLoc != null) {
             nearestWrongInSrp = CompleteSrp.getNearestWrongInSrp(currentSrpLoc); // Returns null if no wrong tiles. Returns MapLocation(-1, -1) if enemy paint
             if (nearestWrongInSrp != null && nearestWrongInSrp.equals(new MapLocation(-1, -1))) {
-                invalidSrp.add(currentSrpLoc);
+                invalidSrp = currentSrpLoc;
                 return falseCompleteSrp();
             } else if (nearestWrongInSrp == null && rc.getLocation().isWithinDistanceSquared(currentSrpLoc, 4) && !rc.canCompleteResourcePattern(currentSrpLoc) && rc.getChips() > 200) {
-                invalidSrp.add(currentSrpLoc);
+                invalidSrp = currentSrpLoc;
                 return falseCompleteSrp(); // The Srp must be completed, since it is close enough to confirm there are no wrong tiles in the entire SRP, and canComplete returns false.
             } else {
                 return true; // We are not in range to see all the tiles
@@ -198,7 +198,7 @@ public class Soldiers extends RobotPlayer {
             CompleteSrp.paintSrp(currentSrpLoc, nearestWrongInSrp);
         } else {
             if (rc.canCompleteResourcePattern(currentSrpLoc)) {
-                invalidSrp.add(currentSrpLoc);
+                invalidSrp = currentRuinLoc;
                 rc.completeResourcePattern(currentSrpLoc);
             }
             Debug.setIndicatorLine(rc.getLocation(), currentSrpLoc, 0, 0, 255);
