@@ -5,7 +5,7 @@ import architecture.Tools.AuxConstants;
 import architecture.Tools.Debug;
 import architecture.Tools.ImpureUtils;
 import battlecode.common.*;
-import gavin.fast.FastMath;
+import architecture.fast.*;
 
 import java.util.Random;
 

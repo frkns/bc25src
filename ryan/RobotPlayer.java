@@ -210,16 +210,6 @@ public class RobotPlayer {
             RuinDotter.init();
         }
 
-        // switch (rc.getType()) {
-        //     case SOLDIER: {
-        //         switch (role) {
-        //             case 1:
-        //                 // AttackBase.init();
-        //                 break;
-        //         }
-        //         break;
-        //     }
-        // }
 
         if(mx < 36) {
             AuxConstants.buildOrder[4] = UnitType.LEVEL_ONE_PAINT_TOWER;

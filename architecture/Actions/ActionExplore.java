@@ -4,7 +4,7 @@ import architecture.RobotPlayer;
 import architecture.Tools.Debug;
 import architecture.Tools.Pathfinder;
 import battlecode.common.*;
-import gavin.fast.FastMath;
+import architecture.fast.FastMath;
 
 public class ActionExplore extends RobotPlayer {
     static MapLocation target;

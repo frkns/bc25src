@@ -2,8 +2,7 @@
 package ref_best_tmp;
 
 import battlecode.common.*;
-import ref_best.fast.FastLocSet;
-import ref_best.fast.FastMath;
+import ref_best_tmp.fast.*;
 
 public class Pathfinder extends RobotPlayer {
 

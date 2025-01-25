@@ -207,6 +207,7 @@ public class Soldiers extends RobotPlayer {
         }
         rc.setIndicatorString("completeSrp");
     }
+
     /*
      * Find and attack an enemy tower. Returns true if
      *   1. Soldier health > 30
@@ -214,6 +215,7 @@ public class Soldiers extends RobotPlayer {
      */
     public static boolean shouldAttackEnemyTower() throws GameActionException {
         if (rc.getHealth() <= 30) return false; // Will die instantly
+        if (Explore.exploreScore > 3) return false; // This means there is at least 1 empty tile in the direction of interest, and not just bonus for moving toward center
         if (nearestEnemyTower == null && potentialEnemyTower == null){
             // MapRecorder will always return a location that has at least a ruin since it uses either
             // known enemy towers or the mirrored location of allied towers only AFTER symmetry is confirmed.
@@ -234,7 +236,7 @@ public class Soldiers extends RobotPlayer {
         else if (rc.getLocation().isWithinDistanceSquared(nearestEnemyTower, 18)){
             towerMicro();
             Debug.setIndicatorDot(nearestEnemyTower, 255, 0, 0);
-        // We are close enough to see the nearestEnemyTower, but not close enough to attack it on this turn.
+            // We are close enough to see the nearestEnemyTower, but not close enough to attack it on this turn.
         } else if (rc.isMovementReady() && rc.getPaint() > 0) {
             Pathfinder.move(nearestEnemyTower);
         }
@@ -260,7 +262,7 @@ public class Soldiers extends RobotPlayer {
         // If we can attack the tower, we attack it
         if (rc.canAttack(nearestEnemyTower)) {
             rc.attack(nearestEnemyTower);
-        // Otherwise we move in range to attack the tower
+            // Otherwise we move in range to attack the tower
         } else if (rc.isMovementReady() && rc.isActionReady() && rc.getPaint() > 5) {
             HeuristicMove.towerMicro(false);
             if (rc.canAttack(nearestEnemyTower)) { // Should only return false if robot was unable to get in range. Otherwise robot should always be able to attack
@@ -274,7 +276,6 @@ public class Soldiers extends RobotPlayer {
         }
     }
 
-
     public static void explore() throws GameActionException {
         if (exploreTarget == null || rc.getLocation().isWithinDistanceSquared(exploreTarget, 9) || (Explore.nearBoundary(3) && !rc.onTheMap(exploreTarget))) {
             exploreTarget = Explore.getExploreTarget(); // Move a specified number of tiles in the direction with the most empty tiles. Bias toward center for ties.
@@ -284,12 +285,11 @@ public class Soldiers extends RobotPlayer {
             Pathfinder.move(exploreTarget);
         }
 
-        MapLocation robotLoc = rc.getLocation();
-
-        if (!rc.onTheMap(exploreTarget)) {
+        // Debug indicators
+        if (!rc.onTheMap(exploreTarget)) { // If target not on the map set the indicator to the closest point on the map
             MapLocation indicatorExploreTarget = new MapLocation(
-                Math.min(Math.max(exploreTarget.x, 0), rc.getMapWidth() - 1),
-                Math.min(Math.max(exploreTarget.y, 0), rc.getMapHeight() - 1)
+                    Math.min(Math.max(exploreTarget.x, 0), rc.getMapWidth() - 1),
+                    Math.min(Math.max(exploreTarget.y, 0), rc.getMapHeight() - 1)
             );
             Debug.setIndicatorLine(rc.getLocation(), indicatorExploreTarget, 255, 255, 0);
         } else {
@@ -297,4 +297,5 @@ public class Soldiers extends RobotPlayer {
         }
         rc.setIndicatorString("Explore");
     }
+
 }
