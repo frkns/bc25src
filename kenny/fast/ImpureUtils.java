@@ -1,8 +1,6 @@
-package ryan;
-
+package kenny.fast;
 import battlecode.common.*;
 
-import ryan.fast.*;
 // these Utils are NOT pure functions (i.e. they modify state / change global variables, etc.)
 
 public class ImpureUtils extends RobotPlayer {
@@ -32,9 +30,17 @@ public class ImpureUtils extends RobotPlayer {
         }
     }
 
-    static void tryUpgradeNearbyTowers() throws GameActionException {
-        if (rc.getMoney() > 3000)
-        for (RobotInfo robot : nearbyRobots) {
+    static void tryUpgradeNearbyTowers() throws GameActionException {  // updates nearest ruins as well
+        nearbyRuins = rc.senseNearbyRuins(-1);
+        if (rc.getMoney() < 3000)
+            return;
+
+        for (MapLocation ruinLoc : nearbyRuins) {
+            if (!rc.canSenseRobotAtLocation(ruinLoc))
+                continue;
+            RobotInfo robot = rc.senseRobotAtLocation(ruinLoc);
+            if (robot.getType() == UnitType.LEVEL_ONE_MONEY_TOWER && (rc.getMoney() < 15000 || robot.getPaintAmount() >= 100))  // experimental testing
+                continue;
             if (rc.canUpgradeTower(robot.getLocation())) {
                 if (rc.getMoney() < 6000) {
                     if (robot.getType().getBaseType() == UnitType.LEVEL_ONE_DEFENSE_TOWER) {
@@ -79,7 +85,7 @@ public class ImpureUtils extends RobotPlayer {
     }
 
 
-
+    // really, after the change, this should be called updateNearestPaintTarget, because moppers/money/defense towers are inlcuded
     static void updateNearestPaintTower() throws GameActionException {
         if (nearestPaintTower != null && rc.getLocation().distanceSquaredTo(nearestPaintTower) <= 20) {
             // if tower is destroyed or it's not a paint tower and there's no paint left
@@ -93,6 +99,8 @@ public class ImpureUtils extends RobotPlayer {
                 continue;
             RobotInfo robot = rc.senseRobotAtLocation(ruinLoc);
             if (robot.getTeam() == rc.getTeam() && (robot.getType().isTowerType())) {
+                // if (robot.getType() == UnitType.LEVEL_ONE_MONEY_TOWER)  // experimental
+                //     continue;
                 if (robot.getType().getBaseType() == UnitType.LEVEL_ONE_PAINT_TOWER) {
                     if (nearestPaintTower == null || rc.getLocation().distanceSquaredTo(robot.getLocation()) < rc
                             .getLocation().distanceSquaredTo(nearestPaintTower)) {
@@ -122,6 +130,18 @@ public class ImpureUtils extends RobotPlayer {
         }
     }
 
+    // static void updateNearestEnemyTower() throws GameActionException {
+    //     nearestEnemyTower = null;
+    //     for (RobotInfo robot : nearbyRobots) {  // assumes non-defense tower
+    //         if (robot.getTeam() != rc.getTeam() && robot.getType().isTowerType()) {
+    //             MapLocation robotLoc = robot.getLocation();
+    //             if (nearestEnemyTower == null || rc.getLocation().distanceSquaredTo(robotLoc) < rc.getLocation().distanceSquaredTo(nearestEnemyTower)) {
+    //                 nearestEnemyTower = robot.getLocation();
+    //                 nearestEnemyTowerType = robot.getType().getBaseType();
+    //             }
+    //         }
+    //     }
+    // }
 
     // updates two towers now!
     static void updateNearestEnemyTower() throws GameActionException {
@@ -150,7 +170,7 @@ public class ImpureUtils extends RobotPlayer {
                     nearestEnemyTowerType = robot.getType().getBaseType();
                 }
                 // Check if this tower is closer than the current second nearest tower but not closer than the nearest tower
-                else if ((sndNearestEnemyTower == null || distanceSquared < rc.getLocation().distanceSquaredTo(sndNearestEnemyTower)) && !robotLoc.equals(nearestEnemyTower)) {
+                else if (sndNearestEnemyTower == null || distanceSquared < rc.getLocation().distanceSquaredTo(sndNearestEnemyTower)) {
                     // Update the second nearest tower to be this tower
                     sndNearestEnemyTower = robotLoc;
                     sndNearestEnemyTowerType = robot.getType().getBaseType();
@@ -261,9 +281,9 @@ public class ImpureUtils extends RobotPlayer {
         // rc.setIndicatorDot(avgClump, 0, 0, 255);
     }
 
-    public static void checkAndCompleteNearbySrps() throws GameActionException {
+    public static void checkAndCompleteNearbySRPs() throws GameActionException {
         // actually don't need this --
-        // CAN BE REACHED can be reached because it might complete *another* robot's Srp
+        // CAN BE REACHED can be reached because it might complete *another* robot's SRP
         // that they would've completed anyway on their turn
 
         // for (MapInfo tile : nearbyTiles) {
@@ -277,38 +297,4 @@ public class ImpureUtils extends RobotPlayer {
         //     }
         // }
     }
-
-    public static MapLocation getBorderLocation() {
-        switch (FastMath.rand256() % 4) {
-            case 0: // Top
-                return new MapLocation(FastMath.rand256() % mapWidth, mapHeight - 1);
-            case 1: // Bottom
-                return new MapLocation(FastMath.rand256() % mapWidth, 0);
-            case 2: // Left
-                return new MapLocation(0, FastMath.rand256() % mapHeight);
-            case 3: // Top
-                return new MapLocation(mapWidth - 1, FastMath.rand256() % mapHeight);
-            default:
-                Debug.println("Init explore : Should not be possible.");
-                return null;
-        }
-    }
-
-    public static MapLocation initExploreTarget(){
-        // Explore in the direction given by the direction from tower to unit.
-        mapWidth = rc.getMapWidth();
-        mapHeight = rc.getMapHeight();
-
-        Direction dir = spawnTowerLocation.directionTo(rc.getLocation());
-
-        for(int i=0; i < 10; i++) {
-            MapLocation target = getBorderLocation();
-            if(rc.getLocation().directionTo(target) == dir){
-                return target;
-            }
-        }
-
-        return null; // Failled to have a target
-    }
-
 }

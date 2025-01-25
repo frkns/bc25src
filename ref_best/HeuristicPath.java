@@ -847,10 +847,24 @@ if (directionCost[0] < minCost) {
     public static void mopperMove(MapLocation targetLoc) throws GameActionException {
         int[] directionCost = new int[8];
         MapLocation nearbyEnemyTowerLoc = nearestEnemyTower;
+        boolean[] enemyPaint =  new boolean[8];
+
+        for(MapInfo tile : nearbyTiles) {
+            if(rc.getLocation().distanceSquaredTo(tile.getMapLocation()) != 2) {
+                int dir = rc.getLocation().directionTo(tile.getMapLocation()).ordinal();
+
+                if(dir != 8) {enemyPaint[rc.getLocation().directionTo(tile.getMapLocation()).ordinal()] = true;}
+            }
+        }
 
         int INF = (int) 2e9;
         for (int i = 8; i-- > 0;) {
             Direction dir = directions[i];
+
+            //add cost in directions that don't lead to enemy paint
+            if(!enemyPaint[i]) {
+                directionCost[i] += 400;
+            }
 
             // if we can't move there, set the cost to infinity
             if (!rc.canMove(dir)) {
@@ -1210,9 +1224,25 @@ if (directionCost[0] < minCost) {
     public static void splasherMove(MapLocation targetLoc) throws GameActionException {
         int[] directionCost = new int[8];
 
+        boolean[] enemyPaint =  new boolean[8];
+
+        for(MapInfo tile : nearbyTiles) {
+            if(rc.getLocation().distanceSquaredTo(tile.getMapLocation()) != 2) {
+                int dir = rc.getLocation().directionTo(tile.getMapLocation()).ordinal();
+
+                if(dir != 8) {enemyPaint[rc.getLocation().directionTo(tile.getMapLocation()).ordinal()] = true;}
+            }
+        }
+
         int INF = (int) 2e9;
         for (int i = 8; i-- > 0;) {
             Direction dir = directions[i];
+
+            //add cost in directions that don't lead to enemy paint
+            if(!enemyPaint[i]) {
+                directionCost[i] += 400;
+            }
+
             // if we can't move there, set the cost to infinity
             if (!rc.canMove(dir)) {
                 directionCost[i] = INF;

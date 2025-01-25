@@ -30,6 +30,9 @@ lowest bit read:
 read the i-th highest bit (1-indexed):
 (value >> (32 - i)) & 1
 
+set the i-th highest bit:
+value |= 1 << (32 - i)
+
 read a MapLocation (12 bits) that starts at the i-th highest bit (1-indexed):
 (value >> (21 - i)) & 0xFFF
 

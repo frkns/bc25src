@@ -1,7 +1,7 @@
 // https://github.com/chenyx512/battlecode24/blob/main/src/bot1/fast/FastLocSet.java
-package ryan.fast;
+package kenny.fast.fast;
 
-import battlecode.common.*;
+import battlecode.common.MapLocation;
 
 public class FastLocSet {
     public StringBuilder keys;
@@ -22,6 +22,7 @@ public class FastLocSet {
 
     public void add(MapLocation loc) {
         String key = "^" + (char) (loc.x) + (char) (loc.y);
+        // String key = locToStr(loc);
         if (keys.indexOf(key) == -1) {
             keys.append(key);
             size++;

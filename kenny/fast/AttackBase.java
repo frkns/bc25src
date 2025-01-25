@@ -1,4 +1,4 @@
-package ryan;
+package kenny.fast;
 
 import battlecode.common.*;
 
@@ -79,14 +79,18 @@ public class AttackBase extends RobotPlayer {
         if (nearestEnemyTower != null) {
             if (rc.canAttack(nearestEnemyTower)) {
                 rc.attack(nearestEnemyTower);
+                inTowerRange = true;
             }
             if (rc.getHealth() < 31) {  // stop attacking if low health, 30 or less means we die to level 1 paint/money tower shot + AoE
                 role = 0;
+                Soldiers.run();
                 return;
             }
-
+            HeuristicPath.towerMicro();
+            inTowerRange = rc.getLocation().isWithinDistanceSquared(nearestEnemyTower, 9);
             if (rc.canAttack(nearestEnemyTower)) {
                 rc.attack(nearestEnemyTower);
+                inTowerRange = true;
             }
             return;
         }
@@ -162,13 +166,18 @@ public class AttackBase extends RobotPlayer {
         if (rc.isMovementReady()) {
             if (target == null) {
                 role = 0;
+                Soldiers.run();
                 return;
             }
 
         }
 
         assert(target != null);
-        Pathfinder.move(target);
+
+        // if (rc.getLocation().isWithinDistanceSquared(target, 20))
+        //     HeuristicPath.attackBaseMove(target);
+        // else
+            Pathfinder.move(target, true);
 
         rc.setIndicatorLine(rc.getLocation(), target, 255, 255, 255);
 
@@ -204,9 +213,14 @@ public class AttackBase extends RobotPlayer {
         }
 
         if (foundLoc != null && !rc.canSenseRobotAtLocation(foundLoc)) {
+            // System.out.println("Haha I destroyed the enemy tower");
             role = 0;
+            // Soldiers.run();
+            return;
         } else if (visited[0] && visited[1] && visited[2] && nearestEnemyTower == null) {  // visited everything
             role = 0;
+            // Soldiers.run();
+            return;
         }
 
     }

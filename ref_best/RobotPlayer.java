@@ -178,7 +178,7 @@ public class RobotPlayer {
         Splashers.init();
 
         mx = Math.max(mapWidth, mapHeight);  // ~60 for huge ~35 for medium
-        siegePhase = (int)(mx * 3);  // cast to int, will be useful for tuning later
+        siegePhase = (int)(0);  // cast to int, will be useful for tuning later
         fullFillPhase = (int)(mx * 3);
         mopperPhase = (int)(mx * 2);
         splasherPhase = (int)(mx * 3);

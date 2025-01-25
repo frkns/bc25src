@@ -1,5 +1,5 @@
 // https://github.com/chenyx512/battlecode24/blob/main/src/bot1/fast/FastIntSet.java
-package ryan.fast;
+package kenny.fast.fast;
 
 public class FastIntSet {
     public StringBuilder keys;

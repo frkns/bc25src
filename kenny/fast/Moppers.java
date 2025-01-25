@@ -1,4 +1,4 @@
-package ryan;
+package kenny.fast;
 
 import battlecode.common.*;
 
