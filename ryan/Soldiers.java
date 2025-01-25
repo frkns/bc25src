@@ -51,7 +51,7 @@ public class Soldiers extends RobotPlayer {
     }
 
     public static void endTurn() throws GameActionException {
-        ImpureUtils.tryMarkSrp();
+        ImpureUtils.tryMarkSRP();
         paintUnder();
         MapRecorder.recordSym(1000);
     }
