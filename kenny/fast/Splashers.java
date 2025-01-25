@@ -1,7 +1,6 @@
-package ryan;
+package kenny.fast;
 
 import battlecode.common.*;
-
 
 public class Splashers extends RobotPlayer {
 
@@ -103,7 +102,7 @@ public class Splashers extends RobotPlayer {
 
         int[] locScores = new int[9];
         MapLocation[] locs = new MapLocation[9]; // locations to splash, it should form a diamond, updated to include
-        // center
+                                                 // center
 
         /* */
         // Unroll the first loop (i from 8 down to 0)
@@ -284,7 +283,7 @@ public class Splashers extends RobotPlayer {
                     if (rc.canSenseRobotAtLocation(tileLoc))
                         locScores[0] += 50;
                 }
-            } else if (tile.getPaint() == PaintType.EMPTY) {
+            } /*else if (tile.getPaint() == PaintType.EMPTY) {
                 // Unroll neutral paint scoring
                 if (locs[8].isWithinDistanceSquared(tileLoc, 4)) {
                     locScores[8] += 100;
@@ -332,6 +331,7 @@ public class Splashers extends RobotPlayer {
                         locScores[0] += 50;
                 }
             }
+            */
         }
 
         // Unroll max score calculation

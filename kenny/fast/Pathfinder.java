@@ -1,14 +1,16 @@
 // Adapted from https://github.com/chenyx512/battlecode24/blob/main/src/bot1/PathFinder.java
-package ryan;
+package kenny.fast;
 
 import battlecode.common.*;
+import kenny.fast.fast.FastLocSet;
+import kenny.fast.fast.FastMath;
 
-import ryan.fast.*;
-
-public class Pathfinder extends RobotPlayer{
+public class Pathfinder extends RobotPlayer {
 
     static MapLocation target = null;
+    static MapLocation stayawayFrom = null;
     static int stuckCnt;
+    static boolean ignoreTowers = false;
 
 
     public static void tryMove(Direction dir) throws GameActionException {
@@ -20,12 +22,16 @@ public class Pathfinder extends RobotPlayer{
     }
 
     public static void move(MapLocation loc) throws GameActionException {
-        if (!rc.isMovementReady() || loc == null){
-//            Debug.println(Debug.PATHFINDER, "Null return: Movement not ready or loc is null");
+        move(loc, false);
+        return;
+    }
+
+    public static void move(MapLocation loc, boolean _ignoreTowers) throws GameActionException {
+        ignoreTowers = _ignoreTowers;
+        if (!rc.isMovementReady() || loc == null)
             return;
-        }
         target = loc;
-        if (rc.getLocation().equals(target)) return; // Don't move if already at target location
+        stayawayFrom = null;
         Direction dir = BugNav.getMoveDir();
         if (dir == null)
             return;
@@ -36,6 +42,7 @@ public class Pathfinder extends RobotPlayer{
         if (!rc.isMovementReady() || loc == null)
             return null;
         target = loc;
+        stayawayFrom = null;
         Direction dir = BugNav.getMoveDir();
         if (dir == null) {
             return null;
@@ -63,8 +70,9 @@ public class Pathfinder extends RobotPlayer{
         }
 
         static Direction getMoveDir() throws GameActionException {
+            //EXTRA
             if (rc.getRoundNum() == lastMoveRound) {
-                Debug.println(Debug.PATHFINDER, "Null return: Already moved this round");
+                System.out.println("Null return: Already moved this round");
                 return null;
             } else {
                 lastMoveRound = rc.getRoundNum();
@@ -88,6 +96,8 @@ public class Pathfinder extends RobotPlayer{
                 if (canMoveOrFill(dir)) {
                     return dir;
                 }
+
+                // If robot cannot move
                 MapLocation loc = rc.getLocation().add(dir);
                 // Try to sidestep enemy or empty paint
                 if (rc.canSenseLocation(loc) && !rc.senseMapInfo(loc).getPaint().isAlly()) {
@@ -112,13 +122,14 @@ public class Pathfinder extends RobotPlayer{
                     }
                 }
 
+                // ADAPT bot 1 code that starts with: if there is water and sideway passage...
                 currentTurnDir = getTurnDir(dir);
                 // obstacle encountered, rotate and add new dirs to stack
                 while (!canMoveOrFill(dir) && dirStack.size < 8) {
                     if (!rc.onTheMap(rc.getLocation().add(dir))) {
                         currentTurnDir ^= 1;
                         dirStack.clear();
-                        Debug.println(Debug.PATHFINDER, "Null return: Hit map boundary");
+                        System.out.println("Null return: Hit map boundary");
                         return null; // do not move
                     }
                     dirStack.push(dir);
@@ -127,7 +138,8 @@ public class Pathfinder extends RobotPlayer{
                 if (dirStack.size != 8) {
                     return dir;
                 }
-            } else {
+            }
+            else {
                 // dxx
                 // xo
                 // x
@@ -158,27 +170,7 @@ public class Pathfinder extends RobotPlayer{
                         return dir;
                     }
                     MapLocation loc = rc.getLocation().add(dir);
-                    if (rc.canSenseLocation(loc) && !rc.senseMapInfo(loc).getPaint().isAlly()) {
-                        Direction dirL = dir.rotateLeft();
-                        MapLocation locL = rc.getLocation().add(dirL);
-                        Direction dirR = dir.rotateRight();
-                        MapLocation locR = rc.getLocation().add(dirR);
-                        if (target.distanceSquaredTo(locL) < target.distanceSquaredTo(locR)) {
-                            if (canMoveOrFill(dirL)) {
-                                return dirL;
-                            }
-                            if (canMoveOrFill(dirR)) {
-                                return dirR;
-                            }
-                        } else {
-                            if (canMoveOrFill(dirR)) {
-                                return dirR;
-                            }
-                            if (canMoveOrFill(dirL)) {
-                                return dirL;
-                            }
-                        }
-                    }
+                    // ADAPT bot 1 code that starts with:if (rc.canSenseLocation(loc) && rc.senseMapInfo(loc).isWater()...
                     dirStack.push(dir);
                 }
                 // keep rotating and adding things to the stack
@@ -188,13 +180,13 @@ public class Pathfinder extends RobotPlayer{
                     if (!rc.onTheMap(rc.getLocation().add(curDir))) {
                         currentTurnDir ^= 1;
                         dirStack.clear();
-                        Debug.println(Debug.PATHFINDER, "Null return: Hit map boundary");
+                        System.out.println("Null return: Hit map boundary");
                         return null; // do not move
                     }
                     dirStack.push(curDir);
                     if (dirStack.size == stackSizeLimit) {
                         dirStack.clear();
-                        Debug.println(Debug.PATHFINDER, "Null return: Stack size limit reached");
+                        System.out.println("Null return: Stack size limit reached");
                         return null;
                     }
                 }
@@ -202,15 +194,14 @@ public class Pathfinder extends RobotPlayer{
                     int cutoff = stackDepthCutoff + 8;
                     dirStack.clear();
                     stackDepthCutoff = cutoff;
+                    System.out.println("Null return: Stack depth cutoff reached, new cutoff: " + cutoff);
                 }
                 Direction moveDir = dirStack.size == 0 ? dirStack.dirs[0] : turn(dirStack.top());
                 if (canMoveOrFill(moveDir)) {
                     return moveDir;
                 }
             }
-            Debug.println(Debug.PATHFINDER, "Null return: Final moveDir cannot be moved to");
-            Debug.println(Debug.PATHFINDER, "Robot location: " + rc.getLocation());
-            Debug.println(Debug.PATHFINDER, "Target location: " + target);
+            System.out.println("Null return: Final moveDir cannot be moved to");
             return null;
         }
 
@@ -330,49 +321,34 @@ public class Pathfinder extends RobotPlayer{
         }
 
         static boolean canMoveOrFill(Direction dir) throws GameActionException {
-                MapLocation loc = rc.getLocation().add(dir);
-                if (rc.canMove(dir)) {
-                    if (!rc.canSenseLocation(loc))
-                        return false;
-                    MapInfo info = rc.senseMapInfo(loc);
-                    if (info.getPaint().isEnemy()) {
-                        if (!rc.senseMapInfo(rc.getLocation().add(dir.rotateLeft())).getPaint().isEnemy()
-                            || !rc.senseMapInfo(rc.getLocation().add(dir.rotateRight())).getPaint().isEnemy())
-                            return false;
-
-                        // We must be allowed to cross paint if it is adjacent to two non-connected walls
-                        int wall_length = 0;
-                        int wall_cnt = 0;
-                        for (Direction d : directions) {
-                            MapLocation adjLoc = loc.add(d);
-                            if (rc.sensePassability(adjLoc)) {
-                                wall_length++;
-                            } else {
-                                if (wall_length > 0) {
-                                    wall_length = 0;
-                                    wall_cnt++;
-                                }
-                            }
-                        }
-                        if (wall_cnt > 1)
-                            return true;
-
-                        // we must be allowed to remove water if it blocks a passage between EW or NS
-                        MapLocation N = loc.add(Direction.NORTH);
-                        MapLocation E = loc.add(Direction.EAST);
-                        MapLocation S = loc.add(Direction.SOUTH);
-                        MapLocation W = loc.add(Direction.WEST);
-                        boolean canN = rc.canSenseLocation(N) && (!rc.senseMapInfo(N).getPaint().isEnemy() || rc.sensePassability(N));
-                        boolean canE = rc.canSenseLocation(E) && (!rc.senseMapInfo(E).getPaint().isEnemy() || rc.sensePassability(E));
-                        boolean canS = rc.canSenseLocation(S) && (!rc.senseMapInfo(E).getPaint().isEnemy() || rc.sensePassability(S));
-                        boolean canW = rc.canSenseLocation(W) && (!rc.senseMapInfo(E).getPaint().isEnemy() || rc.sensePassability(W));
-                        if (!canN && !canS) return true;
-                        if (!canE && !canW) return true;
-                        return false;
-                    }
-                }
+            MapLocation loc = rc.adjacentLocation(dir);
+            if (stayawayFrom != null && loc.isAdjacentTo(stayawayFrom))
                 return false;
+
+            if (!ignoreTowers) {
+                if (nearestEnemyTower != null && loc.isWithinDistanceSquared(nearestEnemyTower,
+                        nearestEnemyTowerType == UnitType.LEVEL_ONE_DEFENSE_TOWER ? 16 : 9)) {
+                    return false;
+                }
+                if (sndNearestEnemyTower != null && loc.isWithinDistanceSquared(sndNearestEnemyTower,
+                        sndNearestEnemyTowerType == UnitType.LEVEL_ONE_DEFENSE_TOWER ? 16 : 9)) {
+                    return false;
+                }
             }
+
+            if (rc.canMove(dir)) {
+                return true;
+            }
+            // ADAPT bot 1 code that starts with: if (info.isWater()) ...
+            // EXTRA
+            if (!rc.canSenseLocation(loc))
+                return false;
+
+            RobotInfo robot = rc.senseRobotAtLocation(loc);
+            if (robot != null && robot.getType().isRobotType()) {
+                return FastMath.rand256() % 5 == 0; // small chance robot might be gone by the time duck reaches location
+            }
+            return false;
         }
 
         static boolean canPass(MapLocation loc, Direction targetDir) throws GameActionException {
@@ -381,12 +357,25 @@ public class Pathfinder extends RobotPlayer{
                 return false;
             if (rc.canSenseLocation(newLoc)) {
                 return rc.senseMapInfo(newLoc).isPassable();
-            } else {
-                return MapRecorder.getPassible(newLoc);
             }
+            return false;
+
+            // if (!ignoreTowers) {
+            //     if (nearestEnemyTower != null && loc.isWithinDistanceSquared(nearestEnemyTower,
+            //             nearestEnemyTowerType == UnitType.LEVEL_ONE_DEFENSE_TOWER ? 16 : 9)) {
+            //         return false;
+            //     }
+            //     if (sndNearestEnemyTower != null && loc.isWithinDistanceSquared(sndNearestEnemyTower,
+            //             sndNearestEnemyTowerType == UnitType.LEVEL_ONE_DEFENSE_TOWER ? 16 : 9)) {
+            //         return false;
+            //     }
+            // }
+
+            // return true;
+            // return MapRecorder.getPassible(newLoc);
         }
     }
-
+}
 
 class DirectionStack {
     static int STACK_SIZE = 60;

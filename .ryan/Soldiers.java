@@ -1,6 +1,5 @@
 package ryan;
 
-import ryan.fast.*;
 import battlecode.common.*;
 
 public class Soldiers extends RobotPlayer {

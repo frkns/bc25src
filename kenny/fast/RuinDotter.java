@@ -1,10 +1,15 @@
-package ryan;
+package kenny.fast;
 
-import battlecode.common.*;
+import battlecode.common.GameActionException;
+import battlecode.common.MapInfo;
+import battlecode.common.MapLocation;
+import battlecode.common.UnitType;
 
 public class RuinDotter extends RobotPlayer {
 
     static MapLocation target;
+
+    static MapInfo[] _attackableNearbyTiles;  // var names that start with an underscore are set static to save bytecode
 
 
     static void init() throws GameActionException {
@@ -42,8 +47,9 @@ public class RuinDotter extends RobotPlayer {
 
         if (visited[0] && visited[1] && visited[2]) {
             System.out.println("Ruin Dotter visited all 3 syms");
+            HeuristicPath.move();
         } else {
-            Pathfinder.move(target);
+            Pathfinder.move(target, false);
             assert(potentialEnemySpawnLocations[0].equals(Utils.mirror(spawnTowerLocation)));
             // rc.setIndicatorDot(potentialEnemySpawnLocations[0], 255, 0, 255);
             // rc.setIndicatorDot(Utils.mirror(spawnTowerLocation), 255, 0, 255);

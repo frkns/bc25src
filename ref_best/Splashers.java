@@ -32,7 +32,7 @@ public class Splashers extends RobotPlayer {
     public static void init() {
         PAINT_SCORE_IF_RECOVER[PaintType.ALLY_PRIMARY.ordinal()] = 0; // Recover primary with primary -> score = 0
         PAINT_SCORE_IF_RECOVER[PaintType.ALLY_SECONDARY.ordinal()] = -8; // Dont recover already patterns
-        PAINT_SCORE_IF_RECOVER[PaintType.EMPTY.ordinal()] = 1;
+        PAINT_SCORE_IF_RECOVER[PaintType.EMPTY.ordinal()] = 0;
         PAINT_SCORE_IF_RECOVER[PaintType.ENEMY_PRIMARY.ordinal()] = 3;
         PAINT_SCORE_IF_RECOVER[PaintType.ENEMY_SECONDARY.ordinal()] = 4; // Assuming enemy use secondary for pattern
         PAINT_SCORE_IF_RECOVER[5] = 0;

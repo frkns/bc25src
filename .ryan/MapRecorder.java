@@ -2,7 +2,6 @@
 package ryan;
 
 import battlecode.common.*;
-import ryan.fast.*;
 
 
 public class MapRecorder extends RobotPlayer {

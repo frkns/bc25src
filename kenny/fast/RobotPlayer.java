@@ -1,4 +1,4 @@
-package ryan;
+package kenny.fast;
 
 import battlecode.common.*;
 
@@ -13,20 +13,20 @@ public class RobotPlayer {
 
     static final Random rng = new Random();
     static final Direction[] directions = {
-            Direction.NORTH,
-            Direction.NORTHEAST,
-            Direction.EAST,
-            Direction.SOUTHEAST,
-            Direction.SOUTH,
-            Direction.SOUTHWEST,
-            Direction.WEST,
-            Direction.NORTHWEST,
+        Direction.NORTH,
+        Direction.NORTHEAST,
+        Direction.EAST,
+        Direction.SOUTHEAST,
+        Direction.SOUTH,
+        Direction.SOUTHWEST,
+        Direction.WEST,
+        Direction.NORTHWEST,
     };
     static final Direction[] directions4 = {
-            Direction.NORTH,
-            Direction.EAST,
-            Direction.SOUTH,
-            Direction.WEST,
+        Direction.NORTH,
+        Direction.EAST,
+        Direction.SOUTH,
+        Direction.WEST,
     };
 
     static MapLocation spawnTowerLocation;
@@ -150,24 +150,9 @@ public class RobotPlayer {
         moneyPattern = rc.getTowerPattern(UnitType.LEVEL_ONE_MONEY_TOWER);
         defensePattern = rc.getTowerPattern(UnitType.LEVEL_ONE_DEFENSE_TOWER);
 
-        nearbyRuins = rc.senseNearbyRuins(4);
-        for (MapLocation ruinLoc : nearbyRuins) {
-            if (!rc.canSenseRobotAtLocation(ruinLoc))
-                continue;
-            RobotInfo robot = rc.senseRobotAtLocation(ruinLoc);
-            if (robot.getTeam() == rc.getTeam()) {
-                if (robot.getType().isTowerType()) {
-                    // if (spawnTowerLocation == null || rc.getLocation().distanceSquaredTo(robot.getLocation()) < rc.getLocation().distanceSquaredTo(spawnTowerLocation)) {
-                    spawnTowerLocation = robot.getLocation();
-                    spawnTowerType = robot.getType().getBaseType();
-                    // }
-                    break;
-                }
-            }
-        }
-
-        if (spawnTowerLocation == null)  // it is possible that spawn tower is destroyed in the middle of the turn
-            spawnTowerLocation = rc.getLocation();
+        spawnTowerLocation = rc.senseNearbyRuins(4)[0];
+        if (rc.canSenseRobotAtLocation(spawnTowerLocation))
+            spawnTowerType = rc.senseRobotAtLocation(spawnTowerLocation).getType().getBaseType();
 
         if (spawnTowerType == UnitType.LEVEL_ONE_MONEY_TOWER
                 && rc.canCompleteTowerPattern(UnitType.LEVEL_ONE_MONEY_TOWER, spawnTowerLocation)) {
@@ -177,7 +162,7 @@ public class RobotPlayer {
         AttackBase.init();
 
         mx = Math.max(mapWidth, mapHeight);  // ~60 for huge ~35 for medium
-        siegePhase = (int)(mx * 3);  // cast to int, will be useful for tuning later
+        siegePhase = (int)(0);  // cast to int, will be useful for tuning later
         fullFillPhase = (int)(mx * 3);
         mopperPhase = (int)(mx * 2);
         splasherPhase = (int)(mx * 3);
@@ -194,7 +179,7 @@ public class RobotPlayer {
                 if (totalManDist < 50 || mx < 33) {
                     if (spawnTowerType == UnitType.LEVEL_ONE_PAINT_TOWER) {
                         role = 1;  // on small/med maps send 2 to their paint tower
-                    } else if (totalManDist < 30) {
+                    } else if (totalManDist < 25) {
                         role = 1;  // send from money tower if really close
                     }
                 } else if (spawnTowerType == UnitType.LEVEL_ONE_PAINT_TOWER && rc.getRoundNum() == 3) {

@@ -1,7 +1,8 @@
 // https://github.com/maxwelljones14/BattleCode2023/blob/main/src/MPWorking/Debug.java
-package ryan;
+package kenny.fast;
 
-import battlecode.common.*;
+import battlecode.common.GameActionException;
+import battlecode.common.MapLocation;
 
 /**
  * Utilizes the robot's indicator string to display debug information
@@ -23,10 +24,8 @@ public class Debug extends RobotPlayer {
     public static final boolean FAIL_FAST = false;
     public static final boolean INDICATORS = true;
     public static final boolean INFO = true;
-    public static final boolean PATHFINDER = true;
-    public static final boolean MOPPER = false;
-    public static final boolean SPLASHER = false;
-    public static final boolean SRP = true;
+    public static final boolean TOWER = true;
+    public static final boolean COMMS = true;
 
 
     public static String bytecodeDebug = new String();
