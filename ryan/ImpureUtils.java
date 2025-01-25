@@ -201,40 +201,6 @@ public class ImpureUtils extends RobotPlayer {
         }
     }
 
-    public static void tryMarkSrp() throws GameActionException {
-        int cx = rc.getLocation().x;
-        int cy = rc.getLocation().y;
-        if (cx - 2 < 0 || cy - 2 < 0 || cx + 2 >= mapWidth || cy + 2 >= mapHeight) {
-            return;
-        }
-        boolean possibleSrp = true;
-        for (MapInfo tile : nearbyTiles) {
-            MapLocation tileLoc = tile.getMapLocation();
-            if (!tile.isPassable()) {
-                if (Utils.chessDistance(rc.getLocation(), tileLoc) <= 2) {
-                    possibleSrp = false;
-                    break;
-                }
-            }
-            int abs_diff_x = Math.abs(cx - tileLoc.x);
-            int abs_diff_y = Math.abs(cy - tileLoc.y);
-            if (tile.getMark() == PaintType.ALLY_PRIMARY) {
-                if ((abs_diff_x == 4 && abs_diff_y == 0) || (abs_diff_x == 0 && abs_diff_y == 4)) {
-                    continue;
-                }
-                possibleSrp = false;
-                break;
-            }
-        }
-        if (possibleSrp) {
-            if (rc.canMark(rc.getLocation())) {
-                rc.mark(rc.getLocation(), false);
-            } else {
-                System.out.println("Couldn't mark " + rc.getLocation());
-            }
-        }
-    }
-
     public static void updateNearbyUnits() throws GameActionException {
         // pending deletion
         // // post Sprint 1 balance change: avoid clumping of units

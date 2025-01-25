@@ -189,6 +189,8 @@ public class RobotPlayer {
         alwaysBuildDefenseTowerPhase = (int)(mx * 10);
 
 
+        /*
+        // Remove rush, but RuinDotter is a good idea !
         if (rc.getType() == UnitType.SOLDIER) {
             if (rc.getRoundNum() <= 3) {
                 System.out.println("total man distance for 3 syms : " + totalManDist);
@@ -210,6 +212,7 @@ public class RobotPlayer {
         if (role == 2) {
             RuinDotter.init();
         }
+        */
 
         // switch (rc.getType()) {
         //     case SOLDIER: {

@@ -126,8 +126,6 @@ public class Soldiers extends RobotPlayer {
         }
 
 
-
-
         if (rc.getNumberTowers() == GameConstants.MAX_NUMBER_OF_TOWERS) {
             isFillingRuin = false;
         }
