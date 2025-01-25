@@ -1,5 +1,5 @@
 // https://github.com/chenyx512/battlecode24/blob/main/src/bot1/fast/FastIterableLocSet.java
-package kenny.fast.fast;
+package kenny_version_lmx.fast;
 
 import battlecode.common.MapLocation;
 

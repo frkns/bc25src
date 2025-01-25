@@ -1,4 +1,4 @@
-package kenny.fast;
+package kenny_version_lmx;
 
 import battlecode.common.*;
 
@@ -162,7 +162,7 @@ public class RobotPlayer {
         AttackBase.init();
 
         mx = Math.max(mapWidth, mapHeight);  // ~60 for huge ~35 for medium
-        siegePhase = (int)(0);  // cast to int, will be useful for tuning later
+        siegePhase = (int)(mx * 3);  // cast to int, will be useful for tuning later
         fullFillPhase = (int)(mx * 3);
         mopperPhase = (int)(mx * 2);
         splasherPhase = (int)(mx * 3);
@@ -172,7 +172,7 @@ public class RobotPlayer {
         reserveMorePaintPhase = (int)(mx * 10);
         alwaysBuildDefenseTowerPhase = (int)(mx * 10);
 
-
+        /*
         if (rc.getType() == UnitType.SOLDIER) {
             if (rc.getRoundNum() <= 3) {
                 System.out.println("total man distance for 3 syms : " + totalManDist);
@@ -193,7 +193,7 @@ public class RobotPlayer {
 
         if (role == 2) {
             RuinDotter.init();
-        }
+        }*/
 
         // switch (rc.getType()) {
         //     case SOLDIER: {

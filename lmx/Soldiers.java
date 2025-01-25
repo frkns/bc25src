@@ -2,7 +2,6 @@ package lmx;
 
 import battlecode.common.*;
 
-import static lmx.ImpureUtils.initExploreTarget;
 
 public class Soldiers extends RobotPlayer {
 
@@ -49,10 +48,7 @@ public class Soldiers extends RobotPlayer {
 
     public static void run() throws GameActionException {
         // Init target according to spawn direction
-        if(turnsAlive <= 1){
-            // Init target according to spawn orientation
-            target = initExploreTarget();
-        }
+
 
 
         if (lastRuinLocWithEnemyPaintCounter++ > 10) {  // reset ruin avoidance after some time has passed

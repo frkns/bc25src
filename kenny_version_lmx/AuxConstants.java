@@ -1,6 +1,5 @@
-package kenny.fast;
-
-import battlecode.common.UnitType;
+package kenny_version_lmx;
+import battlecode.common.*;
 
 
 // all fields must be marked final

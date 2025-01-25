@@ -1,4 +1,4 @@
-package kenny.fast;
+package kenny_version_lmx;
 
 import battlecode.common.*;
 

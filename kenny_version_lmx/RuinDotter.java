@@ -1,9 +1,6 @@
-package kenny.fast;
+package kenny_version_lmx;
 
-import battlecode.common.GameActionException;
-import battlecode.common.MapInfo;
-import battlecode.common.MapLocation;
-import battlecode.common.UnitType;
+import battlecode.common.*;
 
 public class RuinDotter extends RobotPlayer {
 

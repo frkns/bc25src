@@ -1,8 +1,6 @@
-package kenny.fast;
+package kenny_version_lmx;
 
-import battlecode.common.GameActionException;
-import battlecode.common.MapLocation;
-import battlecode.common.PaintType;
+import battlecode.common.*;
 
 public class FillSRP extends RobotPlayer {
 

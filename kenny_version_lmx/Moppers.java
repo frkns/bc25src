@@ -1,4 +1,4 @@
-package lmx;
+package kenny_version_lmx;
 
 import battlecode.common.*;
 

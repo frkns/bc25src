@@ -1,11 +1,11 @@
 // Adapted from https://github.com/chenyx512/battlecode24/blob/main/src/bot1/PathFinder.java
-package kenny.fast;
+package kenny_version_lmx;
 
 import battlecode.common.*;
-import kenny.fast.fast.FastLocSet;
-import kenny.fast.fast.FastMath;
 
-public class Pathfinder extends RobotPlayer {
+import kenny_version_lmx.fast.*;
+
+public class Pathfinder extends RobotPlayer{
 
     static MapLocation target = null;
     static MapLocation stayawayFrom = null;

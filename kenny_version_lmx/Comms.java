@@ -1,9 +1,6 @@
-package kenny.fast;
+package kenny_version_lmx;
 
-import battlecode.common.GameActionException;
-import battlecode.common.MapLocation;
-import battlecode.common.Message;
-import battlecode.common.UnitType;
+import battlecode.common.*;
 
 
 public class Comms extends RobotPlayer {

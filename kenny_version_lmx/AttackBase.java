@@ -1,6 +1,8 @@
-package kenny.fast;
+package kenny_version_lmx;
 
 import battlecode.common.*;
+import java.util.Arrays;
+import java.util.Comparator;
 
 public class AttackBase extends RobotPlayer {
 

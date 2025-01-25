@@ -1,9 +1,6 @@
-package kenny.fast;
-
-import battlecode.common.GameActionException;
-import battlecode.common.MapLocation;
-import battlecode.common.PaintType;
-import battlecode.common.UnitType;
+package kenny_version_lmx;
+import java.util.Random;
+import battlecode.common.*;
 
 // these Utils are pure functions - no side-effects, they don't change variables or modify game state in any way
 

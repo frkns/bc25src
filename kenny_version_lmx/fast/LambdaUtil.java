@@ -1,5 +1,5 @@
 // https://github.com/awesomelemonade/Battlecode2023/blob/master/src/finalBot/util/LambdaUtil.java
-package kenny.fast;
+package kenny_version_lmx.fast;
 
 import java.util.Comparator;
 import java.util.Optional;

@@ -1,5 +1,5 @@
 // https://github.com/BSreenivas0713/Battlecode2022/blob/main/src/MPBasic/fast/FastLocIntMap.java
-package kenny.fast.fast;
+package kenny_version_lmx.fast;
 
 import battlecode.common.MapLocation;
 

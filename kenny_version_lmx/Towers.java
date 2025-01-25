@@ -1,4 +1,4 @@
-package kenny.fast;
+package kenny_version_lmx;
 
 import battlecode.common.*;
 
@@ -390,7 +390,6 @@ public class Towers extends RobotPlayer {
             if (spawn == UnitType.MOPPER)
                 spawnedFirstMopper = true;
             numSpawnedUnits++;
-
         }
 
         rc.attack(null);

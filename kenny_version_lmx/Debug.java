@@ -1,8 +1,7 @@
 // https://github.com/maxwelljones14/BattleCode2023/blob/main/src/MPWorking/Debug.java
-package kenny.fast;
+package kenny_version_lmx;
 
-import battlecode.common.GameActionException;
-import battlecode.common.MapLocation;
+import battlecode.common.*;
 
 /**
  * Utilizes the robot's indicator string to display debug information

@@ -304,20 +304,5 @@ public class ImpureUtils extends RobotPlayer {
         }
     }
 
-    public static MapLocation initExploreTarget(){
-        // Explore in the direction given by the direction from tower to unit.
-        mapWidth = rc.getMapWidth();
-        mapHeight = rc.getMapHeight();
 
-        Direction dir = spawnTowerLocation.directionTo(rc.getLocation());
-
-        for(int i=0; i < 10; i++) {
-            MapLocation target = getBorderLocation();
-            if(rc.getLocation().directionTo(target) == dir){
-                return target;
-            }
-        }
-
-        return null; // Failled to have a target
-    }
 }
