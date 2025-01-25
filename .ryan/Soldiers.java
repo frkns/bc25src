@@ -5,14 +5,14 @@ import battlecode.common.*;
 public class Soldiers extends RobotPlayer {
     // -------- Tower building variables -------------
     public static MapLocation[] nearbyRuins;
-    public static MapLocation ruinWithEnemyPaint;
+    public static MapLocation ruinWithEnemyPaint = new MapLocation(-1, -1);
     public static UnitType buildTowerType;
     public static MapLocation currentRuinLoc;
     public static MapLocation nearestWrongInRuin;
     public static int numWrongTilesInRuin = 0; // Used to determine if there is enough paint to complete
     public static int strictFollowBuildOrderNumTowers;
     // -------- Srp building variables -----------
-    public static MapLocation invalidSrp;
+    public static MapLocation invalidSrp = new MapLocation(-1, -1);
     public static MapLocation currentSrpLoc;
     public static MapLocation nearestWrongInSrp;
     public static int numWrongTilesInSrp;
@@ -50,7 +50,7 @@ public class Soldiers extends RobotPlayer {
     }
 
     public static void endTurn() throws GameActionException {
-        ImpureUtils.tryMarkSrp();
+        ImpureUtils.tryMarkSRP();
         paintUnder();
         MapRecorder.recordSym(1000);
     }
